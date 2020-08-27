@@ -189,12 +189,26 @@ define value-of-result [ lambda (r) [
   assert-is-type r 'Result';
   wutcol [ repr-car r ]
     repr-cdr r
-    [ error [ NO_SUCH_VALUE ] ];
+    [ error [ NO_SUCH_VALUE ] ]
 ] ];
 
 define error-of-result [ lambda (r) [
   assert-is-type r 'Result';
   wutcol [ repr-car r ]
     [ error [ NO_SUCH_VALUE ] ]
-    repr-cdr r;
+    repr-cdr r
+] ];
+
+define cons-list [ lambda (v, l) [
+  assert-is-type l 'List';
+  repr-make-cons 'List' v l
+] ];
+
+define concat-list [ lambda (l1, l2) [
+  assert-is-type l1 'List';
+  assert-is-type l2 'List';
+  wutcol
+    [ empty? l1 ]
+    l2
+    [ cons-list [ first l1 ] [ concat-list [ rest l1 ] l2 ]
 ] ];
