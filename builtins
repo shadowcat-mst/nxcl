@@ -1,38 +1,42 @@
-define repr-make-nil [ bind-native 'repr-make-nil ]; # (type)
-
-define repr-make [ bind-native 'repr-make' ]; # (type, value)
-define repr-value? [ bind-native 'repr-value?' ];
-define repr-value [ bind-native 'repr-value' ];
-
-define repr-make-cons [ bind-native 'repr-make-cons' ]; # (type, car, cdr?)
-define repr-cons? [ bind-native 'repr-cons?' ];
-define repr-car [ bind-native 'repr-car' ];
-define repr-cdr? [ bind-native 'repr-cdr?' ];
-define repr-cdr [ bind-native 'repr-cdr' ];
-
-define result-get [ bind-native 'result-get' ];
-define result-of [ bind-native 'result-of' ];
-
-define type-of [ bind-native 'type-of' ];
-
-define eq [ bind-native 'eq' ];
-
-define + [ bind-native '+' ];
-define - [ bind-native '-' ];
-define * [ bind-native '*' ];
-define / [ bind-native '/' ];
-
-define wutcol [ bind-native 'wutcol' ];
-
-define abort [ bind-native 'abort' ];
-
-define eval-inscope [ bind-native 'eval-inscope' ];
-
 define fexpr [ bind-native 'fexpr' ];
 
 # define fexpr [ _fexpr (scope, args, body) [
 #   repr-make-cons 'Fexpr' args [ repr-make-cons 'Inscope' scope body ]
 # ] ]
+
+define eval-inscope [ bind-native 'eval-inscope' ];
+
+define native [ fexpr (scope, name) [
+  eval-inscope scope [ define name [ bind-native name ] ]
+] ];
+
+native repr-make-nil; # (type)
+
+native repr-make; # (type, value)
+native repr-value?;
+native repr-value;
+
+native repr-make-cons; # (type, car, cdr?)
+native repr-cons?;
+native repr-car;
+native repr-cdr?;
+native repr-cdr;
+
+native result-get;
+native result-of;
+
+native type-of;
+
+native eq;
+
+native +;
+native -;
+native *;
+native /;
+
+native wutcol;
+
+native abort;
 
 # ??? lambda ???
 
