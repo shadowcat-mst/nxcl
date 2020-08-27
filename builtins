@@ -7,11 +7,12 @@ define fexpr [ bind-native 'fexpr' ];
 define eval-inscope [ bind-native 'eval-inscope' ];
 
 define repr-make-cons [ bind-native 'repr-make-cons' ];
+define repr-value [ bind-native 'repr-value' ];
 
 define native [ fexpr (scope, name) [
   eval-inscope scope [
     repr-make-cons 'Call'
-      define (name, [ bind-native name ])
+      define (name, [ bind-native [ repr-value name ] ])
   ]
 ] ];
 
@@ -19,7 +20,7 @@ native repr-make-nil; # (type)
 
 native repr-make; # (type, value)
 native repr-value?;
-native repr-value;
+#native repr-value;
 
 #native repr-make-cons; # (type, car, cdr?)
 native repr-cons?;
@@ -70,12 +71,12 @@ define assert-is-type [ lambda (v, t) [
 
 define string-of-name [ lambda (v) [
   assert-is-type v 'Name';
-  repr-make 'String' [ repr-value v ]
+  repr-value v
 ];
 
 define name-of-string [ lambda (v) [
   assert-is-type v 'String';
-  repr-make 'Name' [ repr-value v ]
+  repr-make 'Name' v
 ];
 
 define true [ repr-make 'Bool' 1 ];
