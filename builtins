@@ -144,11 +144,15 @@ define rest [ lambda (v) [
   repr-cdr v
 ] ];
 
-defrec dict-of-list [ lambda (v) [
+define _dictify [ lambda (me, v) [
   assert-is-type v 'List';
   wutcol [ empty? v ]
     [ repr-make-nil 'Dict' ]
-    [ repr-make-cons 'Dict' [ first v ] [ dict-of-list [ rest v ] ] ];
+    [ repr-make-cons 'Dict' [ first v ] [ me [ rest v ] ] ];
+] ];
+
+define dict-of-list [ lambda (v) [
+  _dictify _dictify v
 ] ];
 
 define dict [ lambda v [ dict-of-list v ] ];
