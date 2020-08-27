@@ -6,8 +6,13 @@ define fexpr [ bind-native 'fexpr' ];
 
 define eval-inscope [ bind-native 'eval-inscope' ];
 
+define repr-make-cons [ bind-native 'repr-make-cons' ];
+
 define native [ fexpr (scope, name) [
-  eval-inscope scope [ define name [ bind-native name ] ]
+  eval-inscope scope [
+    repr-make-cons 'Call'
+      define (name, [ bind-native name ])
+  ]
 ] ];
 
 native repr-make-nil; # (type)
@@ -16,7 +21,7 @@ native repr-make; # (type, value)
 native repr-value?;
 native repr-value;
 
-native repr-make-cons; # (type, car, cdr?)
+#native repr-make-cons; # (type, car, cdr?)
 native repr-cons?;
 native repr-car;
 native repr-cdr?;
