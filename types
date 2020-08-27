@@ -1,0 +1,36 @@
+repr int
+repr string
+repr cons
+repr native
+
+type string repr string
+type name repr string
+
+type bool repr int
+
+type int repr int
+
+type rat repr cons(int, int)
+
+type result repr cons(bool, item?)
+
+type list repr cons(item, list)?
+
+type call repr cons(item, list)
+
+type key repr string
+
+type pair repr cons(key, item)
+
+type dict repr cons(pair, dict)?
+
+type inscope repr cons(dict, call)
+
+type fexpr repr cons(name|list, inscope)
+
+type native repr native
+
+repr bytes
+type bytes repr bytes
+
+type object repr key

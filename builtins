@@ -1,0 +1,196 @@
+define repr-make-nil [ bind-native 'repr-make-nil ]; # (type)
+
+define repr-make [ bind-native 'repr-make' ]; # (type, value)
+define repr-value? [ bind-native 'repr-value?' ];
+define repr-value [ bind-native 'repr-value' ];
+
+define repr-make-cons [ bind-native 'repr-make-cons' ]; # (type, car, cdr?)
+define repr-cons? [ bind-native 'repr-cons?' ];
+define repr-car [ bind-native 'repr-car' ];
+define repr-cdr? [ bind-native 'repr-cdr?' ];
+define repr-cdr [ bind-native 'repr-cdr' ];
+
+define result-get [ bind-native 'result-get' ];
+define result-of [ bind-native 'result-of' ];
+
+define type-of [ bind-native 'type-of' ];
+
+define eq [ bind-native 'eq' ];
+
+define + [ bind-native '+' ];
+define - [ bind-native '-' ];
+define * [ bind-native '*' ];
+define / [ bind-native '/' ];
+
+define wutcol [ bind-native 'wutcol' ];
+
+define abort [ bind-native 'abort' ];
+
+define eval-inscope [ bind-native 'eval-inscope' ];
+
+define fexpr [ bind-native 'fexpr' ];
+
+# define fexpr [ _fexpr (scope, args, body) [
+#   repr-make-cons 'Fexpr' args [ repr-make-cons 'Inscope' scope body ]
+# ] ]
+
+# ??? lambda ???
+
+define quote [ fexpr (scope, thing) thing ];
+
+define list [ lambda args args ];
+
+# later this should get adjusted to use variable error catching
+
+define assert [ fexpr (scope, expr, errp) [
+  wutcol [ eval-inscope scope expr ]
+    true
+    [ abort [ eval-inscope scope errp ] ]
+]
+
+define WRONG_TYPE [ lambda (v, t, tt) ('WRONG_TYPE', v, t, tt) ];
+
+# this sucks but I'm not sure what args I want to give it yet
+
+define NO_SUCH_VALUE [ lambda args [ ('NO_SUCH_VALUE') ] ];
+define CANT_BOOL [ lambda args [ ('CANT_BOOL') ] ];
+
+define assert-is-type [ lambda (v, t) [
+  assert [ eq [ type-of v ] t ] [ WRONG_TYPE v t [ type-of v ] ]
+] ];
+
+define string-of-name [ lambda (v) [
+  assert-is-type v 'Name';
+  repr-make 'String' [ repr-value v ]
+];
+
+define name-of-string [ lambda (v) [
+  assert-is-type v 'String';
+  repr-make 'Name' [ repr-value v ]
+];
+
+define true [ repr-make 'Bool' 1 ];
+define false [ repr-make 'Bool' 0 ];
+
+define bool-of-number [ lambda (v) [
+  wutcol [ eq v 0 ] false true
+] ];
+
+define bool-of-string [ lambda (v) [
+  wutcol [ eq v '' ] false true
+] ];
+
+define bool-of-iterable [ lambda (v) [ repr-cons? v ] ];
+
+define bool-of-list bool-of-iterable;
+
+define bool-of-dict bool-of-iterable;
+
+define bool-of [ lambda (v) [
+  define vtype [ type-of v ];
+  wutcol [ eq vtype 'Bool' ]
+    v
+    [ wutcol
+      [ wutcol [ eq vtype 'Int' ] true [ eq vtype 'Rat' ] ]
+      [ bool-of-number v ]
+      [ wutcol [ eq vtype 'String' ] [ bool-of-string v ]
+        [ wutcol [ wutcol [ eq vtype 'List' ] true [ eq vtype 'Dict' ] ]
+          [ bool-of-iterable v ]
+          [ error [ CANT_BOOL v vtype ] ] ] ] ];
+] ];
+
+define make-nil-result [ lambda () [
+  repr-make-cons 'Result' true
+] ];
+
+define make-value-result [ lambda (v) [
+  repr-make-cons 'Result' true v
+] ];
+
+define make-error-result [ lambda (e) [
+  repr-make-cons 'Result' false e
+] ];
+
+define error [ lambda (e) [
+  result-get [ make-error-result e ]
+] ];
+
+define assert-is-iterable [ lambda (v) [
+  define vtype [ type-of v ];
+  assert
+    [ wutcol [ eq vtype 'List' ] true [ eq vtype 'Dict' ] ]
+    [ WRONG_TYPE v ('List', 'Dict') vtype ]
+] ];
+
+define empty? [ lambda (v) [
+  assert-is-iterable v;
+  wutcol [ repr-cons? v ] false true;
+] ];
+
+define first [ lambda (v) [
+  assert-is-iterable v;
+  wutcol [ repr-cons? v ] true [ error [ NO_SUCH_VALUE ] ];
+  repr-car v
+] ];
+
+define rest [ lambda (v) [
+  assert-is-iterable v;
+  wutcol [ repr-cons? v ] true [ error [ NO_SUCH_VALUE ] ];
+  wutcol [ repr-cdr? v ] true [ error [ NO_SUCH_VALUE ] ];
+  repr-cdr v
+] ];
+
+defrec dict-of-list [ lambda (v) [
+  assert-is-type v 'List';
+  wutcol [ empty? v ]
+    [ repr-make-nil 'Dict' ]
+    [ repr-make-cons 'Dict' [ first v ] [ dict-of-list [ rest v ] ] ];
+] ];
+
+define dict [ lambda v [ dict-of-list v ] ];
+
+define ?: [ fexpr (scope, expr, iftrue, iffalse) [
+  wutcol
+    [ bool-of [ eval-inscope scope expr ] ]
+    [ eval-inscope scope iftrue ]
+    [ eval-inscope scope iffalse ]
+] ];
+
+define and [ fexpr (scope, l, r) [
+  define lres [ eval-inscope scope l ];
+  ?: lres lres [ eval-inscope scope r ];
+] ];
+
+define or [ fexpr (scope, l, r) [
+  define lres [ eval-inscope scope l ];
+  ?: lres [ eval-inscope scope r ] lres;
+] ];
+
+define result-is-ok [ lambda (r) [
+  assert-is-type r 'Result';
+  repr-car r
+] ];
+
+define result-has-value [ lambda (r) [
+  assert-is-type r 'Result';
+  and [ repr-car r ] [ repr-cdr? r ]
+] ];
+
+define result-has-error [ lambda (r) [
+  assert-is-type r 'Result';
+  wutcol [ repr-car r ] false true
+] ];
+
+define value-of-result [ lambda (r) [
+  assert-is-type r 'Result';
+  wutcol [ repr-car r ]
+    repr-cdr r
+    [ error [ NO_SUCH_VALUE ] ];
+] ];
+
+define error-of-result [ lambda (r) [
+  assert-is-type r 'Result';
+  wutcol [ repr-car r ]
+    [ error [ NO_SUCH_VALUE ] ]
+    repr-cdr r;
+] ];
