@@ -50,13 +50,16 @@ native metadata-of;
 
 native with-metadata;
 
+define wrap-operative [ fexpr (opv) [
+  fexpr argsp [
+    eval-inscope scope [ repr-make-cons 'Call' opv args ]
+  ]
+] ];
+
 define lambda [ fexpr (args, body) [
-  define wrapped [
+  wrap-operative [
     repr-make-cons 'Call'
       fexpr args body
-  ];
-  fexpr argsp [
-    eval-inscope scope [ repr-make-cons 'Call' wrapped argsp ]
   ]
 ] ];
 
