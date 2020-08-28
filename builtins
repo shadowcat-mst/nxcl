@@ -44,6 +44,10 @@ native wutcol;
 
 native abort;
 
+native metadata-of;
+
+native with-metadata;
+
 # ??? lambda ???
 
 define quote [ fexpr (scope, thing) thing ];
