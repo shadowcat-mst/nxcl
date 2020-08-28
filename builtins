@@ -228,3 +228,23 @@ define concat-list [ lambda (l1, l2) [
     l2
     [ cons-list [ first l1 ] [ concat-list [ rest l1 ] l2 ]
 ] ];
+
+define flatconcat-list [ lambda (thing, lst) [
+  assert-is-type lst 'List';
+  [ wutcol [ eq [ type-of thing ] 'List' ] concat-list cons-list ]
+    thing lst
+] ];
+
+define make-list-mapper [ lambda (concat-func) [
+  lambda (f, lst) [
+    assert-is-type lst 'List';
+    wutcol
+      [ empty? lst ]
+      lst
+      [ concat-func [ f [ first lst ] ] [ map-list f [ rest lst ] ] ]
+    ]
+] ];
+
+define map-list [ make-list-mapper cons-list ];
+define listmap-list [ make-list-mapper concat-list ];
+define flatmap-list [ make-list-mapper flatconcat-list ];
