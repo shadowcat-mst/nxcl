@@ -1,6 +1,6 @@
 define fexpr [ bind-native 'fexpr' ];
 
-# define fexpr [ _fexpr (scope, args, body) [
+# define fexpr [ vau (args, body) scope [
 #   repr-make-cons 'Fexpr' args [ repr-make-cons 'Inscope' scope body ]
 # ] ]
 
@@ -9,7 +9,7 @@ define eval-inscope [ bind-native 'eval-inscope' ];
 define repr-make-cons [ bind-native 'repr-make-cons' ];
 define repr-value [ bind-native 'repr-value' ];
 
-define native [ fexpr (scope, name) [
+define native [ fexpr (name) [
   eval-inscope scope [
     repr-make-cons 'Call'
       define (name, [ bind-native [ repr-value name ] ])
@@ -50,15 +50,23 @@ native metadata-of;
 
 native with-metadata;
 
-# ??? lambda ???
+define lambda [ fexpr (args, body) [
+  define wrapped [
+    repr-make-cons 'Call'
+      fexpr args body
+  ];
+  fexpr argsp [
+    eval-inscope scope [ repr-make-cons 'Call' wrapped argsp ]
+  ]
+] ];
 
-define quote [ fexpr (scope, thing) thing ];
+define quote [ fexpr (thing) thing ];
 
 define list [ lambda args args ];
 
 # later this should get adjusted to use variable error catching
 
-define assert [ fexpr (scope, expr, errp) [
+define assert [ fexpr (expr, errp) [
   wutcol [ eval-inscope scope expr ]
     true
     [ abort [ eval-inscope scope errp ] ]
@@ -169,19 +177,19 @@ define dict-of-list [ lambda (v) [
 
 define dict [ lambda v [ dict-of-list v ] ];
 
-define ?: [ fexpr (scope, expr, iftrue, iffalse) [
+define ?: [ fexpr (expr, iftrue, iffalse) [
   wutcol
     [ bool-of [ eval-inscope scope expr ] ]
     [ eval-inscope scope iftrue ]
     [ eval-inscope scope iffalse ]
 ] ];
 
-define and [ fexpr (scope, l, r) [
+define and [ fexpr (l, r) [
   define lres [ eval-inscope scope l ];
   ?: lres lres [ eval-inscope scope r ];
 ] ];
 
-define or [ fexpr (scope, l, r) [
+define or [ fexpr (l, r) [
   define lres [ eval-inscope scope l ];
   ?: lres [ eval-inscope scope r ] lres;
 ] ];
