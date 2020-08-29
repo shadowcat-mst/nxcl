@@ -248,14 +248,23 @@ define flatconcat-list [ lambda (thing, lst) [
     thing lst
 ] ];
 
+define _reduce_one [ lambda (me, func, accum, it) [
+  wutcol
+    [ empty? it ]
+    accum
+    [ me me func [ func [ first it ] accum ] [ rest it ] ]
+] ];
+
+define reduce-list [ lambda (func, it) [
+  assert-is-list it;
+  _reduce_one _reduce_one func () it
+] ];
+
 define make-list-mapper [ lambda (concat-func) [
   lambda (f, lst) [
-    assert-is-type lst 'List';
-    wutcol
-      [ empty? lst ]
-      lst
-      [ concat-func [ f [ first lst ] ] [ map-list f [ rest lst ] ] ]
-    ]
+    define func [ lambda (v) [ concat-func [ f v ] ] ];
+    reduce-list func lst
+  ]
 ] ];
 
 define map-list [ make-list-mapper cons-list ];
