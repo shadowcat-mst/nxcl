@@ -252,7 +252,7 @@ define _reduce_one [ lambda (me, func, accum, it) [
   wutcol
     [ empty? it ]
     accum
-    [ me me func [ func [ first it ] accum ] [ rest it ] ]
+    [ me me func [ func accum [ first it ] ] [ rest it ] ]
 ] ];
 
 define reduce-list [ lambda (func, it) [
@@ -262,7 +262,7 @@ define reduce-list [ lambda (func, it) [
 
 define make-list-mapper [ lambda (concat-func) [
   lambda (f, lst) [
-    define func [ lambda (v, a) [ concat-func a [ f v ] ] ];
+    define func [ lambda (a, v) [ concat-func a [ f v ] ] ];
     reduce-list func lst
   ]
 ] ];
