@@ -28,7 +28,9 @@ native repr-car;
 native repr-cdr?;
 native repr-cdr;
 
-native repr-var; # var() -> value, var(value) -> set value
+native repr-make-var;
+native repr-get-var;
+native repr-set-var;
 
 native result-get;
 native result-of;
