@@ -262,7 +262,7 @@ define reduce-list [ lambda (func, it) [
 
 define make-list-mapper [ lambda (concat-func) [
   lambda (f, lst) [
-    define func [ lambda (v) [ concat-func [ f v ] ] ];
+    define func [ lambda (v, a) [ concat-func a [ f v ] ] ];
     reduce-list func lst
   ]
 ] ];
