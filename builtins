@@ -261,6 +261,9 @@ define make-list-mapper [ lambda (concat-func) [
 define map-list [ make-list-mapper cons-list ];
 define listmap-list [ make-list-mapper concat-list ];
 define flatmap-list [ make-list-mapper flatconcat-list ];
+define filter-list [ lambda (f, lst) [
+  listmap-list [ lambda (v) [ ?: [ f v ] (v) () ] ] lst
+] ];
 
 ### dicts
 
