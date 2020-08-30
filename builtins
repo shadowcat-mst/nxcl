@@ -276,7 +276,9 @@ define dict-get [ lambda (d, k) [
   ];
   wutcol [ eq [ repr-car pair ] k ]
     [ repr-cdr pair ]
-    [ dict-get [ rest d ] k ]
+    [ wutcol [ gt [ repr-car pair ] l ]
+      [ error [ NO_SUCH_VALUE ] ]
+      [ dict-get [ rest d ] k ] ]
 ] ];
 
 define _dict_set [ lambda (me, d, p) [
@@ -300,7 +302,9 @@ define _dict_remove [ lambda (me, d, k) [
     d
     [ wutcol [ eq [ repr-car [ first d ] k ] ]
       [ rest d ]
-      [ repr-make-cons 'Dict' [ first d ] me me [ rest d ] k ]
+      [ wutcol [ gt [ repr-car [ first d ] k ] ]
+        d
+        [ repr-make-cons 'Dict' [ first d ] me me [ rest d ] k ]
 ] ];
 
 define dict-remove [ lambda (d, k) [
