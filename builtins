@@ -173,19 +173,6 @@ define rest [ lambda (v) [
   repr-cdr v
 ] ];
 
-define _dictify [ lambda (me, v) [
-  assert-is-type v 'List';
-  wutcol [ empty? v ]
-    [ repr-make-nil 'Dict' ]
-    [ repr-make-cons 'Dict' [ first v ] [ me [ rest v ] ] ];
-] ];
-
-define dict-of-list [ lambda (v) [
-  _dictify _dictify v
-] ];
-
-define dict [ lambda v [ dict-of-list v ] ];
-
 define ?: [ fexpr (expr, iftrue, iffalse) [
   wutcol
     [ bool-of [ eval-inscope scope expr ] ]
@@ -259,18 +246,70 @@ define _reduce_one [ lambda (me, func, accum, it) [
     [ me me func [ func accum [ first it ] ] [ rest it ] ]
 ] ];
 
-define reduce-list [ lambda (func, it) [
+define reduce-list [ lambda (func, seed, it) [
   assert-is-list it;
-  _reduce_one _reduce_one func () it
+  _reduce_one _reduce_one func seed it
 ] ];
 
 define make-list-mapper [ lambda (concat-func) [
   lambda (f, lst) [
     define func [ lambda (a, v) [ concat-func a [ f v ] ] ];
-    reduce-list func lst
+    reduce-list func () lst
   ]
 ] ];
 
 define map-list [ make-list-mapper cons-list ];
 define listmap-list [ make-list-mapper concat-list ];
 define flatmap-list [ make-list-mapper flatconcat-list ];
+
+### dicts
+
+define pair [ lambda (k, v) [ repr-make-cons 'Pair' k v ] ];
+
+define dict-get [ lambda (d, k) [
+  define pair [ wutcol [ empty? d ]
+    [ error [ NO_SUCH_VALUE ] ]
+    [ first d ]
+  ];
+  wutcol [ eq [ repr-car pair ] k ]
+    [ repr-cdr pair ]
+    [ dict-get [ rest d ] k ]
+] ];
+
+define _dict_set [ lambda (me, d, p) [
+  wutcol [ empty? d ]
+    [ repr-make-cons 'Dict' p d ]
+    [ wutcol [ eq [ repr-car [ first d ] ] [ repr-car p ] ]
+      [ repr-make-cons 'Dict' p [ rest d ] ]
+      [ wutcol [ gt [ repr-car [ first d ] ] [ repr-car p ] ]
+        [ repr-make-cons 'Dict' p d ]
+        [ repr-make-cons 'Dict' [ first d ] [ me me [ rest d ] p ] ]
+] ];
+
+define dict-set [ lambda (d, p) [
+  assert-is-type d 'Dict';
+  assert-is-type p 'Pair';
+  _dict_set _dict_set d p
+] ];
+
+define _dict_remove [ lambda (me, d, k) [
+  wutcol [ empty? d ]
+    d
+    [ wutcol [ eq [ repr-car [ first d ] k ] ]
+      [ rest d ]
+      [ repr-make-cons 'Dict' [ first d ] me me [ rest d ] k ]
+] ];
+
+define dict-remove [ lambda (d, k) [
+  assert-is-type d 'Dict';
+  assert-is-type k 'String';
+  _dict_remove _dict_remove d k
+] ];
+
+define dict-keys [ lambda (d) [ map-list repr-car d ] ];
+
+define dict-of-list [ lambda (v) [
+  reduce-list dict-set [ repr-make-nil 'Dict' ] v
+] ];
+
+define dict [ lambda v [ dict-of-list v ] ];
