@@ -38,6 +38,10 @@ native result-of;
 native type-of;
 
 native eq;
+native gt;
+native gte;
+native lt;
+native lte;
 
 native +;
 native -;
@@ -48,9 +52,9 @@ native wutcol;
 
 native abort;
 
-native metadata-of;
+native metastore-of;
 
-native with-metadata;
+native with-metastore;
 
 define wrap-operative [ fexpr (opv) [
   fexpr argsp [
