@@ -1,0 +1,27 @@
+  _fexpr [ # (d, p) + scope, args, thisfunc
+    _wutcol [ _rcons? [ _rcar args ] ] # is d an empty dict?
+      [ _wutcol
+        [ eq # d.0.0 eq p.0
+          [ _rcar [ _rcar [ _rcar args ] ] ] # d.0.0
+          [ _rcar [ _rcar [ _rcdr args ] ] ] # p.0 # d.next.0
+        ]
+        # cons p [ rest d ]
+        [ _rcons 'Dict'
+          [ _rcar [ _rcdr args ] ] [ _rcdr [ _rcar args ] ]
+        ]
+        [ _wutcol
+          [ gt # d.0.0 gt p.0
+            [ _rcar [ _rcar [ _rcar args ] ] ] # d.0.0
+            [ _rcar [ _rcar [ _rcdr args ] ] ] # p.0 # d.next.0
+          ]
+          # cons p d
+          [ _rcons 'Dict'
+            [ _rcar [ _rcdr args ] ] [ _rcar args ]
+          ]
+          # cons [ car d ] [ thisfunc [ cdr d ] p ]
+          [ _rcons 'Dict'
+            [ _rcar [ _rcar args ] ]
+            [ thisfunc [ _rcdr [ _rcar args ] ] [ _rcar [ _rcdr args ] ] ]
+          ]
+      ]
+  ]
