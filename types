@@ -1,10 +1,10 @@
 repr int
-repr string
+repr chars
 repr cons
 repr native
 
-type string repr string
-type name repr string
+type string repr chars
+type name repr chars
 
 type bool repr int
 
@@ -18,19 +18,17 @@ type list repr cons(item, list)?
 
 type call repr cons(item, list)
 
-type key repr string
+type key repr chars
 
 type pair repr cons(key, item)
 
 type dict repr cons(pair, dict)?
 
-type inscope repr cons(dict, call)
-
-type fexpr repr cons(name|list, inscope)
+type fexpr repr call
 
 type native repr native
 
 repr bytes
 type bytes repr bytes
 
-type object repr key
+type opaque repr cons(item, fexpr?)

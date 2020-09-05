@@ -18,7 +18,7 @@ define native [ fexpr (name) [
 
 native repr-make-nil; # (type)
 
-native repr-make; # (type, value)
+native repr-makev; # (type, value)
 native repr-value?;
 #native repr-value;
 
