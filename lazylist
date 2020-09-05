@@ -1,0 +1,65 @@
+deftype LazyList;
+
+let make-var = x => { _rmake_var _type_Var x };
+
+let LazyList.^new = gen => {
+  _rmake_value this [ make-var gen ]
+}
+
+let LazyList.^new_empty = () => { _rmake_nil this }
+
+let LazyList.^new_cons = (l, r) => { _rmake_cons this l [ make-var r ] }
+
+let LazyList.empty? = () => {
+  ?: [ _rnil? this ]
+    true
+    {
+      let thisvar = _rcdr [ _rvalue this ]);
+      let thisval = thisvar();
+      ?: [ _rcons? thisval ];
+        false
+        ![ thisvar thisval() ]
+    }
+}
+
+let LazyList.first = () => {
+  ?: $.empty?()
+    [ error NO_SUCH_VALUE ]
+    [ _rcar this ]
+}
+
+let LazyList.rest = () => {
+  ?: $.empty?()
+    [ error NO_SUCH_VALUE ]
+    [ [ _rcdr this ] ]
+}
+
+let range = (x, y) => {
+  let me = thisfunc;
+  ?: [ x > y ]
+    LazyList.new_empty()
+    [ LazyList.new () => { LazyList.new_cons x me(x + 1, y) } ]
+}
+
+let r = range 1 3;
+
+diag r; # LazyList(genmaker 1 3)
+
+empty? r; # returns false; r now LazyList(:car 1, :cdr genmaker(2 3))
+
+first r; # returns 1 
+
+let r2 = rest r; # returns LazyList(genmaker(2 3))
+
+empty? r2; # returns false; now LazyList(:car 2, :cdr genmaker(3, 3))
+
+diag r; # (1 2 . genmaker(3, 3))
+
+let sth-iter = sth => {
+  let me = thisfunc;
+  ?: sth.'Active'
+    [ LazyList.new () => {
+        LazyList.new_cons sth.fetchrow_arrayref() me(sth)
+    } ]
+    LazyList.new_empty()
+}
