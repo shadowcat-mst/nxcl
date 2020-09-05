@@ -1,0 +1,59 @@
+# iam: _lookup_native
+
+_getscope
+_setscope
+
+_wutcol
+
+_eval_inscope
+
+_rmake_nil
+_rnil?
+
+_rmake_item
+_ritem?
+_ritem
+
+_rmake_cons
+_rcons?
+_rcar
+_rcdr?
+_rcdr
+
+_rmake_var
+_rvar?
+_rvar
+_rvar_set
+
+_rmake_true
+_rmake_false
+_rbool?
+_rbool_eq
+
+_rstring?
+_rstring_eq
+_rstring_gt
+_rstring_concat
+
+_rtype_of
+_rtype_eq
+
+_rmetastore
+_rwith_metastore
+
+_type_String
+_type_Name
+_type_Call
+_type_List
+_type_Fexpr
+_type_Opaque
+_type_Var
+
+_gen_id
+
+# raw functions: (called by the parser, not available from userland)
+#
+# __raw_String
+# __raw_Name
+# __raw_List
+# __raw_Call
