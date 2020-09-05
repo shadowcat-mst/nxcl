@@ -1,0 +1,20 @@
+# reprs
+
+[ nil ]
+[ atom "foo" ]
+[ cons <item> <item>|nil ]
+[ ref <item> ]
+[ var <item> ]
+[ bool t/f ]
+
+# types
+
+[ String [ atom "foo" ] ]
+[ Name [ atom "foo" ] ]
+[ Bool [ bool ?? ] ] # ?? may be 1/0 or true/false or ...
+[ List nil|[cons ref<car> List<cdr>|nil ]]
+[ Call [cons ref<car> List<cdr>|nil]]
+[ Var [var <item>]]
+[ Fexpr [ref <call>]]
+[ Opaque [atom <id>]]
+[ Var [var <item>]]
