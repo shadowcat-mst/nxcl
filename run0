@@ -1,0 +1,34 @@
+
+sub mkv ($type, $repr, @v) { [ $type => [ $repr => @v ] }
+
+sub typ ($v) { $v->[1][0] }
+
+sub car ($lst, $n = 0) {
+  my $targ = ($n ? cdr($lst, $n) : $lst);
+  die unless typ $targ eq 'cons';
+  $targ->[1][1];
+}
+
+sub cdr ($lst, $n = 1) {
+  my $targ = $lst;
+  while ($n--) {
+    die unless typ $targ eq 'cons';
+    $targ = $targ->[1][2];
+  }
+  $targ;
+}
+
+sub val ($v) {
+  my $typ = typ $v;
+  die if $typ eq 'cons';
+  return mkv String => $v->[1] if $typ eq 'chars';
+  return mkv Bool => $v->[1] if $typ eq 'bool';
+  return mkv Native => $v->[1] if $typ eq 'native';
+  return $v->[1] if $typ eq 'val' or $type eq 'var';
+  die "NOTREACHED";
+}
+
+sub set ($var, $value) {
+  die unless typ($var) eq 'var';
+  $var->[1][1] = $value;
+}
