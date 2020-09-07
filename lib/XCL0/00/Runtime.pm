@@ -1,10 +1,39 @@
+package XCL0::00::Runtime;
+
 use Mojo::Base -base, -signatures;
+use Exporter 'import';
+
+our @EXPORT_OK = qw(
+  mkv
+  typ type
+  rconsp rnilp rcharsp rboolp rnativep rvalp rvarp
+  car cdr
+  valp val raw
+  set
+  list uncons flatten
+  make_scope
+  progn
+  wrap
+);
 
 sub mkv ($type, $repr, @v) { [ $type => [ $repr => @v ] ] }
 
 sub typ ($v) { $v->[1][0] }
 
 sub rconsp ($v) { typ($v) eq 'cons' }
+sub rnilp ($v) { typ($v) eq 'nil' }
+sub rcharsp ($v) { typ($v) eq 'chars' }
+sub rboolp ($v) { typ($v) eq 'bool' }
+sub rnativep ($v) { typ($v) eq 'native' }
+sub rvalp ($v) { typ($v) eq 'val' }
+sub rvarp ($v) { typ($v) eq 'var' }
+
+sub rtruep ($v) {
+  die unless typ($v) eq 'bool';
+  $v->[1][1]
+}
+
+sub rfalsep ($v) { !rtruep($v) }
 
 sub car ($cons, $n = 0) {
   my $targ = ($n ? cdr($cons, $n) : $cons);
@@ -21,27 +50,33 @@ sub cdr ($cons, $n = 1) {
   $targ;
 }
 
+sub refp ($v) { typ($v) eq 'val' or typ($v) eq 'var' }
+
+sub deref ($v) {
+  die unless refp($v);
+  $v->[1][1]
+}
+
 sub valp ($v) {
   my $typ = typ $v;
-  return 0 if $typ eq 'cons' or $typ eq 'nil';
-  return 1;
+  0+!($typ eq 'cons' or $typ eq 'nil');
 }
 
 sub val ($v) {
   die unless valp $v;
-  my $typ = typ $v;
   my $r = $v->[1];
-  return mkv String => $r if $typ eq 'chars';
-  return mkv Bool => $r if $typ eq 'bool';
-  return mkv Native => $r if $typ eq 'native';
-  return $r if $typ eq 'val' or $typ eq 'var';
-  die "NOTREACHED";
+  return mkv String => $r if rcharsp $v;
+  return mkv Bool => $r if rboolp $v;
+  return mkv Native => $r if rnativep $v;
+  return deref $v;
 }
 
 sub raw ($v) {
   die unless valp $v;
   $v->[1][1];
 }
+
+sub varp ($v) { 0+!!(typ($v) eq 'var') }
 
 sub set ($var, $value) {
   die unless typ($var) eq 'var';
@@ -54,12 +89,15 @@ sub list ($first, @rest) {
 
 sub type ($v) { $v->[0] }
 
-sub rnilp ($v) { typ($v) eq 'nil' }
-sub rstringp ($v) { typ($v) eq 'string' }
-
 sub uncons ($cons) {
   die unless typ $cons eq 'cons';
   @{$cons->[1]}[1,2];
+}
+
+sub flatten ($cons) {
+  return () if rnilp $cons;
+  my ($car, $cdr) = uncons $cons;
+  return ($car, flatten $cdr);
 }
 
 sub make_scope ($hash, $next = sub { die }) {
@@ -90,15 +128,33 @@ sub combine_fexpr ($scope, $fexpr, $args) {
 sub eval_inscope ($scope, $v) {
   my $type = type($v);
   return combine($scope, $scope, list($v)) if $type eq 'Name';
-  return $v unless type($v) eq 'Call';
-  my ($callp, $args) = uncons $v;
-  my $call = eval_inscope($scope, $callp);
-  combine($scope, $call, $args);
+  if ($type eq 'List') {
+    return mkv List => (
+      rnilp $v
+        ? 'nil'
+        : (cons => map eval_inscope($scope, $_), uncons $v)
+    );
+  }
+  if ($type eq 'Call') 
+    my ($callp, $args) = uncons $v;
+    my $call = eval_inscope($scope, $callp);
+    return combine($scope, $call, $args);
+  }
+  return ($scope, $v);
 }
 
 sub progn ($scope, $args) {
   my ($first, $rest) = uncons $args;
-  my $res = eval_inscope $scope, $first;
+  my ($res = eval_inscope $scope, $first;
   return $res if rnilp $rest;
   progn($scope, $rest);
 }
+
+sub wrap ($opv_sub) {
+  sub ($scope, $lstp) {
+    my $lst = eval_inscope $scope, $lstp;
+    $opv_sub->($scope, $lst)
+  }
+}
+
+1;
