@@ -1,7 +1,11 @@
-repr int
+repr nil
 repr chars
 repr cons
 repr native
+repr ref
+repr bool
+
+repr int
 
 type string repr chars
 type name repr chars
@@ -24,7 +28,7 @@ type pair repr cons(key, item)
 
 type dict repr cons(pair, dict)?
 
-type fexpr repr call
+type fexpr repr cons(scope, call)
 
 type native repr native
 
