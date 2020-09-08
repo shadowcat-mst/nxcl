@@ -8,13 +8,13 @@ our @EXPORT = qw(L S N C);
 
 sub L (@el) {
   reduce { [ List => [ cons => $b, $a ] ] }
-    [ List => [ 'nil' ],
+    [ List => [ 'nil' ] ],
     reverse @el;
 }
 
-sub S ($v) { [ String => [ string => $v ] ] }
+sub S :prototype($) ($v) { [ String => [ string => $v ] ] }
 
-sub N ($v) { [ Name => [ string => $v ] ] }
+sub N :prototype($) ($v) { [ Name => [ string => $v ] ] }
 
 sub C ($inv, @el) {
   die unless $inv;

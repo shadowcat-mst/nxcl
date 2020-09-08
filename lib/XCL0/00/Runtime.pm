@@ -132,12 +132,12 @@ sub eval_inscope ($scope, $v) {
     return mkv List => (
       rnilp $v
         ? 'nil'
-        : (cons => map eval_inscope($scope, $_), uncons $v)
+        : (cons => map { eval_inscope($scope, $_)[1] } uncons $v)
     );
   }
   if ($type eq 'Call') 
     my ($callp, $args) = uncons $v;
-    my $call = eval_inscope($scope, $callp);
+    my ($scope, $call) = eval_inscope($scope, $callp);
     return combine($scope, $call, $args);
   }
   return ($scope, $v);
@@ -145,14 +145,14 @@ sub eval_inscope ($scope, $v) {
 
 sub progn ($scope, $args) {
   my ($first, $rest) = uncons $args;
-  my ($res = eval_inscope $scope, $first;
-  return $res if rnilp $rest;
+  my ($scope, $res) = eval_inscope $scope, $first;
+  return ($scope, $res) if rnilp $rest;
   progn($scope, $rest);
 }
 
 sub wrap ($opv_sub) {
   sub ($scope, $lstp) {
-    my $lst = eval_inscope $scope, $lstp;
+    my ($scope, $lst) = eval_inscope $scope, $lstp;
     $opv_sub->($scope, $lst)
   }
 }

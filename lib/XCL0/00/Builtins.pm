@@ -1,6 +1,15 @@
 package XCL0::00::Builtins;
 
-use XCL0::00::Runtime qw();
+use XCL0::00::Runtime qw(
+  car cdr uncons flatten
+  eval_inscope progn
+  type rboolp rcharsp
+  raw make_scope
+);
+
+use Exporter 'import';
+
+our @EXPORT = qw(builtin_scope);
 
 my %raw = (
   _setscope => wrap sub ($scope, $lst) {
@@ -61,3 +70,9 @@ foreach my $name (sort keys %normal) {
   my $normal = $normal{$name};
   $raw{$name} = sub ($scope, $lst) { ($scope, $normal->($scope, $lst)) };
 }
+
+sub builtin_scope {
+  make_scope \%raw;
+}
+
+1;
