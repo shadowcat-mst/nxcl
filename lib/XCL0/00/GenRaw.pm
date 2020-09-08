@@ -12,9 +12,9 @@ sub L (@el) {
     reverse @el;
 }
 
-sub S :prototype($) ($v) { [ String => [ string => $v ] ] }
+sub S ($v, @rest) { ([ String => [ string => $v ] ], @rest) }
 
-sub N :prototype($) ($v) { [ Name => [ string => $v ] ] }
+sub N ($v, @rest) { ([ Name => [ string => $v ] ], @rest) }
 
 sub C ($inv, @el) {
   die unless $inv;

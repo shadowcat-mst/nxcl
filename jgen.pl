@@ -7,6 +7,6 @@ sub printj ($thing) {
   print "--\n".jdc($thing)."--\n";
 }
 
-printj C(N('foo'), S('bar'), L(S('a'),S('b')));
+printj C(N 'foo', S 'bar', L(S 'a', S 'b'));
 
 1;
