@@ -27,7 +27,7 @@ let from-tokenlist (tl) {
   case tl
     (.empty?(), tl)
     (.first().type() == 'EnterCall', call-from-tokenlist tl.rest())
-    (true, (tl.first(), @(from-tokenlist tl.rest())));
+    ({true}, (tl.first(), @(from-tokenlist tl.rest())));
 }
 
 let _call_from_tokenlist (acc, tl) {
