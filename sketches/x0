@@ -11,22 +11,22 @@ let _type_tok (re, typ, str, tok) {
 
 let tokenize-string (str) {
   return () unless str;
-  let str = s'^\s+''' str;
-  cond
-    (m'^[A-Za-z_]' str, _type_tok(s'^([A-Za-z_-?]+)'', Name, str, thisfunc))
-    (m`{`^'} str, _type_tok(
+  let (str) = s'^\s+''' str;
+  case str
+    (m'^[A-Za-z_]', _type_tok(s'^([A-Za-z_-?]+)'', Name, str, thisfunc))
+    (m'^\'', _type_tok(
       s`{`'((?:[^'\\\\]+|\\\\.)*)'}'',
       String, str, thisfunc
     ))
-    (s'^\['' str, (EnterCall.new, @(tok rest)))
-    (s'^\]'' str, (LeaveCall.new, @(tok rest)))
-    (s'^;'' str, (SemiColon.new, @(tok rest)));
+    (s'^\['',  { (EnterCall.new, @(thisfunc $.0)) })
+    (s'^\]'',  { (LeaveCall.new, @(thisfunc $.0)) })
+    (s'^;'', { (SemiColon.new, @(thisfunc $.0)) });
 }
 
 let from-tokenlist (tl) {
-  cond
-    (tl.empty?(), tl)
-    (tl.first().type() == 'EnterCall', call-from-tokenlist(tl.rest()))
+  case tl
+    (.empty?(), tl)
+    (.first().type() == 'EnterCall', call-from-tokenlist tl.rest())
     (true, (tl.first(), @(from-tokenlist tl.rest())));
 }
 
