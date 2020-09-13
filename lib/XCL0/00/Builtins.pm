@@ -1,7 +1,7 @@
 package XCL0::00::Builtins;
 
 use XCL0::00::Runtime qw(
-  car cdr uncons flatten
+  mkv car cdr uncons flatten
   eval_inscope progn
   type rboolp rcharsp
   raw make_scope
@@ -52,17 +52,22 @@ my %normal = (
   _eq_bool => wrap sub ($scope, $lst) {
     my ($l, $r) = flatten $lst;
     die unless rboolp $l and rboolp $r;
-    raw($l) == raw($r)
+    mkv(Bool => bool => 0+!!(raw($l) == raw($r)))
   },
   _eq_chars => wrap sub ($scope, $lst) {
     my ($l, $r) = flatten $lst;
     die unless rcharsp $l and rcharsp $r;
-    raw($l) eq raw($r)
+    mkv(Bool => bool => 0+!!(raw($l) eq raw($r)))
   },
   _gt_chars => wrap sub ($scope, $lst) {
     my ($l, $r) = flatten $lst;
     die unless rcharsp $l and rcharsp $r;
-    raw($l) gt raw($r)
+    mkv(Bool => bool => 0+!!(raw($l) gt raw($r)))
+  },
+  _string_concat => wrap sub ($scope, $lst) {
+    my ($l, $r) = (car($lst), car($lst, 1));
+    die unless type($l) eq 'String' and type($r) eq 'String';
+    mkv(String => chars => raw($l).raw($r))
   },
 );
 
