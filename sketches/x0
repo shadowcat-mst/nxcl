@@ -20,22 +20,23 @@ let tokenize-string (str) {
     ))
     (s'^\['',  { (EnterCall.new, @(thisfunc $.0)) })
     (s'^\]'',  { (LeaveCall.new, @(thisfunc $.0)) })
-    (s'^;'', { (SemiColon.new, @(thisfunc $.0)) });
+    (s'^;'',   { (SemiColon.new, @(thisfunc $.0)) });
 }
 
 let from-tokenlist (tl) {
   case tl
     (.empty?(), tl)
-    (.first().type() == 'EnterCall', call-from-tokenlist tl.rest())
-    ({true}, (tl.first(), @(from-tokenlist tl.rest())));
+    (.0.type() == 'EnterCall', call-from-tokenlist tl(1..*))
+    ({true}, (tl.0, @(from-tokenlist tl(1..*))));
 }
 
 let _call_from_tokenlist (acc, tl) {
+  let (first, @rest) = tl;
   cond
-    (tl.first().type() == 'LeaveCall',
-      (call-of-list acc, @(from-tokenlist t1.rest()))
+    (first.type() == 'LeaveCall',
+      (call-of-list acc, @(from-tokenlist rest))
     (true,
-      (thisfunc (@acc, tl.first()), t.rest());
+      (thisfunc (@acc, first), rest);
 }
 
 let call-from-tokenlist (tl) {
