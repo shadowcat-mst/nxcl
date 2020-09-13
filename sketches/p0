@@ -1,0 +1,28 @@
+use Sub::Call::Tail;
+
+sub tok ($str) {
+  return () unless length $str;
+  my $tok;
+  for ($str) {
+    s/^\s+//;
+    if (/^[A-Za-z_]/) {
+      s/^([A-Za-z_-?]+)// or die;
+      $tok = [ Name => [ string => $1 ] ];
+    } elsif (/^'/) {
+      s{'((?:[^'\\\\]+|\\\\.)*)'}{} or die;
+      $tok = [ String => [ string => $1 ] ];
+    } elsif (s/^\[//) {
+      $tok = [ EnterCall => [ 'nil' ] ];
+    } elsif (s/^\]//) {
+      $tok = [ LeaveCall => [ 'nil' ] ];
+    } elsif (s/^;//) {
+      $tok = [ SemiColon => [ 'nil' ] ];
+    }
+    die;
+  }
+  ($tok, tail tok($str));
+}
+
+sub prs (@toks) {
+  
+}

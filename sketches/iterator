@@ -1,0 +1,87 @@
+
+let ping_every(host, seconds) {
+  sleep $seconds;
+  ping $host;
+  ping_every host seconds;
+}
+
+let reduce(lst, accum, func) {
+  if empty?(lst) {
+    $accum
+  } else {
+    reduce [ rest lst ] [ func accum [ first lst ] ] func
+  }
+}
+
+let sum = lambda lst { reduce lst 0 + }
+
+##########################
+
+lst.empty?;
+lst.first;
+lst.rest;
+
+class ListWrapper {
+  has List lst;
+  has Callable wrapper;
+
+  method empty? { $:lst.empty?() }
+  method first { wrapper $:lst.first() }
+  method rest { self.new $:lst.rest() $:wrapper }
+}
+
+
+
+let reduce_signal(lst, accum, func) {
+  if empty?(lst) {
+    None
+  } else {
+    LazyList.from_cons
+      accum
+      [ reduce_signal [ rest lst ] [ func accum [ first lst ] ] func ]
+  }
+}
+
+let follow-signal(lst, accum, func) {
+  if empty?(lst) {
+    None
+  } else {
+    let (sf, @sr) = lst;
+    let accum = func accum sf;
+    say accum;
+    follow-signal sr accum func;
+  }
+}
+
+follow-signal [rainfall-sensor 'garden'] 0 +;
+
+
+
+class Iterator {
+  has mut lst;
+  method next {
+    uncons $:lst f r;
+    $:lst = r;
+    $f;
+  }
+}
+
+let it = Iterator.new(:lst mylst);
+
+while [ let el = it.next() ] {
+  ...
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

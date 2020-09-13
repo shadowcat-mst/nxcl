@@ -1,0 +1,46 @@
+# this works only for [] foo 'foo'
+
+type EnterCall Opaque(nil);
+type LeaveCall Opaque(nil);
+type SemiColon Opaque(nil);
+
+let _type_tok (re, typ, str, tok) {
+  assert [ let (v, rest) = re str ];
+  (typ.new v, @(tok rest))
+}
+
+let tok (str) {
+  return () unless str;
+  let str = s'^\s+''' str;
+  cond
+    (m'^[A-Za-z_]' str, _type_tok(s'^([A-Za-z_-?]+)'', Name, str, thisfunc))
+    (m`{`^'} str, _type_tok(
+      s`{`'((?:[^'\\\\]+|\\\\.)*)'}'',
+      String, str, thisfunc
+    ))
+    (s'^\['' str, (EnterCall.new, @(tok rest)))
+    (s'^\]'' str, (LeaveCall.new, @(tok rest)))
+    (s'^;'' str, (SemiColon.new, @(tok rest)));
+}
+
+let from-tokenlist (tl) {
+  cond
+    (tl.empty?(), tl)
+    (tl.first().type() == 'EnterCall', call-from-tokenlist(tl.rest()))
+    (true, (tl.first(), @(from-tokenlist tl.rest())));
+}
+
+let _call_from_tokenlist (acc, tl) {
+  cond
+    (tl.first().type() == 'LeaveCall',
+      (call-of-list acc, @(from-tokenlist t1.rest()))
+    (true,
+      (thisfunc (@acc, tl.first()), t.rest());
+}
+
+let call-from-tokenlist (tl) {
+  assert not(tl.empty?());
+  _call_from_tokenlist () tl;
+}
+
+let parse-from-str (str) { from-tokenlist tok(str) }

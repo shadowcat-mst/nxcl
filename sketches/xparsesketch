@@ -1,0 +1,117 @@
+
+define parse-stmtlist-from-tokens (tokens) {
+  ?:
+    [ empty? tokens ]
+    ()
+    {
+      uncons tokens tfirst trest;
+      ?: [ eq tfirst ';' ]
+        ()
+        {
+          call-of-list [list-cons tfirst [parse-stmtlist-from-tokens trest]]
+        }
+    }
+}
+
+# tokens can be one of:
+#
+# - name
+# - call
+
+define parse-example (tokens) [
+  ?:
+    [ empty? tokens ]
+    ()
+    [
+      ?: [ eq [ type [ first tokens ] ] 'start_call' ]
+        [ 
+    ]
+];
+
+define traverse-tokens (tfirst, trest) [
+  ?:
+    [ is-startcall tfirst ]
+    [ traverse-call-tokens trest ]
+    [ list-cons tfirst [ traverse-tokens trest ] ]
+]
+
+define traverse-call-tokens (stuff) {
+  ...
+  call-of-list _traverse_call_tokens tfirst trest ();
+}
+
+define _traverse_call_tokens (tfirst, trest, callbody) {
+  ?:
+    [ eq [ type tfirst ] 'end_call' ]
+    ( (), traverse-tokens trest )
+    [ list-cons tfirst traverse-tokens trest ]
+}
+
+########################
+
+let traverse-statement = (acc, (tf, @tr)) {
+  if [ tf == SEMICOLON ] {
+    ((), tr)
+  } else {
+    (acc ++ (tf), traverse-statement tr)
+  }
+}
+
+#########################
+
+# this works only for [] foo 'foo'
+
+define from-tokenlist [ tl ] [
+  if [ empty? tl ] [
+    $ tl
+  ] [
+    define firsttype [ type-of [ first t1 ] ];
+    if [ eq firsttype 'Open_Call' ] [
+      call-from-tokenlist [ rest t1 ]
+    ] [
+      cons-list t1 [ from-tokenlist t1 ]
+    ]
+  ]
+]
+
+define call-from-tokenlist [ tl ] [
+  _call_from_tokenlist [ make-list ] tl
+]
+
+define _call_from_tokenlist [ acc tl ] [
+  if [ empty? tl ] [
+    abort
+  ] [
+    if [ eq [ type-of [ first tl ] ] 'Close_Call' ] [
+      cons-list [ call-of-list acc ] [ from-tokenlist [ rest tl ] ]
+    ] [
+      thisfunc # _call_from_tokenlist
+        [ list-concat acc [ list [ first tl ] ]
+        [ rest tl ]
+    ]
+  ]
+]
+
+#########################
+
+# this works only for [] foo 'foo'
+
+let from-tokenlist (tl) {
+  cond
+    (tl.empty?(), tl)
+    (tl.first().type() == 'EnterCall', call-from-tokenlist(tl.rest()))
+    (true, (tl.first(), @(from-tokenlist tl.rest())));
+}
+
+let call-from-tokenlist (tl) {
+  assert not(tl.empty?());
+  _call_from_tokenlist () tl;
+}
+
+let _call_from_tokenlist (acc, tl) {
+  cond
+    (tl.first().type() == 'LeaveCall',
+      (call-of-list acc, @(from-tokenlist t1.rest()))
+    (true,
+      (thisfunc (@acc, tl.first()), t.rest());
+}
