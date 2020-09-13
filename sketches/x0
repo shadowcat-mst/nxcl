@@ -9,7 +9,7 @@ let _type_tok (re, typ, str, tok) {
   (typ.new v, @(tok rest))
 }
 
-let tok (str) {
+let tokenize-string (str) {
   return () unless str;
   let str = s'^\s+''' str;
   cond
@@ -43,4 +43,4 @@ let call-from-tokenlist (tl) {
   _call_from_tokenlist () tl;
 }
 
-let parse-from-str (str) { from-tokenlist tok(str) }
+let parse-string (str) { from-tokenlist tokenize-string(str) }
