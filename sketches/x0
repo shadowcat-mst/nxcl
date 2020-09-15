@@ -18,9 +18,19 @@ let tokenize-string (str) {
       s`{`'((?:[^'\\\\]+|\\\\.)*)'}'',
       String, str, thisfunc
     ))
-    (s'^\['',  { (EnterCall.new, @(thisfunc $.0)) })
-    (s'^\]'',  { (LeaveCall.new, @(thisfunc $.0)) })
-    (s'^;'',   { (SemiColon.new, @(thisfunc $.0)) });
+#   (s'^\['',  { (EnterCall.new, @(thisfunc $.0)) })
+#   (s'^\]'',  { (LeaveCall.new, @(thisfunc $.0)) })
+#   (s'^;'',   { (SemiColon.new, @(thisfunc $.0)) });
+    @(do {
+      letf token_is (scope, type) {
+        scope.eval \${ ($$(type).new, @(thisfunc $.0)) }
+      }
+      \$(
+        (s'^\['', $$(token_is EnterCall)),
+        (s'^\]'', $$(token_is LeaveCall)),
+        (s'^;'',  $$(token_is SemiColon)),
+     )
+    });
 }
 
 let from-tokenlist (tl) {
