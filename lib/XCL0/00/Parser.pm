@@ -51,22 +51,32 @@ sub _call (@args) {
 }
 
 sub prs (@tok) {
-  return () unless @tok;
-  my ($first, @rest) = @tok;
-  if ($first->[0] eq 'EnterCall') {
-    prs_call([], @rest);
-  } else {
-    ($first, prs(@rest))
+  my @res;
+  while (my $m = shift @tok) {
+    my $ret;
+    if ($m->[0] eq 'EnterCall') {
+      ($ret, @tok) = prs_call(@tok)
+    } else {
+      $ret = $m;
+    }
+    push @res, $ret;
   }
+  return @res;
 }
 
-sub prs_call ($acc, @tok) {
-  my ($first, @rest) = @tok;
-  if ($first->[0] eq 'LeaveCall') {
-    (_call(@$acc), prs @rest);
-  } else {
-    prs_call([ @$acc, $first ], @rest);
+sub prs_call (@tok) {
+  my @res;
+  while (my $m = shift @tok) {
+    last if $m->[0] eq 'LeaveCall';
+    my $ret;
+    if ($m->[0] eq 'EnterCall') {
+      ($ret, @tok) = prs_call(@tok)
+    } else {
+      $ret = $m;
+    }
+    push @res, $ret;
   }
+  _call @res;
 }
 
 sub parse_string ($string) {

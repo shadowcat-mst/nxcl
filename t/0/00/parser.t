@@ -27,8 +27,6 @@ while (my $start = shift @test_text) {
 }
 
 foreach my $test (@tests) {
-  my $outj = join "\n", @{$test->{out}};
-warn $outj;
   is 
     parse_string(join "\n", @{$test->{in}}),
     decode_json(join "\n", @{$test->{out}}),
@@ -51,3 +49,25 @@ $ [ x 'foo' ]
 <       ]
 <     ]
 < ] ]
+$ x [ y [ z 'foo' ] ]
+< [
+<   [ "Name", [ "string", "x" ] ], [
+<     "Call", [
+<       "cons", [ "Name", [ "string", "y" ] ], [
+<         "List", [
+<           "cons", [
+<             "Call", [
+<               "cons", [ "Name", [ "string", "z" ] ], [
+<                 "List", [
+<                   "cons", [ "String", [ "string", "foo" ] ],
+<                   [ "List", [ "nil" ] ]
+<                 ]
+<               ]
+<             ]
+<           ],
+<           [ "List", [ "nil" ] ]
+<         ]
+<       ]
+<     ]
+<   ]
+< ]
