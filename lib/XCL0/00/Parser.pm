@@ -39,16 +39,6 @@ sub tok ($str) {
   @tok;
 }
 
-sub prs (@tok) {
-  return () unless @tok;
-  my ($first, @rest) = @tok;
-  if ($first->[0] eq 'EnterCall') {
-    prs_call([], @rest);
-  } else {
-    ($first, prs(@rest))
-  }
-}
-
 sub _list ($first, @rest) {
   [ List => [ cons =>
     $first,
@@ -58,6 +48,16 @@ sub _list ($first, @rest) {
 
 sub _call (@args) {
   [ Call => _list(@args)->[1] ]
+}
+
+sub prs (@tok) {
+  return () unless @tok;
+  my ($first, @rest) = @tok;
+  if ($first->[0] eq 'EnterCall') {
+    prs_call([], @rest);
+  } else {
+    ($first, prs(@rest))
+  }
 }
 
 sub prs_call ($acc, @tok) {
