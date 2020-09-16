@@ -1,7 +1,6 @@
 use Mojo::Base -strict, -signatures;
 use Test2::V0;
 
-use JSON::Dumper::Compact qw(jdc);
 use Mojo::JSON qw(decode_json);
 use XCL0::00::Parser qw(parse_string);
 
