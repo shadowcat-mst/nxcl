@@ -80,5 +80,7 @@ sub prs_call (@tok) {
 }
 
 sub parse_string ($string) {
-  [ prs tok $string ];
+  _call prs tok $string;
 }
+
+1;

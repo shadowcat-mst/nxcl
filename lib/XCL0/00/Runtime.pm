@@ -90,14 +90,14 @@ sub list ($first, @rest) {
 sub type ($v) { $v->[0] }
 
 sub uncons ($cons) {
-  die unless typ $cons eq 'cons';
+  die unless typ($cons) eq 'cons';
   @{$cons->[1]}[1,2];
 }
 
 sub flatten ($cons) {
   return () if rnilp $cons;
   my ($car, $cdr) = uncons $cons;
-  return ($car, flatten $cdr);
+  return ($car, flatten($cdr));
 }
 
 sub make_scope ($hash, $next = sub { die }) {
@@ -132,10 +132,10 @@ sub eval_inscope ($scope, $v) {
     return mkv List => (
       rnilp $v
         ? 'nil'
-        : (cons => map { eval_inscope($scope, $_)[1] } uncons $v)
+        : (cons => map +(eval_inscope($scope, $_))[1], uncons $v)
     );
   }
-  if ($type eq 'Call') 
+  if ($type eq 'Call') {
     my ($callp, $args) = uncons $v;
     my ($scope, $call) = eval_inscope($scope, $callp);
     return combine($scope, $call, $args);
@@ -145,15 +145,15 @@ sub eval_inscope ($scope, $v) {
 
 sub progn ($scope, $args) {
   my ($first, $rest) = uncons $args;
-  my ($scope, $res) = eval_inscope $scope, $first;
-  return ($scope, $res) if rnilp $rest;
-  progn($scope, $rest);
+  my ($next_scope, $res) = eval_inscope $scope, $first;
+  return ($next_scope, $res) if rnilp $rest;
+  progn($next_scope, $rest);
 }
 
 sub wrap ($opv_sub) {
   sub ($scope, $lstp) {
-    my ($scope, $lst) = eval_inscope $scope, $lstp;
-    $opv_sub->($scope, $lst)
+    my ($next_scope, $lst) = eval_inscope $scope, $lstp;
+    $opv_sub->($next_scope, $lst)
   }
 }
 
