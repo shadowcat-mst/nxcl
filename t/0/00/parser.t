@@ -1,7 +1,6 @@
 use Mojo::Base -strict, -signatures;
 use Test2::V0;
 
-use Mojo::JSON qw(decode_json);
 use XCL0::00::Reader qw(read_string);
 use XCL0::00::Writer qw(write_string);
 
