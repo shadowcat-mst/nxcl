@@ -2,7 +2,7 @@ use Mojo::Base -strict, -signatures;
 use Test2::V0;
 
 use Mojo::JSON qw(decode_json);
-use XCL0::00::Parser qw(parse_string);
+use XCL0::00::Reader qw(read_string);
 use XCL0::00::Writer qw(write_string);
 
 my @test_text = do {
@@ -28,7 +28,7 @@ while (my $start = shift @test_text) {
 
 foreach my $test (@tests) {
   is 
-    write_string(parse_string(join "\n", @{$test->{in}})),
+    write_string(read_string(join "\n", @{$test->{in}})),
     join("\n", @{$test->{out}}),
     "Data test ".$test->{idx};
 }

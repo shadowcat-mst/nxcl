@@ -1,9 +1,9 @@
-package XCL0::00::Parser;
+package XCL0::00::Reader;
 
 use Mojo::Base -strict, -signatures;
 use Exporter 'import';
 
-our @EXPORT_OK = qw(parse_string);
+our @EXPORT_OK = qw(read_string);
 
 sub _tok ($str) {
   return () unless length $str;
@@ -79,7 +79,7 @@ sub prs_call (@tok) {
   _call @res;
 }
 
-sub parse_string ($string) {
+sub read_string ($string) {
   _call prs tok $string;
 }
 
