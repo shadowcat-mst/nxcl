@@ -1,5 +1,5 @@
-use Mojo::Base -strict, -signatures;
 use Test2::V0;
+use Mojo::Base -strict, -signatures;
 
 use XCL0::00::Reader qw(read_string);
 use XCL0::00::Writer qw(write_string);
@@ -25,9 +25,13 @@ while (my $start = shift @test_text) {
   push @tests, $t;
 }
 
+sub evaluate_test ($v) {
+  write_string(read_string $v);
+}
+
 foreach my $test (@tests) {
   is 
-    write_string(read_string(join "\n", @{$test->{in}})),
+    evaluate_test(join "\n", @{$test->{in}}),
     join("\n", @{$test->{out}}),
     "Data test ".$test->{idx};
 }
