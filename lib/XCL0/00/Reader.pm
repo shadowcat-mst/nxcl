@@ -13,10 +13,10 @@ sub _tok ($str) {
   $tok = do {
     if (/^[A-Za-z_]/) {
       s/^([A-Za-z_\-?]+)// or die;
-      [ Name => [ string => $1 ] ];
+      [ Name => [ chars => $1 ] ];
     } elsif (/^'/) {
       s{'((?:[^'\\\\]+|\\\\.)*)'}{} or die;
-      [ String => [ string => $1 ] ];
+      [ String => [ chars => $1 ] ];
     } elsif (s/^\[//) {
       [ EnterCall => [ 'nil' ] ];
     } elsif (s/^\]//) {

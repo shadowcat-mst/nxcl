@@ -3,38 +3,9 @@ use Mojo::Base -strict, -signatures;
 
 use XCL0::00::Reader qw(read_string);
 use XCL0::00::Writer qw(write_string);
+use XCL0::DataTest;
 
-my @test_text = do {
-  my $idx = 0;
-  map [ $idx++, $_ ], <DATA>;
-};
-
-my @tests;
-
-while (my $start = shift @test_text) {
-  my ($idx, $line) = @$start;
-  die unless $line =~ /^\$ (.*)$/;
-  my (@inlines, @outlines) = ($1);
-  my $t = { idx => $idx, in => \@inlines, out => \@outlines };
-  while (@test_text and $test_text[0][1] =~ /^> (.*)$/) {
-    shift @test_text; push @inlines, $1
-  }
-  while (@test_text and $test_text[0][1] =~ /^< (.*)$/) {
-    shift @test_text; push @outlines, $1
-  }
-  push @tests, $t;
-}
-
-sub evaluate_test ($v) {
-  write_string(read_string $v);
-}
-
-foreach my $test (@tests) {
-  is 
-    evaluate_test(join "\n", @{$test->{in}}),
-    join("\n", @{$test->{out}}),
-    "Data test ".$test->{idx};
-}
+data_test \*DATA, sub ($v) { write_string(read_string $v) };
 
 done_testing;
 

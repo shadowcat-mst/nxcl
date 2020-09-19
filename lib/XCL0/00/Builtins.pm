@@ -1,10 +1,12 @@
 package XCL0::00::Builtins;
 
+use Mojo::Base -strict, -signatures;
+
 use XCL0::00::Runtime qw(
   mkv car cdr uncons flatten
   eval_inscope progn
   type rboolp rcharsp
-  raw make_scope
+  raw make_scope wrap
 );
 
 use Exporter 'import';
@@ -27,7 +29,7 @@ my %normal = (
     if (rtruep $res) {
       return eval_inscope $scope2, $then;
     } else {
-      return eval_inscope $scope2, $false;
+      return eval_inscope $scope2, $else;
     }
   },
   _eval_inscope => wrap \&eval_inscope,
@@ -76,8 +78,10 @@ foreach my $name (sort keys %normal) {
   $raw{$name} = sub ($scope, $lst) { ($scope, $normal->($scope, $lst)) };
 }
 
+my %cooked = map +($_ => mkv Native => native => $raw{$_}), keys %raw;
+
 sub builtin_scope {
-  make_scope \%raw;
+  make_scope \%cooked;
 }
 
 1;

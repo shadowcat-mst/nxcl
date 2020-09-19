@@ -11,7 +11,7 @@ our @EXPORT_OK = qw(
   valp val raw
   set
   list uncons flatten
-  make_scope
+  make_scope eval_inscope
   progn
   wrap
 );
@@ -84,7 +84,7 @@ sub set ($var, $value) {
 }
 
 sub list ($first, @rest) {
-  mkv 'List', val => $first, (@rest ? list(@rest) : mkv 'List', 'nil')
+  mkv 'List', cons => $first, (@rest ? list(@rest) : mkv 'List', 'nil')
 }
 
 sub type ($v) { $v->[0] }
@@ -100,15 +100,15 @@ sub flatten ($cons) {
   return ($car, flatten($cdr));
 }
 
-sub make_scope ($hash, $next = sub { die }) {
+sub make_scope ($hash, $next = mkv(Native => native => sub { die })) {
   mkv Native => native => sub ($scope, $args) {
     die unless rcharsp(my $first = car $args);
-    $hash->(raw $first) // combine($scope, $next, $args)
+    $hash->{raw($first)} // combine($scope, $next, $args)
   };
 }
 
 sub combine ($scope, $call, $args) {
-  my $type = typ($call);
+  my $type = type($call);
   return $call->[1][1]->($scope, $args) if $type eq 'Native';
   die unless $type eq 'Fexpr';
   combine_fexpr($scope, $call, $args);
@@ -129,11 +129,11 @@ sub eval_inscope ($scope, $v) {
   my $type = type($v);
   return combine($scope, $scope, list($v)) if $type eq 'Name';
   if ($type eq 'List') {
-    return mkv List => (
+    return ($scope, mkv List => (
       rnilp $v
         ? 'nil'
         : (cons => map +(eval_inscope($scope, $_))[1], uncons $v)
-    );
+    ));
   }
   if ($type eq 'Call') {
     my ($callp, $args) = uncons $v;
@@ -150,7 +150,7 @@ sub progn ($scope, $args) {
   progn($next_scope, $rest);
 }
 
-sub wrap ($opv_sub) {
+sub wrap :prototype($) ($opv_sub) {
   sub ($scope, $lstp) {
     my ($next_scope, $lst) = eval_inscope $scope, $lstp;
     $opv_sub->($next_scope, $lst)
