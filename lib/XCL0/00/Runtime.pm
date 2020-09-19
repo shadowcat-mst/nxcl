@@ -5,7 +5,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(
   mkv
-  typ type
+  rtype type
   rconsp rnilp rcharsp rboolp rnativep rvalp rvarp
   car cdr
   valp val raw
@@ -18,18 +18,19 @@ our @EXPORT_OK = qw(
 
 sub mkv ($type, $repr, @v) { [ $type => [ $repr => @v ] ] }
 
-sub typ ($v) { $v->[1][0] }
+sub type ($v) { $v->[0] }
+sub rtype ($v) { $v->[1][0] }
 
-sub rconsp ($v) { typ($v) eq 'cons' }
-sub rnilp ($v) { typ($v) eq 'nil' }
-sub rcharsp ($v) { typ($v) eq 'chars' }
-sub rboolp ($v) { typ($v) eq 'bool' }
-sub rnativep ($v) { typ($v) eq 'native' }
-sub rvalp ($v) { typ($v) eq 'val' }
-sub rvarp ($v) { typ($v) eq 'var' }
+sub rconsp ($v) { rtype($v) eq 'cons' }
+sub rnilp ($v) { rtype($v) eq 'nil' }
+sub rcharsp ($v) { rtype($v) eq 'chars' }
+sub rboolp ($v) { rtype($v) eq 'bool' }
+sub rnativep ($v) { rtype($v) eq 'native' }
+sub rvalp ($v) { rtype($v) eq 'val' }
+sub rvarp ($v) { rtype($v) eq 'var' }
 
 sub rtruep ($v) {
-  die unless typ($v) eq 'bool';
+  die unless rtype($v) eq 'bool';
   $v->[1][1]
 }
 
@@ -50,7 +51,7 @@ sub cdr ($cons, $n = 1) {
   $targ;
 }
 
-sub refp ($v) { typ($v) eq 'val' or typ($v) eq 'var' }
+sub refp ($v) { rtype($v) eq 'val' or rtype($v) eq 'var' }
 
 sub deref ($v) {
   die unless refp($v);
@@ -58,8 +59,8 @@ sub deref ($v) {
 }
 
 sub valp ($v) {
-  my $typ = typ $v;
-  0+!($typ eq 'cons' or $typ eq 'nil');
+  my $rtype = rtype $v;
+  0+!($rtype eq 'cons' or $rtype eq 'nil');
 }
 
 sub val ($v) {
@@ -76,10 +77,10 @@ sub raw ($v) {
   $v->[1][1];
 }
 
-sub varp ($v) { 0+!!(typ($v) eq 'var') }
+sub varp ($v) { 0+!!(rtype($v) eq 'var') }
 
 sub set ($var, $value) {
-  die unless typ($var) eq 'var';
+  die unless rtype($var) eq 'var';
   $var->[1][1] = $value;
 }
 
@@ -87,10 +88,8 @@ sub list ($first, @rest) {
   mkv 'List', cons => $first, (@rest ? list(@rest) : mkv 'List', 'nil')
 }
 
-sub type ($v) { $v->[0] }
-
 sub uncons ($cons) {
-  die unless typ($cons) eq 'cons';
+  die unless rtype($cons) eq 'cons';
   @{$cons->[1]}[1,2];
 }
 

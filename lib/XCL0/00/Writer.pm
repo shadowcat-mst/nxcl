@@ -1,6 +1,6 @@
 package XCL0::00::Writer;
 
-use XCL0::00::Runtime qw(typ type raw flatten);
+use XCL0::00::Runtime qw(type raw flatten);
 use Mojo::Base -strict, -signatures;
 use Exporter 'import';
 
