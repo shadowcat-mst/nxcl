@@ -100,7 +100,7 @@ sub flatten ($cons) {
 }
 
 sub make_scope ($hash, $next = mkv(Native => native => sub { die })) {
-  mkv Native => native => sub ($scope, $args) {
+  mkv Scope => var => mkv Native => native => sub ($scope, $args) {
     die unless rcharsp(my $first = car $args);
     $hash->{raw($first)} // combine($scope, $next, $args)
   };
