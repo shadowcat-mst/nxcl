@@ -2,7 +2,8 @@ use Test2::V0;
 use Mojo::Base -strict, -signatures;
 
 use XCL0::00::Runtime qw(
-  mkv type rtype raw car cdr list uncons flatten
+  mkv type rtype raw car cdr list uncons flatten deref
+  make_scope combine
 );
 
 is +(my $v = mkv(X => y => 'z')), [ X => [ y => 'z' ] ];
@@ -30,5 +31,11 @@ is raw(car(cdr($list, 2))), 'c';
 }
 
 is [ map raw($_), flatten($list) ], [ qw(a b c) ];
+
+{
+  my $scope = make_scope({ x => mkv(Bool => bool => 1) });
+  my $val = combine($scope, deref($scope), list mkv(Name => chars => 'x'));
+  is $val, [ Bool => [ bool => 1 ] ];
+}
 
 done_testing;

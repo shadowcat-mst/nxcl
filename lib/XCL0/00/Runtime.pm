@@ -8,10 +8,10 @@ our @EXPORT_OK = qw(
   rtype type
   rconsp rnilp rcharsp rboolp rnativep rvalp rvarp
   car cdr
-  valp val raw
+  valp val raw deref
   set
   list uncons flatten
-  make_scope eval_inscope
+  make_scope eval_inscope combine
   progn
   wrap
 );
@@ -84,8 +84,10 @@ sub set ($var, $value) {
   $var->[1][1] = $value;
 }
 
-sub list ($first, @rest) {
-  mkv 'List', cons => $first, (@rest ? list(@rest) : mkv 'List', 'nil')
+sub list (@list) {
+  return mkv List => 'nil' unless @list;
+  my ($first, @rest) = @list;
+  mkv 'List', cons => $first, list(@rest);
 }
 
 sub uncons ($cons) {
@@ -108,7 +110,7 @@ sub make_scope ($hash, $next = mkv(Native => native => sub { die })) {
 
 sub combine ($scope, $call, $args) {
   my $type = type($call);
-  return $call->[1][1]->($scope, $args) if $type eq 'Native';
+  return raw($call)->($scope, $args) if $type eq 'Native';
   die unless $type eq 'Fexpr';
   combine_fexpr($scope, $call, $args);
 }
@@ -126,27 +128,23 @@ sub combine_fexpr ($scope, $fexpr, $args) {
 
 sub eval_inscope ($scope, $v) {
   my $type = type($v);
-  return combine($scope, $scope, list($v)) if $type eq 'Name';
+  return combine($scope, deref($scope), list($v)) if $type eq 'Name';
   if ($type eq 'List') {
-    return ($scope, mkv List => (
-      rnilp $v
-        ? 'nil'
-        : (cons => map +(eval_inscope($scope, $_))[1], uncons $v)
-    ));
+    return list map eval_inscope($scope, $_), flatten $v;
   }
   if ($type eq 'Call') {
     my ($callp, $args) = uncons $v;
-    my ($scope, $call) = eval_inscope($scope, $callp);
+    my $call = eval_inscope($scope, $callp);
     return combine($scope, $call, $args);
   }
-  return ($scope, $v);
+  return $v;
 }
 
 sub progn ($scope, $args) {
   my ($first, $rest) = uncons $args;
-  my ($next_scope, $res) = eval_inscope $scope, $first;
-  return ($next_scope, $res) if rnilp $rest;
-  progn($next_scope, $rest);
+  my $res = eval_inscope $scope, $first;
+  return $res if rnilp $rest;
+  progn($scope, $rest);
 }
 
 sub wrap :prototype($) ($opv_sub) {
