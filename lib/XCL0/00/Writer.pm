@@ -1,12 +1,13 @@
 package XCL0::00::Writer;
 
-use XCL0::00::Runtime qw(type raw flatten);
+use XCL0::00::Runtime qw(type rtype raw flatten);
 use Mojo::Base -strict, -signatures;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(write_string);
 
 sub write_string ($v) {
+  return if rtype($v) eq 'nil';
   my $type = type $v;
   return raw($v) if $type eq 'Name';
   return q{'}.raw($v).q{'} if $type eq 'String';

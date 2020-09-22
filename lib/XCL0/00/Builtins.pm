@@ -31,10 +31,15 @@ my %raw = (
     }
   },
   _eval_inscope => wrap \&eval_inscope,
-  _rmkv => wrap sub ($scope, $lst) {
+  _rmkraw => wrap sub ($scope, $lst) {
+    my ($typep, $reprp, $v) = flatten($lst);
+    mkv(raw($typep), raw($reprp), raw($v));
+  },
+  _rmkref => wrap sub ($scope, $lst) {
     my ($typep, $reprp, @v) = flatten($lst);
     mkv(raw($typep), raw($reprp), @v);
   },
+  _list => wrap sub ($scope, $lst) { $lst },
   _type => wrap sub ($scope, $lst) { mkv String => chars => type(car $lst) },
   _rtype => wrap sub ($scope, $lst) { mkv String => chars => rtype(car $lst) },
   (map {

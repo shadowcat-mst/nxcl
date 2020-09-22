@@ -16,3 +16,7 @@ done_testing;
 __DATA__
 $ _type 'foo'
 < 'String'
+$ _rmkraw 'String' 'chars' 'foo'
+< 'foo'
+$ _rmkref 'Call' 'cons' 'x' [ _list 'y' ]
+< [ 'x' 'y' ]
