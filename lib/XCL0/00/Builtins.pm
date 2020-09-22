@@ -4,7 +4,7 @@ use Mojo::Base -strict, -signatures;
 
 use XCL0::00::Runtime qw(
   mkv car cdr uncons flatten
-  eval_inscope progn
+  eval_inscope progn set
   type rboolp rcharsp
   raw make_scope wrap
 );
@@ -16,11 +16,9 @@ our @EXPORT = qw(builtin_scope);
 my %raw = (
   _setscope => wrap sub ($scope, $lst) {
     my $argscope = car $lst;
-    return ($argscope, $argscope);
-  }
-);
-
-my %normal = (
+    set $scope => $argscope;
+    return $argscope;
+  },
   _getscope => wrap sub ($scope, $) { $scope },
   _wutcol => sub ($scope, $lst) {
     my ($if, $blocks) = uncons $lst;
@@ -37,10 +35,13 @@ my %normal = (
     my ($typep, $reprp, @v) = flatten($lst);
     mkv(raw($typep), raw($reprp), @v);
   },
-  _type => wrap sub ($scope, $lst) { type(car $lst) },
+  _type => wrap sub ($scope, $lst) { mkv String => chars => type(car $lst) },
+  _rtype => wrap sub ($scope, $lst) { mkv String => chars => rtype(car $lst) },
   (map {
     my $code = XCL0::00::Runtime->can("r${_}p");
-    ("_r${_}?" => wrap sub ($scope, $lst) { $code->(car $lst) })
+    ("_r${_}?" => wrap sub ($scope, $lst) {
+      mkv Bool => bool => 0+!!$code->(car $lst) 
+    })
   } qw(cons nil chars bool native val var)),
   (map {
     my $code = XCL0::00::Runtime->can($_);
@@ -72,11 +73,6 @@ my %normal = (
     mkv(String => chars => raw($l).raw($r))
   },
 );
-
-foreach my $name (sort keys %normal) {
-  my $normal = $normal{$name};
-  $raw{$name} = sub ($scope, $lst) { ($scope, $normal->($scope, $lst)) };
-}
 
 my %cooked = map +($_ => mkv Native => native => $raw{$_}), keys %raw;
 

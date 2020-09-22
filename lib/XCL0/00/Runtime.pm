@@ -149,8 +149,8 @@ sub progn ($scope, $args) {
 
 sub wrap :prototype($) ($opv_sub) {
   sub ($scope, $lstp) {
-    my ($next_scope, $lst) = eval_inscope $scope, $lstp;
-    $opv_sub->($next_scope, $lst)
+    my $lst = eval_inscope $scope, $lstp;
+    $opv_sub->($scope, $lst)
   }
 }
 
