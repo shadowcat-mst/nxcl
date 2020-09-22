@@ -14,23 +14,23 @@ is rtype($v), 'y';
 
 is raw($v), 'z';
 
-my $list = list map mkv(String => string => $_), qw(a b c);
+my $abc_list = list map mkv(String => string => $_), qw(a b c);
 
-is raw(car($list)), 'a';
+is raw(car($abc_list)), 'a';
 
-is raw(car(cdr $list)), 'b';
+is raw(car(cdr $abc_list)), 'b';
 
-is raw(car($list, 1)), 'b';
+is raw(car($abc_list, 1)), 'b';
 
-is raw(car(cdr($list, 2))), 'c';
+is raw(car(cdr($abc_list, 2))), 'c';
 
 {
-  my ($x, $y) = uncons($list);
+  my ($x, $y) = uncons($abc_list);
   is raw($x), 'a';
   is raw(car $y), 'b';
 }
 
-is [ map raw($_), flatten($list) ], [ qw(a b c) ];
+is [ map raw($_), flatten($abc_list) ], [ qw(a b c) ];
 
 my $scope = make_scope({ x => mkv(Bool => bool => 1) });
 
@@ -53,12 +53,17 @@ my $concat = mkv(Native => native => sub ($scope, $args) {
   mkv String => chars => join '', map raw($_), flatten($args);
 });
 
-is eval_inscope($scope, mkv(
-    Call => cons => $concat, list(
-      mkv(String => chars => 'foo'),
-      mkv(String => chars => 'bar'),
-    )
-  )),
+my $foobar_list = list(map mkv(String => chars => $_), qw(foo bar));
+
+is eval_inscope($scope, mkv(Call => cons => $concat, $foobar_list)),
   mkv(String => chars => 'foobar');
+
+my $fid = mkv(Fexpr => cons =>
+  $scope,
+  mkv(Name => chars => 'args'),
+);
+
+is eval_inscope($scope, mkv(Call => cons => $fid, $foobar_list)),
+  $foobar_list;
 
 done_testing;
