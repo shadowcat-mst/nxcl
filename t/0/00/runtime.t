@@ -32,16 +32,33 @@ is raw(car(cdr($list, 2))), 'c';
 
 is [ map raw($_), flatten($list) ], [ qw(a b c) ];
 
-{
-  my $scope = make_scope({ x => mkv(Bool => bool => 1) });
-  my $val = combine($scope, deref($scope), list mkv(Name => chars => 'x'));
-  is $val, [ Bool => [ bool => 1 ] ];
-}
+my $scope = make_scope({ x => mkv(Bool => bool => 1) });
 
-{
-  my $scope = make_scope({ x => mkv(Bool => bool => 1) });
-  my $val = eval_inscope($scope, mkv(Name => chars => 'x'));
-  is $val, [ Bool => [ bool => 1 ] ];
-}
+is combine($scope, deref($scope), list mkv(Name => chars => 'x')),
+  [ Bool => [ bool => 1 ] ];
+
+is eval_inscope($scope, mkv(Name => chars => 'x')),
+  [ Bool => [ bool => 1 ] ];
+
+is eval_inscope($scope, mkv(String => chars => 'foo')),
+  [ String => [ chars => 'foo' ] ];
+
+is eval_inscope($scope, list(
+      mkv(Name => chars => 'x'),
+      mkv(String => chars => 'foo')
+  )),
+  list(mkv(Bool => bool => 1), mkv(String => chars => 'foo'));
+
+my $concat = mkv(Native => native => sub ($scope, $args) {
+  mkv String => chars => join '', map raw($_), flatten($args);
+});
+
+is eval_inscope($scope, mkv(
+    Call => cons => $concat, list(
+      mkv(String => chars => 'foo'),
+      mkv(String => chars => 'bar'),
+    )
+  )),
+  mkv(String => chars => 'foobar');
 
 done_testing;
