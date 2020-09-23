@@ -76,7 +76,9 @@ sub prs_call ($end, @tok) {
   }
   die unless $end_ok;
   my @call = map +(@$_ ? _call(@$_) : ()), @reslist;
-  return ($call[0], @tok); # LIES
+  die unless @call; # ?
+  return ($call[0], @tok) if @call == 1;
+  return _call([ Name => [ chars => '_progn' ] ], @call);
 }
 
 sub read_string ($string) {

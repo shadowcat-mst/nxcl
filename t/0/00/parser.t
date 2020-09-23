@@ -20,3 +20,5 @@ $ x [ y [ z 'foo' ] ]
 < [ x [ y [ z 'foo' ] ] ]
 $ x [ y 'y1' ] [ z 'z1' ]
 < [ x [ y 'y1' ] [ z 'z1' ] ]
+$ x 'x1'; y 'y1';
+< [ _progn [ x 'x1' ] [ y 'y1' ] ]
