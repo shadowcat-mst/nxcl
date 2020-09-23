@@ -7,10 +7,12 @@ use Exporter 'import';
 our @EXPORT_OK = qw(write_string);
 
 sub write_string ($v) {
-  return if rtype($v) eq 'nil';
   my $type = type $v;
   return raw($v) if $type eq 'Name';
   return q{'}.raw($v).q{'} if $type eq 'String';
+  if ($type eq 'Bool')  {
+    return raw($v) ? 'true' : 'false';
+  }
   if ($type eq 'Call') {
     return join ' ', '[', (map write_string($_), flatten($v)), ']';
   }
