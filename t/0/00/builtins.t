@@ -16,6 +16,8 @@ done_testing;
 __DATA__
 $ _type 'foo'
 < 'String'
+$ _rtype 'foo'
+< 'chars'
 $ _rmkraw 'String' 'chars' 'foo'
 < 'foo'
 $ _rmkref 'Call' 'cons' 'x' [ _list 'y' ]
@@ -34,11 +36,11 @@ $ _gt_chars 'x' 'x'
 < false
 $ _gt_chars 'a' 'x'
 < false
-$ _eq_bool [ _eq_chars 'x' 'x' ] [ _eq_chars 'x' 'x' ]
+$ _eq_bool [ _rtrue ] [ _rtrue ]
 < true
-$ _eq_bool [ _eq_chars 'x' 'x' ] [ _eq_chars 'x' 'y' ]
-< false
-$ _eq_bool [ _eq_chars 'x' 'y' ] [ _eq_chars 'y' 'y' ]
-< false
-$ _eq_bool [ _eq_chars 'y' 'y' ] [ _eq_chars 'y' 'y' ]
+$ _eq_bool [ _rfalse ] [ _rfalse ]
 < true
+$ _eq_bool [ _rfalse ] [ _rtrue ]
+< false
+$ _eq_bool [ _rtrue ] [ _rfalse ]
+< false

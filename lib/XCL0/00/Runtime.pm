@@ -6,7 +6,7 @@ use Exporter 'import';
 our @EXPORT_OK = qw(
   mkv
   rtype type
-  rconsp rnilp rcharsp rboolp rnativep rvalp rvarp
+  rconsp rnilp rcharsp rboolp rnativep rvalp rvarp rtruep rfalsep
   car cdr
   valp val raw deref
   set

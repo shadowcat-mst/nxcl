@@ -5,7 +5,7 @@ use Mojo::Base -strict, -signatures;
 use XCL0::00::Runtime qw(
   mkv car cdr uncons flatten
   eval_inscope progn set
-  type rboolp rcharsp
+  type rtype rtruep rboolp rcharsp
   raw make_scope wrap
 );
 
@@ -27,7 +27,7 @@ my %raw = (
     if (rtruep $res) {
       return eval_inscope $scope2, $then;
     } else {
-      return eval_inscope $scope2, $else;
+      return eval_inscope $scope2, car $else;
     }
   },
   _eval_inscope => wrap \&eval_inscope,
@@ -39,6 +39,8 @@ my %raw = (
     my ($typep, $reprp, @v) = flatten($lst);
     mkv(raw($typep), raw($reprp), @v);
   },
+  _rtrue => sub ($, $) { mkv(Bool => bool => 1) },
+  _rfalse => sub ($, $) { mkv(Bool => bool => 0) },
   _escape => sub ($scope, $lst) { car $lst },
   _list => wrap sub ($scope, $lst) { $lst },
   _type => wrap sub ($scope, $lst) { mkv String => chars => type(car $lst) },
