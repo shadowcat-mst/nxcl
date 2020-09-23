@@ -65,18 +65,23 @@ sub prs (@tok) {
 }
 
 sub prs_call (@tok) {
-  my @res;
+  my @reslist = (my $res = []);
   while (my $m = shift @tok) {
     last if $m->[0] eq 'LeaveCall';
+    if ($m->[0] eq 'SemiColon') {
+      push(@reslist, $res = []);
+      next;
+    }
     my $ret;
     if ($m->[0] eq 'EnterCall') {
       ($ret, @tok) = prs_call(@tok)
     } else {
       $ret = $m;
     }
-    push @res, $ret;
+    push @$res, $ret;
   }
-  return (_call(@res), @tok);
+  my @call = map +(@$_ ? _call(@$_) : ()), @reslist;
+  return ($call[0], @tok); # LIES
 }
 
 sub read_string ($string) {
