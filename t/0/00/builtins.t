@@ -22,3 +22,23 @@ $ _rmkref 'Call' 'cons' 'x' [ _list 'y' ]
 < [ 'x' 'y' ]
 $ _rmkref 'Call' 'cons' [ _escape _type ] [ _list 'y' ]
 < [ _type 'y' ]
+$ _string_concat 'foo' 'bar'
+< 'foobar'
+$ _eq_chars 'foo' 'bar'
+< false
+$ _eq_chars 'foo' 'foo'
+< true
+$ _gt_chars 'x' 'a'
+< true
+$ _gt_chars 'x' 'x'
+< false
+$ _gt_chars 'a' 'x'
+< false
+$ _eq_bool [ _eq_chars 'x' 'x' ] [ _eq_chars 'x' 'x' ]
+< true
+$ _eq_bool [ _eq_chars 'x' 'x' ] [ _eq_chars 'x' 'y' ]
+< false
+$ _eq_bool [ _eq_chars 'x' 'y' ] [ _eq_chars 'y' 'y' ]
+< false
+$ _eq_bool [ _eq_chars 'y' 'y' ] [ _eq_chars 'y' 'y' ]
+< true
