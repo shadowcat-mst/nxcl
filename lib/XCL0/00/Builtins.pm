@@ -42,10 +42,6 @@ my %raw = (
   _rmknil => wrap sub ($scope, $lst) {
     mkv(raw(car($lst)), 'nil');
   },
-  _rmkcons => wrap sub ($scope, $lst) {
-    my ($typep, $car, $cdr) = flatten $lst;
-    mkv(raw($typep), 'cons', $car, $cdr);
-  },
   _rtrue => sub ($, $) { mkv(Bool => bool => 1) },
   _rfalse => sub ($, $) { mkv(Bool => bool => 0) },
   _escape => sub ($scope, $lst) { car $lst },
