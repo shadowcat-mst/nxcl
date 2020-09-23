@@ -44,3 +44,5 @@ $ _eq_bool [ _rfalse ] [ _rtrue ]
 < false
 $ _eq_bool [ _rtrue ] [ _rfalse ]
 < false
+$ _rnil? [ _rmknil 'List' ]
+< true

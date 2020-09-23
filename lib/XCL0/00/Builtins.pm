@@ -32,12 +32,19 @@ my %raw = (
   },
   _eval_inscope => wrap \&eval_inscope,
   _rmkraw => wrap sub ($scope, $lst) {
-    my ($typep, $reprp, $v) = flatten($lst);
+    my ($typep, $reprp, $v) = flatten $lst;
     mkv(raw($typep), raw($reprp), raw($v));
   },
   _rmkref => wrap sub ($scope, $lst) {
     my ($typep, $reprp, @v) = flatten($lst);
     mkv(raw($typep), raw($reprp), @v);
+  },
+  _rmknil => wrap sub ($scope, $lst) {
+    mkv(raw(car($lst)), 'nil');
+  },
+  _rmkcons => wrap sub ($scope, $lst) {
+    my ($typep, $car, $cdr) = flatten $lst;
+    mkv(raw($typep), 'cons', $car, $cdr);
   },
   _rtrue => sub ($, $) { mkv(Bool => bool => 1) },
   _rfalse => sub ($, $) { mkv(Bool => bool => 0) },
