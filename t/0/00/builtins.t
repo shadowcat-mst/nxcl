@@ -48,3 +48,5 @@ $ _rnil? [ _rmknil 'List' ]
 < true
 $ _rnil? [ _list ]
 < true
+$ _rtrue; _rfalse
+< false
