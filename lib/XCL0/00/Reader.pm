@@ -76,7 +76,7 @@ sub prs_call (@tok) {
     }
     push @res, $ret;
   }
-  _call @res;
+  return (_call(@res), @tok);
 }
 
 sub read_string ($string) {

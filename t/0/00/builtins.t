@@ -20,3 +20,5 @@ $ _rmkraw 'String' 'chars' 'foo'
 < 'foo'
 $ _rmkref 'Call' 'cons' 'x' [ _list 'y' ]
 < [ 'x' 'y' ]
+$ _rmkref 'Call' 'cons' [ _escape _type ] [ _list 'y' ]
+< [ _type 'y' ]
