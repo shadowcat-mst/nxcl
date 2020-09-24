@@ -66,3 +66,9 @@ $ [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
 <   _wutcol [ _eq_chars 'x' [ _car args ] ] 'a' 'b'
 < ] ] ] 'y'
 > 'b'
+$ [ [ _getscope ]  '_type' ] 'foo'
+> 'String'
+$ [ [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
+<   [ _getscope ] [ _car args ]
+< ] ] ] '_type' ] 'foo'
+> 'String'
