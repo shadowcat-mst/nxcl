@@ -133,7 +133,9 @@ sub combine_fexpr ($scope, $fexpr, $args) {
 
 sub eval_inscope ($scope, $v) {
   my $type = type($v);
-  return combine($scope, deref($scope), list($v)) if $type eq 'Name';
+  if ($type eq 'Name') {
+    return combine($scope, deref($scope), list(mkv String => chars => raw $v));
+  }
   if ($type eq 'List') {
     return list map eval_inscope($scope, $_), flatten $v;
   }
