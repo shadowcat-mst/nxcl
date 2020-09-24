@@ -24,6 +24,8 @@ $ _rmkref 'Call' 'cons' 'x' [ _list 'y' ]
 > [ 'x' 'y' ]
 $ _rmkref 'Call' 'cons' [ _escape _type ] [ _list 'y' ]
 > [ _type 'y' ]
+$ _id 'foo'
+> 'foo'
 $ _string_concat 'foo' 'bar'
 > 'foobar'
 $ _eq_chars 'foo' 'bar'

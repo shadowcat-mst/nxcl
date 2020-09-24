@@ -45,6 +45,7 @@ my %raw = (
   _rtrue => sub ($, $) { mkv(Bool => bool => 1) },
   _rfalse => sub ($, $) { mkv(Bool => bool => 0) },
   _escape => sub ($scope, $lst) { car $lst },
+  _id => wrap sub ($scope, $lst) { car $lst },
   _list => wrap sub ($scope, $lst) { $lst },
   _type => wrap sub ($scope, $lst) { mkv String => chars => type(car $lst) },
   _rtype => wrap sub ($scope, $lst) { mkv String => chars => rtype(car $lst) },
