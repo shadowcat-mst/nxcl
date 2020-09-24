@@ -15,44 +15,44 @@ done_testing;
 
 __DATA__
 $ _type 'foo'
-< 'String'
+> 'String'
 $ _rtype 'foo'
-< 'chars'
+> 'chars'
 $ _rmkraw 'String' 'chars' 'foo'
-< 'foo'
+> 'foo'
 $ _rmkref 'Call' 'cons' 'x' [ _list 'y' ]
-< [ 'x' 'y' ]
+> [ 'x' 'y' ]
 $ _rmkref 'Call' 'cons' [ _escape _type ] [ _list 'y' ]
-< [ _type 'y' ]
+> [ _type 'y' ]
 $ _string_concat 'foo' 'bar'
-< 'foobar'
+> 'foobar'
 $ _eq_chars 'foo' 'bar'
-< false
+> false
 $ _eq_chars 'foo' 'foo'
-< true
+> true
 $ _gt_chars 'x' 'a'
-< true
+> true
 $ _gt_chars 'x' 'x'
-< false
+> false
 $ _gt_chars 'a' 'x'
-< false
+> false
 $ _eq_bool [ _rtrue ] [ _rtrue ]
-< true
+> true
 $ _eq_bool [ _rfalse ] [ _rfalse ]
-< true
+> true
 $ _eq_bool [ _rfalse ] [ _rtrue ]
-< false
+> false
 $ _eq_bool [ _rtrue ] [ _rfalse ]
-< false
+> false
 $ _rnil? [ _rmknil 'List' ]
-< true
+> true
 $ _rnil? [ _list ]
-< true
+> true
 $ _rtrue; _rfalse
-< false
+> false
 $ [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [ _car args ] ] ] 'x' 'y'
-< 'x'
+> 'x'
 $ _wutcol [ _rtrue ] 'x' 'y'
-< 'x'
+> 'x'
 $ _wutcol [ _rfalse ] 'x' 'y'
-< 'y'
+> 'y'
