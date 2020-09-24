@@ -56,3 +56,11 @@ $ _wutcol [ _rtrue ] 'x' 'y'
 > 'x'
 $ _wutcol [ _rfalse ] 'x' 'y'
 > 'y'
+$ _eq_chars 'a' [ [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
+<   _wutcol [ _eq_chars 'x' [ _car args ] ] 'a' 'b'
+< ] ] ] 'x' ]
+> true
+$ [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
+<   _wutcol [ _eq_chars 'x' [ _car args ] ] 'a' 'b'
+< ] ] ] 'y'
+> 'b'
