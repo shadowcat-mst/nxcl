@@ -50,3 +50,9 @@ $ _rnil? [ _list ]
 < true
 $ _rtrue; _rfalse
 < false
+$ [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [ _car args ] ] ] 'x' 'y'
+< 'x'
+$ _wutcol [ _rtrue ] 'x' 'y'
+< 'x'
+$ _wutcol [ _rfalse ] 'x' 'y'
+< 'y'

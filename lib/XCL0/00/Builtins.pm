@@ -4,7 +4,7 @@ use Mojo::Base -strict, -signatures;
 
 use XCL0::00::Runtime qw(
   mkv car cdr uncons flatten
-  eval_inscope progn set
+  eval_inscope progn set deref
   type rtype rtruep rboolp rcharsp
   raw make_scope wrap
 );
@@ -19,15 +19,15 @@ my %raw = (
     set $scope => $argscope;
     return $argscope;
   },
-  _getscope => wrap sub ($scope, $) { $scope },
+  _getscope => wrap sub ($scope, $) { deref $scope },
   _wutcol => sub ($scope, $lst) {
     my ($if, $blocks) = uncons $lst;
     my ($then, $else) = uncons $blocks;
-    my ($scope2, $res) = eval_inscope $scope, $if;
+    my $res = eval_inscope $scope, $if;
     if (rtruep $res) {
-      return eval_inscope $scope2, $then;
+      return eval_inscope $scope, $then;
     } else {
-      return eval_inscope $scope2, car $else;
+      return eval_inscope $scope, car $else;
     }
   },
   _eval_inscope => wrap \&eval_inscope,
