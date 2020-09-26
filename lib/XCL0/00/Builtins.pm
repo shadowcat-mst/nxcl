@@ -19,7 +19,7 @@ my %raw = (
     set $scope => $argscope;
     return $argscope;
   },
-  _getscope => wrap sub ($scope, $) { deref $scope },
+  _getscope => wrap sub ($scope, $) { $scope },
   _wutcol => sub ($scope, $lst) {
     my ($if, $blocks) = uncons $lst;
     my ($then, $else) = uncons $blocks;
