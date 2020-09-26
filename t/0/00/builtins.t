@@ -76,7 +76,7 @@ $ [
 > 'String'
 $ _setscope
 <   [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
-<     [ _getscope ] [ _car args ]
+<     [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
 <   ] ] ];
 < _type 'foo'
 > 'String'

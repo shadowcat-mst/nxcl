@@ -19,7 +19,7 @@ my %raw = (
     set $scope => $argscope;
     return $argscope;
   },
-  _getscope => wrap sub ($scope, $) { $scope },
+  _getscope => sub ($scope, $) { mkv Scope => var => deref($scope) },
   _wutcol => sub ($scope, $lst) {
     my ($if, $blocks) = uncons $lst;
     my ($then, $else) = uncons $blocks;
@@ -59,7 +59,9 @@ my %raw = (
     my $code = XCL0::00::Runtime->can($_);
     ('_'.$_ => wrap sub ($scope, $lst) { $code->(car $lst) })
   } qw(valp refp val deref car cdr)),
-  _wrap => sub ($scope, $lst) { mkv Native => native => wrap(raw(car $lst)) },
+  _wrap => wrap sub ($scope, $lst) {
+    mkv Native => native => wrap(raw(car $lst))
+  },
   _set => do {
     my $code = XCL0::00::Runtime->can('set');
     wrap sub ($scope, $lst) { $code->(car($lst), car($lst, 1)) }

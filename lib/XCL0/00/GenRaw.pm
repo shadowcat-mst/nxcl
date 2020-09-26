@@ -1,6 +1,6 @@
 package XCL0::00::GenRaw;
 
-use Mojo::Base -base, -signatures;
+use Mojo::Base -strict, -signatures;
 use List::Util qw(reduce);
 use Exporter 'import';
 

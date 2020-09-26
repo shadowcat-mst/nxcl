@@ -1,6 +1,6 @@
 package XCL0::00::GenJ;
 
-use Mojo::Base -base, -signatures;
+use Mojo::Base -strict, -signatures;
 use XCL0::00::GenRaw;
 use JSON::Dumper::Compact qw(jdc);
 use Exporter 'import';

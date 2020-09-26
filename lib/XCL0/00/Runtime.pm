@@ -1,6 +1,6 @@
 package XCL0::00::Runtime;
 
-use Mojo::Base -base, -signatures;
+use Mojo::Base -strict, -signatures;
 use XCL0::00::Tracing;
 use Exporter 'import';
 
