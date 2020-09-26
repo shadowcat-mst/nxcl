@@ -104,13 +104,13 @@ sub flatten ($cons) {
 sub scope_fail ($scope, $args) { die "No such name: ".raw(car $args) }
 
 sub make_scope ($hash, $next = mkv(Native => native => \&scope_fail)) {
-  mkv Scope => var => mkv Native => native => wrap(sub ($scope, $args) {
+  mkv Scope => var => mkv Native => native => sub ($scope, $args) {
     my $first = car $args;
     unless (rcharsp($first)) {
       die "Scope lookup unexpectedly called with argument of type ".type($first);
     }
     $hash->{raw($first)} // combine($scope, $next, $args)
-  })
+  }
 }
 
 sub combine ($scope, $call, $args) {
