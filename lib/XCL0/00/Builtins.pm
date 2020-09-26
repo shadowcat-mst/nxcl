@@ -59,7 +59,8 @@ my %raw = (
     my $code = XCL0::00::Runtime->can($_);
     ('_'.$_ => wrap sub ($scope, $lst) { $code->(car $lst) })
   } qw(valp refp val deref car cdr)),
-  set => do {
+  _wrap => sub ($scope, $lst) { mkv Native => native => wrap(raw(car $lst)) },
+  _set => do {
     my $code = XCL0::00::Runtime->can('set');
     wrap sub ($scope, $lst) { $code->(car($lst), car($lst, 1)) }
   },

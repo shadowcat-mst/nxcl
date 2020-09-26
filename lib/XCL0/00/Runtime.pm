@@ -1,6 +1,7 @@
 package XCL0::00::Runtime;
 
 use Mojo::Base -base, -signatures;
+use XCL0::00::Tracing;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(
@@ -113,38 +114,52 @@ sub make_scope ($hash, $next = mkv(Native => native => \&scope_fail)) {
   }
 }
 
+our $event_id = 'A000';
+
 sub combine ($scope, $call, $args) {
+  my $res;
+  local *T = trace_enter(COMB => $event_id++, $args, \$res) if tracing;
   my $type = type($call);
-  return raw($call)->($scope, $args) if $type eq 'Native';
-  die unless $type eq 'Fexpr';
-  combine_fexpr($scope, $call, $args);
+  return $res = do {
+    if ($type eq 'Native') {
+      raw($call)->($scope, $args);
+    } elsif ($type eq 'Fexpr') {
+      combine_fexpr($scope, $call, $args);
+    } else {
+      die "Can't combine: $type";
+    }
+  };
 }
 
 sub combine_fexpr ($scope, $fexpr, $args) {
   my ($inscope, $body) = uncons $fexpr;
+  die "Not a scope: $_" for grep $_ ne 'Scope', type($inscope);
   my %add = (
     scope => $scope,
     thisfunc => $fexpr,
     args => $args,
   );
-  my $callscope = make_scope(\%add, $inscope);
+  my $callscope = make_scope(\%add, deref $inscope);
   eval_inscope($callscope, $body);
 }
 
 sub eval_inscope ($scope, $v) {
+  my $res;
+  local *T = trace_enter(EVAL => $event_id++, $v, \$res) if tracing;
   my $type = type($v);
-  if ($type eq 'Name') {
-    return combine($scope, deref($scope), list(mkv String => chars => raw $v));
-  }
-  if ($type eq 'List') {
-    return list map eval_inscope($scope, $_), flatten $v;
-  }
-  if ($type eq 'Call') {
-    my ($callp, $args) = uncons $v;
-    my $call = eval_inscope($scope, $callp);
-    return combine($scope, $call, $args);
-  }
-  return $v;
+  return $res = do {
+    if ($type eq 'Name') {
+      combine($scope, deref($scope), list(mkv String => chars => raw $v));
+    } elsif ($type eq 'List') {
+      list map eval_inscope($scope, $_), flatten $v;
+    } elsif ($type eq 'Call') {
+      my ($callp, $args) = uncons $v;
+      my $call = eval_inscope($scope, $callp);
+      combine($scope, $call, $args);
+    } else {
+      $v;
+    }
+  };
 }
 
 sub progn ($scope, $args) {
