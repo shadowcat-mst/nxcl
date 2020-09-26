@@ -80,3 +80,11 @@ $ _setscope
 <   ] ] ];
 < _type 'foo'
 > 'String'
+$ _setscope
+<   [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
+<     _wutcol [ _eq_chars [ _car args ] 'x' ]
+<      'is_x'
+<      [ [ _wrap [ _deref [ _getscope ] ] ] [ _car args ] ]
+<   ] ] ];
+< _id x
+> 'is_x'
