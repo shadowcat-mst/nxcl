@@ -118,7 +118,11 @@ our $event_id = 'A000';
 
 sub combine ($scope, $call, $args) {
   my $res;
-  local *T = trace_enter(COMB => $event_id++, $args, \$res) if tracing;
+  local *T = trace_enter(
+    COMB => $event_id++,
+    mkv(Call => cons => $call => $args),
+    \$res
+  ) if tracing;
   my $type = type($call);
   return $res = do {
     if ($type eq 'Native') {
