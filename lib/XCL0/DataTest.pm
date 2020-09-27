@@ -30,8 +30,12 @@ sub data_test ($data, $evaluator) {
 
 
   foreach my $test (@tests) {
+    my $src = join "\n", @{$test->{in}};
+    diag "-> $src";
+    my $out = $evaluator->($src);
+    diag "<- $out";
     is 
-      $evaluator->(join "\n", @{$test->{in}}),
+      $out,
       join("\n", @{$test->{out}}),
       "Data test ".$test->{idx};
   }
