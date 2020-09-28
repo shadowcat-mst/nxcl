@@ -1,0 +1,34 @@
+diff --git a/t/0/00/builtins.t b/t/0/00/builtins.t
+index 58864b7..7066f3b 100644
+--- a/t/0/00/builtins.t
++++ b/t/0/00/builtins.t
+@@ -88,3 +88,29 @@ $ _setscope
+ <   ] ] ];
+ < _id x
+ > 'is_x'
++# make-scope (old, name, value) [
++#   fexpr (lookup) [ ?: [ eq lookup name ] value [ old lookup ] ]
++# ]
++# define (name, value) [
++#   eval-inscope scope [ _escape [
++#     _setscope [ make-scope [ _getscope ] name value ]
++#   ] ]
++# ]
++# setup () [ make-scope [ _getscope ] 'define' define ]
++#
++# _setscope [ [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
++#     [ _car args ]
++#       [ [ _car args ] 
++#         [ [ _car args ] scope '_scope0' scope ]
++#         'make-scope' [ _car args ] ]
++#       'define' [ _car [ _cdr args ] ]
++#   ] ] ] 
++#   [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
++      [ _rmkref 'Fexpr' scope [ 
++#   ] ] ]           
++#   [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
++#   ] ] ]           
++#
++$ _setscope
++    [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
++      
