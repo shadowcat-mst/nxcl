@@ -16,6 +16,7 @@ sub data_test ($data, $evaluator) {
 
   while (my $start = shift @test_text) {
     my ($idx, $line) = @$start;
+    next if $line =~ /^#/;
     die unless $line =~ /^\$ (.*)$/;
     my (@inlines, @outlines) = ($1);
     my $t = { idx => $idx, in => \@inlines, out => \@outlines };
