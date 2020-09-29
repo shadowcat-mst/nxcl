@@ -14,12 +14,7 @@ use Exporter 'import';
 our @EXPORT = qw(builtin_scope);
 
 my %raw = (
-  _setscope => wrap sub ($scope, $lst) {
-    my $argscope = car $lst;
-    set $scope => $argscope;
-    return $argscope;
-  },
-  _getscope => sub ($scope, $) { mkv Scope => var => deref($scope) },
+  _getscope => sub ($scope, $) { $scope },
   _wutcol => sub ($scope, $lst) {
     my ($if, $blocks) = uncons $lst;
     my ($then, $else) = uncons $blocks;

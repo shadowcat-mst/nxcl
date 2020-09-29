@@ -110,7 +110,8 @@ sub make_scope ($hash, $next = mkv(Native => native => \&scope_fail)) {
     unless (rcharsp($first)) {
       die "Scope lookup unexpectedly called with argument of type ".type($first);
     }
-    $hash->{raw($first)} // combine($scope, $next, $args)
+    return $_ for grep defined, $hash->{raw($first)};
+    return combine($scope, $next, $args)
   }
 }
 
