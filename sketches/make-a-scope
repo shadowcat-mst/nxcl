@@ -95,15 +95,17 @@ _set [ _getscope ] [ make-scope-store [
 
 _set [ _getscope ] [ lambda (maker) {
     maker [ _list [ _list '_make_scope_store' maker ] [ deref scope ] ]
-  } [ fexpr (alis) {
-         lambda (name) {
-           _wutcol [ _rnil? [ _cdr alis ] ]
-             [ [ _car alis ] name ]
-             [ _wutcol
-               [ _eq_chars [ _car [ _car alis ] ] name ]
-               [ _car [ _cdr [ _car alis ] ]  ]
-               [ thisfunc [ _cdr alis ] name ] ]
-         }
+  } [ lambda (alis) {
+        lambda (name) {
+          [ lambda (alis, name) {
+              _wutcol [ _rnil? [ _cdr alis ] ]
+                [ [ _car alis ] name ]
+                [ _wutcol
+                  [ _eq_chars [ _car [ _car alis ] ] name ]
+                  [ _car [ _cdr [ _car alis ] ]  ]
+                  [ thisfunc [ _cdr alis ] name ] ]
+          } ] alis name
+        }
     } ]
 ]
 
