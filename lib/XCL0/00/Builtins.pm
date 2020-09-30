@@ -15,6 +15,7 @@ our @EXPORT = qw(builtin_scope);
 
 my %raw = (
   _getscope => sub ($scope, $) { $scope },
+  _newscope => sub ($scope, $) { mkv Scope => var => deref $scope },
   _wutcol => sub ($scope, $lst) {
     my ($if, $blocks) = uncons $lst;
     my ($then, $else) = uncons $blocks;
