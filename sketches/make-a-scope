@@ -1,0 +1,123 @@
+# scope-lookup ((x, <x>), (y, <y>), fallback) 'x' -> <x>
+# scope-lookup ((x, <x>), (y, <y>), fallback) 'z' -> [ fallback 'z' ]
+
+define scope-lookup (slist, name) {
+  ?: slist.count() == 1
+    slist.0(name)
+  ?: slist.0.0 == name
+    slist.0.1
+  thisfunc(slist.rest(), name);
+}
+
+define scope-lookup (slist, name) {
+  _wutcol [ empty? [ cdr slist ] ]
+    [ [ car slist ] name ]
+    [ _wutcol [ _eq_chars [ name [ car [ car slist ] ] ] ]
+      [ car [ cdr [ car slist ] ] ]
+      [ scope-lookup [ cdr slist ] name ] ]
+}
+
+[ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
+  _wutcol [ _rnil? [ _cdr [ _car args ] ] ]
+    [ [ _car [ _car args ] ] [ _car [ _cdr args ] ] ]
+    [ _wutcol
+      [ _eq_chars [ [ _car [ _cdr args ] ] [ _car [ _car [ _car args ] ] ] ] ]
+        [ _car [ _cdr [ _car [ _car args ] ] ] ]
+        [ scope-lookup [ _cdr [ _car args ] ] [ _car [ _cdr args ] ] ] ]
+]
+
+define make-scope-store (alist) {
+  fexpr args { ?: empty?(args) alist scope-lookup(alist, args.0) }
+}
+
+define init-scope-store () {
+  eval-inscope scope \$[
+    _setscope [ make-scope-store (
+      ('make-scope-store', $$make-scope-store),
+      ('define', $$define),
+      [ _getscope ]
+    ) ]
+  ]
+}
+
+define modify-scope-store (scope, mod) {
+  eval-inscope scope [ call \_setscope [ call mod \[ _getscope ] ] ]
+}
+
+define init-scope-store () {
+  eval-inscope scope \[
+    modify-scope-store
+    fexpr (store) { (
+      ('make-scope-store', make-scope-store),
+      ('define', define),
+      store
+    ) }
+  ]
+}
+
+define _define (name, value) {
+  modify-scope-store [ fexpr (store) [ (name, value) ++ store ] ]
+}
+
+#{{{
+
+Given: native scope store which works only as [native-scope-store name]
+
+Need:
+
+* alist scope store w/native fallback
+* define to add entry to the alist
+
+let make-scope-store = lambda (alis) {
+  lambda (name) { _lookup alis name }
+}
+
+let _define = lambda (name, val) {
+  _set scope [ make-scope-store [
+    _list [ _list name val ] [ [ _deref scope ] ]
+  ];
+}
+
+let _lookup = lambda (alis, name) {
+  _wutcol [ _rnil? [ _cdr alis ]
+    [ [ _car alis ] name ]
+    [ _wutcol
+      [ _eq_chars [ _car [ _car alis ] ] name ]
+      [ _car [ _cdr [ _car alis ] ]  ]
+      [ thisfunc [ _cdr alis ] name ] ]
+}
+
+_set [ _getscope ] [ make-scope-store [
+   [ _list [ [ _deref [ _getscope ] ] ] ]
+] ]
+
+#######
+
+_set [ _getscope ] [ lambda (maker) {
+    maker [ _list [ _list '_make_scope_store' maker ] [ deref scope ] ]
+  } [ fexpr (alis) {
+         lambda (name) {
+           _wutcol [ _rnil? [ _cdr alis ] ]
+             [ [ _car alis ] name ]
+             [ _wutcol
+               [ _eq_chars [ _car [ _car alis ] ] name ]
+               [ _car [ _cdr [ _car alis ] ]  ]
+               [ thisfunc [ _cdr alis ] name ] ]
+         }
+    } ]
+]
+
+[ lambda (definer) {
+    eval-inscope scope [ call definer '_define' definer ]
+  } [
+    lambda (name, value) {
+      _set scope [
+        _make_scope_store [
+          _rmkref 'List' 'cons' [ _list name value ] [ deref scope ]
+        ]
+      ]
+    }
+  ]
+]
+
+}}}#
