@@ -110,7 +110,7 @@ _set [ _getscope ] [ lambda (maker) {
 ]
 
 [ lambda (definer) {
-    eval-inscope scope [ call definer '_define' definer ]
+    _eval_inscope scope [ call definer '_define' definer ]
   } [
     lambda (name, value) {
       _set scope [
@@ -121,5 +121,18 @@ _set [ _getscope ] [ lambda (maker) {
     }
   ]
 ]
+
+###
+
+lambda (name) {
+  [ lambda (alis, name) {
+    ...
+  } ] alis name
+}
+
+[ _rmkref 'Fexpr' 'cons' [ _getscope ] [
+    _rmkref 'Call' 'cons' [ <define the inner lambda> ]
+      [ _list [ _car args ] [ _escape [ _car args ] ] ]
+] ]
 
 }}}#
