@@ -112,7 +112,7 @@ sub scope_fail ($scope, $args) { die "No such name: ".raw(car $args) }
 sub make_scope ($hash, $next = mkv(Native => native => \&scope_fail)) {
   mkv Scope => var => mkv Native => native => wrap(sub ($scope, $args) {
     my $first = car $args;
-    unless (rcharsp($first)) {
+    unless (type($first) eq 'String') {
       die "Scope lookup unexpectedly called with argument "
         .write_string($first);
     }
