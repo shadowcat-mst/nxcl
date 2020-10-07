@@ -88,7 +88,15 @@ $ _set [ _getscope ]
 <   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
 <     _wutcol [ _eq_chars [ _car args ] 'x' ]
 <      'is_x'
-<    [ [ _wrap [ _deref [ _getscope ] ] ] [ _car args ] ]
+<    [ [ _deref [ _getscope ] ] [ _car args ] ]
+<   ] ] ];
+< _id x
+> 'is_x'
+$ _set [ _getscope ]
+<   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
+<     _wutcol [ _eq_chars [ _car args ] 'x' ]
+<      'is_x'
+<    [ _deref scope ] [ _car args ] ]
 <   ] ] ];
 < _id x
 > 'is_x'
