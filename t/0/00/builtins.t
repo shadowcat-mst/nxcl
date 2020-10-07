@@ -52,40 +52,40 @@ $ _rnil? [ _list ]
 > true
 $ _rtrue; _rfalse
 > false
-$ [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [ _car args ] ] ] 'x' 'y'
+$ [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [ _car args ] ] ] 'x' 'y'
 > 'x'
 $ _wutcol [ _rtrue ] 'x' 'y'
 > 'x'
 $ _wutcol [ _rfalse ] 'x' 'y'
 > 'y'
-$ _eq_chars 'a' [ [ _rmkref 'Fexpr' 'cons' [ _getscope ] [ _escape [
+$ _eq_chars 'a' [ [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
 <   _wutcol [ _eq_chars 'x' [ _car args ] ] 'a' 'b'
 < ] ] ] 'x' ]
 > true
-$ [ _rmkref 'Fexpr' 'cons' [ _rmkref 'Scope' 'val' [ _deref [ _getscope ] ] ] [ _escape [
+$ [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
 <   _wutcol [ _eq_chars 'x' [ _car args ] ] 'a' 'b'
 < ] ] ] 'y'
 > 'b'
 $ [ [ _deref [ _getscope ] ] '_type' ] 'foo'
 > 'String'
-$ _rmkref 'Fexpr' 'cons' [ _rmkref 'Scope' 'val' [ _deref [ _getscope ] ] ] [ _escape [
+$ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
 <   [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
 < ] ]
 > Fexpr()
 $ [
-<   [ _rmkref 'Fexpr' 'cons' [ _rmkref 'Scope' 'val' [ _deref [ _getscope ] ] ] [ _escape [
+<   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
 <     [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
 <   ] ] ] '_type'
 < ] 'foo'
 > 'String'
 $ _set [ _getscope ]
-<   [ _rmkref 'Fexpr' 'cons' [ _rmkref 'Scope' 'val' [ _deref [ _getscope ] ] ] [ _escape [
+<   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
 <     [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
 <   ] ] ];
 < _type 'foo'
 > 'String'
 $ _set [ _getscope ]
-<   [ _rmkref 'Fexpr' 'cons' [ _rmkref 'Scope' 'val' [ _deref [ _getscope ] ] ] [ _escape [
+<   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
 <     _wutcol [ _eq_chars [ _car args ] 'x' ]
 <      'is_x'
 <    [ [ _wrap [ _deref [ _getscope ] ] ] [ _car args ] ]

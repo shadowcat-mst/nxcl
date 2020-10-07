@@ -17,6 +17,11 @@ our @EXPORT_OK = qw(
   wrap
 );
 
+sub write_string {
+  require XCL0::00::Writer;
+  &XCL0::00::Writer::write_string;
+}
+
 sub mkv ($type, $repr, @v) { [ $type => [ $repr => @v ] ] }
 
 sub type ($v) { $v->[0] }
@@ -105,14 +110,15 @@ sub flatten ($cons) {
 sub scope_fail ($scope, $args) { die "No such name: ".raw(car $args) }
 
 sub make_scope ($hash, $next = mkv(Native => native => \&scope_fail)) {
-  mkv Scope => var => mkv Native => native => sub ($scope, $args) {
+  mkv Scope => var => mkv Native => native => wrap(sub ($scope, $args) {
     my $first = car $args;
     unless (rcharsp($first)) {
-      die "Scope lookup unexpectedly called with argument of type ".type($first);
+      die "Scope lookup unexpectedly called with argument "
+        .write_string($first);
     }
     return $_ for grep defined, $hash->{raw($first)};
     return combine($scope, $next, $args)
-  }
+  });
 }
 
 our $event_id = 'A000';
@@ -138,13 +144,12 @@ sub combine ($scope, $call, $args) {
 
 sub combine_fexpr ($scope, $fexpr, $args) {
   my ($inscope, $body) = uncons $fexpr;
-  die "Not a scope: $_" for grep $_ ne 'Scope', type($inscope);
   my %add = (
     scope => $scope,
     thisfunc => $fexpr,
     args => $args,
   );
-  my $callscope = make_scope(\%add, deref $inscope);
+  my $callscope = make_scope(\%add, $inscope);
   eval_inscope($callscope, $body);
 }
 

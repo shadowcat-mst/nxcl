@@ -10,9 +10,10 @@ use constant tracing => 0+!!$ENV{XCL0_00_TRACING};
 
 our %T;
 
-require XCL0::00::Writer;
-
-sub write_string { &XCL0::00::Writer::write_string }
+sub write_string {
+  require XCL0::00::Writer;
+  &XCL0::00::Writer::write_string;
+}
 
 sub trace_enter ($type, $id, $val, $retref) {
   warn "${id} ENTER ${type} ${\write_string($val)}\n";
