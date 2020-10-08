@@ -69,18 +69,18 @@ $ [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
 $ [ [ _deref [ _getscope ] ] '_type' ] 'foo'
 > 'String'
 $ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
-<   [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
+<   [ _deref [ _getscope ] ] [ _car args ]
 < ] ]
 > Fexpr()
 $ [
 <   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
-<     [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
+<     [ _deref [ _getscope ] ] [ _car args ]
 <   ] ] ] '_type'
 < ] 'foo'
 > 'String'
 $ _set [ _getscope ]
 <   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
-<     [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
+<     [ _deref [ _getscope ] ] [ _car args ]
 <   ] ] ];
 < _type 'foo'
 > 'String'
