@@ -64,9 +64,9 @@ my %raw = (
 
   _rtype => wrap sub ($scope, $lst) { mkv String => chars => rtype(car $lst) },
 
-  _rmkraw => wrap sub ($scope, $lst) {
-    my ($typep, $reprp, $v) = flatten $lst;
-    mkv(raw($typep), raw($reprp), raw($v));
+  _rmkchars => wrap sub ($scope, $lst) {
+    my ($typep, $v) = flatten $lst;
+    mkv(raw($typep), 'chars', raw($v));
   },
   _rmkref => wrap sub ($scope, $lst) {
     my ($typep, $reprp, @v) = flatten($lst);

@@ -18,7 +18,7 @@ $ _type 'foo'
 > 'String'
 $ _rtype 'foo'
 > 'chars'
-$ _rmkraw 'String' 'chars' 'foo'
+$ _rmkchars 'String' 'foo'
 > 'foo'
 $ _rmkref 'Call' 'cons' 'x' [ _list 'y' ]
 > [ 'x' 'y' ]
