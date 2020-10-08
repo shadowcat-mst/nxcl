@@ -68,9 +68,9 @@ my %raw = (
     my ($typep, $v) = flatten $lst;
     mkv(raw($typep), 'chars', raw($v));
   },
-  _rmkref => wrap sub ($scope, $lst) {
-    my ($typep, $reprp, @v) = flatten($lst);
-    mkv(raw($typep), raw($reprp), @v);
+  _rmkcons => wrap sub ($scope, $lst) {
+    my ($typep, @v) = flatten($lst);
+    mkv(raw($typep), 'cons', @v);
   },
   _rmknil => wrap sub ($scope, $lst) {
     mkv(raw(car($lst)), 'nil');

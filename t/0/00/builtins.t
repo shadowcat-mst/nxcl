@@ -20,9 +20,9 @@ $ _rtype 'foo'
 > 'chars'
 $ _rmkchars 'String' 'foo'
 > 'foo'
-$ _rmkref 'Call' 'cons' 'x' [ _list 'y' ]
+$ _rmkcons 'Call' 'x' [ _list 'y' ]
 > [ 'x' 'y' ]
-$ _rmkref 'Call' 'cons' [ _escape _type ] [ _list 'y' ]
+$ _rmkcons 'Call' [ _escape _type ] [ _list 'y' ]
 > [ _type 'y' ]
 $ _id 'foo'
 > 'foo'
@@ -52,40 +52,40 @@ $ _rnil? [ _list ]
 > true
 $ _rtrue; _rfalse
 > false
-$ [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [ _car args ] ] ] 'x' 'y'
+$ [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [ _car args ] ] ] 'x' 'y'
 > 'x'
 $ _wutcol [ _rtrue ] 'x' 'y'
 > 'x'
 $ _wutcol [ _rfalse ] 'x' 'y'
 > 'y'
-$ _eq_string 'a' [ [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
+$ _eq_string 'a' [ [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <   _wutcol [ _eq_string 'x' [ _car args ] ] 'a' 'b'
 < ] ] ] 'x' ]
 > true
-$ [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
+$ [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <   _wutcol [ _eq_string 'x' [ _car args ] ] 'a' 'b'
 < ] ] ] 'y'
 > 'b'
 $ [ [ _deref [ _getscope ] ] '_type' ] 'foo'
 > 'String'
-$ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
+$ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <   [ _deref [ _getscope ] ] [ _car args ]
 < ] ]
 > Fexpr()
 $ [
-<   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
+<   [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <     [ _deref [ _getscope ] ] [ _car args ]
 <   ] ] ] '_type'
 < ] 'foo'
 > 'String'
 $ _set [ _getscope ]
-<   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
+<   [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <     [ _deref [ _getscope ] ] [ _car args ]
 <   ] ] ];
 < _type 'foo'
 > 'String'
 $ _set [ _getscope ]
-<   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
+<   [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <     _wutcol [ _eq_string [ _car args ] 'x' ]
 <      'is_x'
 <    [ [ _deref [ _getscope ] ] [ _car args ] ]
