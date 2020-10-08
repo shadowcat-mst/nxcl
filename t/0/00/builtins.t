@@ -28,15 +28,15 @@ $ _id 'foo'
 > 'foo'
 $ _string_concat 'foo' 'bar'
 > 'foobar'
-$ _eq_chars 'foo' 'bar'
+$ _eq_string 'foo' 'bar'
 > false
-$ _eq_chars 'foo' 'foo'
+$ _eq_string 'foo' 'foo'
 > true
-$ _gt_chars 'x' 'a'
+$ _gt_string 'x' 'a'
 > true
-$ _gt_chars 'x' 'x'
+$ _gt_string 'x' 'x'
 > false
-$ _gt_chars 'a' 'x'
+$ _gt_string 'a' 'x'
 > false
 $ _eq_bool [ _rtrue ] [ _rtrue ]
 > true
@@ -58,12 +58,12 @@ $ _wutcol [ _rtrue ] 'x' 'y'
 > 'x'
 $ _wutcol [ _rfalse ] 'x' 'y'
 > 'y'
-$ _eq_chars 'a' [ [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
-<   _wutcol [ _eq_chars 'x' [ _car args ] ] 'a' 'b'
+$ _eq_string 'a' [ [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
+<   _wutcol [ _eq_string 'x' [ _car args ] ] 'a' 'b'
 < ] ] ] 'x' ]
 > true
 $ [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
-<   _wutcol [ _eq_chars 'x' [ _car args ] ] 'a' 'b'
+<   _wutcol [ _eq_string 'x' [ _car args ] ] 'a' 'b'
 < ] ] ] 'y'
 > 'b'
 $ [ [ _deref [ _getscope ] ] '_type' ] 'foo'
@@ -86,17 +86,9 @@ $ _set [ _getscope ]
 > 'String'
 $ _set [ _getscope ]
 <   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
-<     _wutcol [ _eq_chars [ _car args ] 'x' ]
+<     _wutcol [ _eq_string [ _car args ] 'x' ]
 <      'is_x'
 <    [ [ _deref [ _getscope ] ] [ _car args ] ]
-<   ] ] ];
-< _id x
-> 'is_x'
-$ _set [ _getscope ]
-<   [ _rmkref 'Fexpr' 'cons' [ _deref [ _getscope ] ] [ _escape [
-<     _wutcol [ _eq_chars [ _car args ] 'x' ]
-<      'is_x'
-<    [ _deref scope ] [ _car args ] ]
 <   ] ] ];
 < _id x
 > 'is_x'

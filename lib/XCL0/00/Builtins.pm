@@ -46,14 +46,14 @@ my %raw = (
     die unless rboolp $l and rboolp $r;
     mkv(Bool => bool => 0+!!(raw($l) == raw($r)))
   },
-  _eq_chars => wrap sub ($scope, $lst) {
+  _eq_string => wrap sub ($scope, $lst) {
     my ($l, $r) = flatten $lst;
-    die unless rcharsp $l and rcharsp $r;
+    die unless type($l) eq 'String' and type($r) eq 'String';
     mkv(Bool => bool => 0+!!(raw($l) eq raw($r)))
   },
-  _gt_chars => wrap sub ($scope, $lst) {
+  _gt_string => wrap sub ($scope, $lst) {
     my ($l, $r) = flatten $lst;
-    die unless rcharsp $l and rcharsp $r;
+    die unless type($l) eq 'String' and type($r) eq 'String';
     mkv(Bool => bool => 0+!!(raw($l) gt raw($r)))
   },
   _string_concat => wrap sub ($scope, $lst) {
