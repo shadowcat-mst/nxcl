@@ -1,0 +1,15 @@
+
+let map (func, lst) {
+  let fst = func first lst;
+  let p = cons fst nil;
+  _maprest func p lst;
+  p;
+}
+
+let _maprest (func, pair, lst) {
+  ?: empty?(lst)
+    pair
+  let p = [ cons [ func first lst ] nil ];
+  set-cdr! pair p;
+  _maprest func p [ rest lst ];
+}

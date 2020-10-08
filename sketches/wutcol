@@ -1,0 +1,83 @@
+let make-expr (first, @rest) {
+  _wutcol [ nil? rest ]
+    first
+    [ call first @rest ]
+}
+
+let ?: = fexpr (cond, ans, @else) {
+  let v = eval-inscope scope cond;
+  _wutcol [ nil? else ] [
+    _wutcol [ bool-of v ] v [ eval-inscope scope ans ]
+  ] [
+    _wutcol [ bool-of v ] [ eval-inscope scope ans ]
+      [ eval-inscope scope [ make-expr @else ] ]
+  ]
+}
+
+cond (
+  (test . value)
+  (test2 . value2)
+);
+
+if [test] {
+  value
+} else if [test2] {
+  value2
+}
+
+?: test
+  value
+?: test2
+  value2;
+
+
+
+?: [x == 1] {
+  ...
+} ?: [x == 2] {
+  ...
+} ?: [x == 3] {
+  ...
+}
+
+
+let name = [
+  ?: [ fdno == 0 ]
+    'stdin'
+  ?: [ fdno == 1 ]
+    'stdout'
+  ?: [ fdno == 2 ]
+    'stderr'
+  [ 'fd' ++ fdno ]
+];
+
+
+#######################
+
+
+let name = [
+  ?: [ fdno == 0 ]
+    'stdin'
+  ?: [ fdno == 1 ]
+    'stdout'
+  ?: [ fdno == 2 ]
+    'stderr'
+  [ 'fd' ++ fdno ]
+];
+
+let name = '';
+
+if [ fdno == 0 ] {
+  name = 'stdin'
+} else if [ fdno == 1 ] {
+  name = 'stdout'
+} else if [ fdno == 2 ] {
+  name = 'stderr'
+} else {
+  name = 'fd' ++ fdno
+}
+
+
+
+
+

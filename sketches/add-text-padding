@@ -1,0 +1,29 @@
+#{{{
+
+Apropos: https://news.ycombinator.com/item?id=24718952
+
+    (defun add-text-padding (str padding)
+      (let ((lines (split-string "\n" str)) (
+        cond
+          ((nil? lines) "")
+          (#t (join-string "\n"
+            (cons
+              (car lines)
+              (mapcar
+                (lambda (x)
+                  (concat-string
+                    (repeat-string " " padding) x))
+                (cdr lines)
+              )
+            )
+          ))
+      )
+    )
+
+}}}#
+
+let add-text-padding (str, padding) {
+  let (first, @rest) = str.split "\n";
+  let pad = ($(1..padding).map { " " }).join();
+  (first, @(rest.map \[ ++ pad ])).join "\n"
+}
