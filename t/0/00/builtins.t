@@ -97,3 +97,14 @@ $ [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [
 <         [ _list 'foo' [ _escape [ _car args ] ] ]
 < ] ] 'bar'
 > 'foobar'
+$ [
+<   [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+<     _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [
+<        _rmkcons 'Call' _concat_string
+<          [ _list [ _car args ] [ _escape [ _car args ] ] ]
+<     ]
+<   ] ] ]
+<   'foo'
+< ]
+< 'bar'
+> 'foobar'
