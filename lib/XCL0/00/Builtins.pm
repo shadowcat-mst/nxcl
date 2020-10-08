@@ -11,7 +11,7 @@ use XCL0::00::Runtime qw(
 
 use Exporter 'import';
 
-our @EXPORT = qw(builtin_scope);
+our @EXPORT = qw(builtin_scope builtin_list);
 
 my %raw = (
   _getscope => sub ($scope, $) { $scope },
@@ -56,7 +56,7 @@ my %raw = (
     die unless type($l) eq 'String' and type($r) eq 'String';
     mkv(Bool => bool => 0+!!(raw($l) gt raw($r)))
   },
-  _string_concat => wrap sub ($scope, $lst) {
+  _concat_string => wrap sub ($scope, $lst) {
     my ($l, $r) = (car($lst), car($lst, 1));
     die unless type($l) eq 'String' and type($r) eq 'String';
     mkv(String => chars => raw($l).raw($r))
@@ -93,6 +93,8 @@ my %raw = (
 );
 
 my %cooked = map +($_ => mkv Native => native => $raw{$_}), keys %raw;
+
+sub builtin_list { sort keys %cooked }
 
 sub builtin_scope {
   make_scope \%cooked;

@@ -26,7 +26,7 @@ $ _rmkcons 'Call' [ _escape _type ] [ _list 'y' ]
 > [ _type 'y' ]
 $ _id 'foo'
 > 'foo'
-$ _string_concat 'foo' 'bar'
+$ _concat_string 'foo' 'bar'
 > 'foobar'
 $ _eq_string 'foo' 'bar'
 > false
@@ -92,3 +92,8 @@ $ _set [ _getscope ]
 <   ] ] ];
 < _id x
 > 'is_x'
+$ [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [
+<       _rmkcons 'Call' _concat_string
+<         [ _list 'foo' [ _escape [ _car args ] ] ]
+< ] ] 'bar'
+> 'foobar'
