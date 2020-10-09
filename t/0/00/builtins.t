@@ -52,38 +52,49 @@ $ _rnil? [ _list ]
 > true
 $ _rtrue; _rfalse
 > false
+# fexpr (x, y) { x } -> 'x'
 $ [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [ _car args ] ] ] 'x' 'y'
 > 'x'
 $ _wutcol [ _rtrue ] 'x' 'y'
 > 'x'
 $ _wutcol [ _rfalse ] 'x' 'y'
 > 'y'
+# == 'a' [ fexpr (s) { ?: [ s == 'x' ] 'a' 'b' } 'x' ]
 $ _eq_string 'a' [ [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <   _wutcol [ _eq_string 'x' [ _car args ] ] 'a' 'b'
 < ] ] ] 'x' ]
 > true
+# fexpr (s) { ?: [ s == 'x' ] 'a' 'b' } 'y'
 $ [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <   _wutcol [ _eq_string 'x' [ _car args ] ] 'a' 'b'
 < ] ] ] 'y'
 > 'b'
+# _type 'foo'
 $ [ [ _deref [ _getscope ] ] '_type' ] 'foo'
 > 'String'
 $ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <   [ _deref [ _getscope ] ] [ _car args ]
 < ] ]
 > Fexpr()
+# [ fexpr (x) { [ _deref [ _getscope ] ] x } '_type ] 'foo;
 $ [
 <   [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <     [ _deref [ _getscope ] ] [ _car args ]
 <   ] ] ] '_type'
 < ] 'foo'
 > 'String'
+# _set [ _getscope ] fexpr (x) { [ _deref [ _getscope ] ] x }; _type 'foo'
 $ _set [ _getscope ]
 <   [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <     [ _deref [ _getscope ] ] [ _car args ]
 <   ] ] ];
 < _type 'foo'
 > 'String'
+# _set [ _getscope ] fexpr (x) {
+#   ?: [ _eq_string x 'x' ]
+#     'is_x'
+#   [ _deref [ _getscope ] ] x
+# }
 $ _set [ _getscope ]
 <   [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <     _wutcol [ _eq_string [ _car args ] 'x' ]
@@ -92,11 +103,13 @@ $ _set [ _getscope ]
 <   ] ] ];
 < _id x
 > 'is_x'
+# [ fexpr (x) { fexpr (y) [ call _concat_string 'foo' y ] } ] 'bar'
 $ [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [
 <       _rmkcons 'Call' _concat_string
 <         [ _list 'foo' [ _escape [ _car args ] ] ]
 < ] ] 'bar'
 > 'foobar'
+# [ [ fexpr (x) { fexpr (y) { _concat_string x y } } ] 'foo' ] 'bar'
 $ [
 <   [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <     _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [
