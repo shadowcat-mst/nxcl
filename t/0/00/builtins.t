@@ -151,3 +151,14 @@ $ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 < ] ] ] ]
 < [ _list [ _list 'x' '1' ] [ _list 'y' '2' ] ] 'y'
 > '2'
+$ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+<   _wutcol [ _rnil? [ _car args ] ]
+<     ''
+<     [ _wutcol
+<         [ _eq_string [ _car [ _car [ _car args ] ] ] [ _car [ _cdr args ] ] ]
+<         [ _car [ _cdr [ _car [ _car args ] ] ] ]
+<         [ [ _wrap thisfunc ] [ _cdr [ _car args ] ] [ _car [ _cdr args ] ] ]
+<     ]
+< ] ] ] ]
+< [ _list [ _list 'x' '1' ] [ _list 'y' '2' ] ] 'z'
+> ''
