@@ -79,7 +79,7 @@ sub val ($v) {
 }
 
 sub raw ($v) {
-  die unless valp $v;
+  die "Can't extract raw from value: ".write_string($v) unless valp $v;
   $v->[1][1];
 }
 

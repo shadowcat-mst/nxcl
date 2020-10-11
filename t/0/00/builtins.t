@@ -121,3 +121,33 @@ $ [
 < ]
 < 'bar'
 > 'foobar'
+# lambda (x, y) {
+#   ?: [ empty? x ]
+#     ''
+#   ?: [ x(0)(0) == y ]
+#     x(0)(1)
+#   thisfunc [ rest x ] y
+# }
+# thisfunc ( ('x', '1'), ('y', '2') ) 'x'
+$ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+<   _wutcol [ _rnil? [ _car args ] ]
+<     ''
+<     [ _wutcol
+<         [ _eq_string [ _car [ _car [ _car args ] ] ] [ _car [ _cdr args ] ] ]
+<         [ _car [ _cdr [ _car [ _car args ] ] ] ]
+<         [ [ _wrap thisfunc ] [ _cdr [ _car args ] ] [ _car [ _cdr args ] ] ]
+<     ]
+< ] ] ] ]
+< [ _list [ _list 'x' '1' ] [ _list 'y' '2' ] ] 'x'
+> '1'
+$ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+<   _wutcol [ _rnil? [ _car args ] ]
+<     ''
+<     [ _wutcol
+<         [ _eq_string [ _car [ _car [ _car args ] ] ] [ _car [ _cdr args ] ] ]
+<         [ _car [ _cdr [ _car [ _car args ] ] ] ]
+<         [ [ _wrap thisfunc ] [ _cdr [ _car args ] ] [ _car [ _cdr args ] ] ]
+<     ]
+< ] ] ] ]
+< [ _list [ _list 'x' '1' ] [ _list 'y' '2' ] ] 'y'
+> '2'

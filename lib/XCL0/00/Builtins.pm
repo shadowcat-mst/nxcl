@@ -6,7 +6,7 @@ use XCL0::00::Runtime qw(
   mkv car cdr uncons flatten
   eval_inscope progn set deref
   type rtype rtruep rboolp rcharsp
-  raw make_scope wrap
+  raw make_scope wrap combine
 );
 
 use Exporter 'import';
@@ -33,9 +33,6 @@ my %raw = (
 
   _eval_inscope => wrap \&eval_inscope,
 
-  _wrap => wrap sub ($scope, $lst) {
-    mkv Native => native => wrap(raw(car $lst))
-  },
   _set => do {
     my $code = XCL0::00::Runtime->can('set');
     wrap sub ($scope, $lst) { $code->(car($lst), car($lst, 1)) }
@@ -88,7 +85,11 @@ my %raw = (
     ('_'.($_ =~ s/p$/?/r) => wrap sub ($scope, $lst) { $code->(car $lst) })
   } qw(valp refp val deref car cdr)),
   _wrap => wrap sub ($scope, $lst) {
-    mkv Native => native => wrap(raw(car $lst))
+    my $opv = car $lst;
+    my $apv = wrap sub ($scope, $lst) {
+      combine($scope, $opv, $lst)
+    };
+    mkv Native => native => $apv;
   },
 );
 
