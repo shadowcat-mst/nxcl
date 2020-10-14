@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
   valp val raw deref
   set
   list uncons flatten
-  make_scope eval_inscope combine
+  make_scope eval0_00 combine
   progn
   wrap
 );
@@ -150,10 +150,10 @@ sub combine_fexpr ($scope, $fexpr, $args) {
     args => $args,
   );
   my $callscope = make_scope(\%add, $inscope);
-  eval_inscope($callscope, $body);
+  eval0_00($callscope, $body);
 }
 
-sub eval_inscope ($scope, $v) {
+sub eval0_00 ($scope, $v) {
   my $res;
   local *T = trace_enter(EVAL => $event_id++, $v, \$res) if tracing;
   my $type = type($v);
@@ -161,10 +161,10 @@ sub eval_inscope ($scope, $v) {
     if ($type eq 'Name') {
       combine($scope, deref($scope), list(mkv String => chars => raw $v));
     } elsif ($type eq 'List') {
-      list map eval_inscope($scope, $_), flatten $v;
+      list map eval0_00($scope, $_), flatten $v;
     } elsif ($type eq 'Call') {
       my ($callp, $args) = uncons $v;
-      my $call = eval_inscope($scope, $callp);
+      my $call = eval0_00($scope, $callp);
       combine($scope, $call, $args);
     } else {
       $v;
@@ -174,14 +174,14 @@ sub eval_inscope ($scope, $v) {
 
 sub progn ($scope, $args) {
   my ($first, $rest) = uncons $args;
-  my $res = eval_inscope $scope, $first;
+  my $res = eval0_00 $scope, $first;
   return $res if rnilp $rest;
   progn($scope, $rest);
 }
 
 sub wrap :prototype($) ($opv_sub) {
   sub ($scope, $lstp) {
-    my $lst = eval_inscope $scope, $lstp;
+    my $lst = eval0_00 $scope, $lstp;
     $opv_sub->($scope, $lst)
   }
 }

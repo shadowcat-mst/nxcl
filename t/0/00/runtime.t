@@ -3,7 +3,7 @@ use Mojo::Base -strict, -signatures;
 
 use XCL0::00::Runtime qw(
   mkv type rtype raw car cdr list uncons flatten deref
-  make_scope combine eval_inscope
+  make_scope combine eval0_00
 );
 
 is +(my $v = mkv(X => y => 'z')), [ X => [ y => 'z' ] ];
@@ -37,13 +37,13 @@ my $scope = make_scope({ x => mkv(Bool => bool => 1) });
 is combine($scope, deref($scope), list mkv(String => chars => 'x')),
   [ Bool => [ bool => 1 ] ];
 
-is eval_inscope($scope, mkv(Name => chars => 'x')),
+is eval0_00($scope, mkv(Name => chars => 'x')),
   [ Bool => [ bool => 1 ] ];
 
-is eval_inscope($scope, mkv(String => chars => 'foo')),
+is eval0_00($scope, mkv(String => chars => 'foo')),
   [ String => [ chars => 'foo' ] ];
 
-is eval_inscope($scope, list(
+is eval0_00($scope, list(
       mkv(Name => chars => 'x'),
       mkv(String => chars => 'foo')
   )),
@@ -55,7 +55,7 @@ my $concat = mkv(Native => native => sub ($scope, $args) {
 
 my $foobar_list = list(map mkv(String => chars => $_), qw(foo bar));
 
-is eval_inscope($scope, mkv(Call => cons => $concat, $foobar_list)),
+is eval0_00($scope, mkv(Call => cons => $concat, $foobar_list)),
   mkv(String => chars => 'foobar');
 
 my $fid = mkv(Fexpr => cons =>
@@ -63,7 +63,7 @@ my $fid = mkv(Fexpr => cons =>
   mkv(Name => chars => 'args'),
 );
 
-is eval_inscope($scope, mkv(Call => cons => $fid, $foobar_list)),
+is eval0_00($scope, mkv(Call => cons => $fid, $foobar_list)),
   $foobar_list;
 
 done_testing;
