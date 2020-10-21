@@ -103,7 +103,7 @@ $ _set [ _getscope ]
 <   ] ] ];
 < _id x
 > 'is_x'
-# [ fexpr (x) { fexpr (y) [ call _concat_string 'foo' y ] } ] 'bar'
+# [ fexpr (y) [ call _concat_string 'foo' y ] ] 'bar'
 $ [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [
 <       _rmkcons 'Call' _concat_string
 <         [ _list 'foo' [ _escape [ _car args ] ] ]
