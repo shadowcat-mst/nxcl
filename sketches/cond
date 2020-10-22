@@ -1,0 +1,24 @@
+#{{{
+
+  (cond
+    ((<cond1>) (<val1>))
+    ((<cond2>) (<val2>))
+    ((#t) (<default>))
+  )
+
+}}}#
+
+  ?: [ <cond1> ]
+    <val1>
+  ?: [ <cond2> ]
+    <val2>
+  <default>
+
+  if [<cond1>] {
+    <val1>
+  } else if [<cond2>] {
+    <val2>
+  } else {
+    <default>
+  }
+
