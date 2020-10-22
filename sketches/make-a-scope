@@ -136,3 +136,14 @@ lambda (name) {
 ] ]
 
 }}}#
+
+let define = lambda (newname, newvalue) {
+  let sfunc = deref scope;
+  _set scope [ lambda (name) {
+    lambda (name) {
+      ?: [ name == newname ]
+        newvalue
+      [ sfunc name ]
+    }
+  } ]
+}
