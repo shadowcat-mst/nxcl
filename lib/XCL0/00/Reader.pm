@@ -12,7 +12,7 @@ sub _tok ($str) {
   s/^\s+//;
   $tok = do {
     if (/^[A-Za-z_]/) {
-      s/^([A-Za-z_\-?]+)// or die;
+      s/^([A-Za-z_0-9\-?]+)// or die;
       [ Name => [ chars => $1 ] ];
     } elsif (/^'/) {
       s{'((?:[^'\\\\]+|\\\\.)*)'}{} or die;
@@ -24,7 +24,7 @@ sub _tok ($str) {
     } elsif (s/^;//) {
       [ SemiColon => [ 'nil' ] ];
     } else {
-      die;
+      die $_;
     }
   };
   ($tok, $_);
