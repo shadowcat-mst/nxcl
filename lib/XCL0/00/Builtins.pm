@@ -6,7 +6,7 @@ use XCL0::00::Runtime qw(
   mkv car cdr uncons flatten
   eval0_00 progn set deref
   type rtype rtruep rboolp rcharsp
-  raw make_scope wrap combine
+  raw list make_scope wrap combine
 );
 
 use Exporter 'import';
@@ -90,6 +90,10 @@ my %raw = (
       combine($scope, $opv, $lst)
     };
     mkv Native => native => $apv;
+  },
+  _scope0_00 => sub ($, $) { builtin_scope() },
+  _names0_00 => sub ($, $) {
+    list map mkv(String => chars => $_), builtin_list()
   },
 );
 
