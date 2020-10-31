@@ -47,3 +47,5 @@ $ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <       ] ]
 <   ] ] ] ]
 > Native(Runtime::__WRAPPED__)
+$ define 'foo' 'Fu'; _id foo
+> 'Fu'
