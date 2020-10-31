@@ -2,6 +2,7 @@ package XCL0::00::Runtime;
 
 use Mojo::Base -strict, -signatures;
 use XCL0::00::Tracing;
+use Sub::Util qw(set_subname);
 use Exporter 'import';
 
 our @EXPORT_OK = qw(
@@ -35,23 +36,28 @@ sub rnativep ($v) { rtype($v) eq 'native' }
 sub rvalp ($v) { rtype($v) eq 'val' }
 sub rvarp ($v) { rtype($v) eq 'var' }
 
+sub assert_rtype ($rtype, $v) {
+  die "Expected rtype $rtype, got ".write_string($v)
+    unless rtype($v) eq $rtype;
+  return $v; # for inline use
+}
+
 sub rtruep ($v) {
-  die unless rtype($v) eq 'bool';
+  assert_rtype bool => $v;
   $v->[1][1]
 }
 
 sub rfalsep ($v) { !rtruep($v) }
 
 sub car ($cons, $n = 0) {
-  my $targ = ($n ? cdr($cons, $n) : $cons);
-  die unless rconsp $targ;
+  my $targ = ($n ? cdr($cons, $n) : assert_rtype cons => $cons);
   $targ->[1][1];
 }
 
 sub cdr ($cons, $n = 1) {
   my $targ = $cons;
   while ($n--) {
-    die unless rconsp $targ;
+    assert_rtype cons => $targ;
     $targ = $targ->[1][2];
   }
   $targ;
@@ -60,7 +66,7 @@ sub cdr ($cons, $n = 1) {
 sub refp ($v) { rtype($v) eq 'val' or rtype($v) eq 'var' }
 
 sub deref ($v) {
-  die unless refp($v);
+  die "Expected ref, got: ".write_string($v) unless refp($v);
   $v->[1][1]
 }
 
@@ -70,7 +76,7 @@ sub valp ($v) {
 }
 
 sub val ($v) {
-  die unless valp $v;
+  die "Expected val, got: ".write_string($v) unless valp($v);
   my $r = $v->[1];
   return mkv String => $r if rcharsp $v;
   return mkv Bool => $r if rboolp $v;
@@ -79,14 +85,14 @@ sub val ($v) {
 }
 
 sub raw ($v) {
-  die "Can't extract raw from value: ".write_string($v) unless valp $v;
+  die "Expected val, got: ".write_string($v) unless valp($v);
   $v->[1][1];
 }
 
 sub varp ($v) { 0+!!(rtype($v) eq 'var') }
 
 sub set ($var, $value) {
-  die unless rtype($var) eq 'var';
+  assert_rtype var => $var;
   $var->[1][1] = $value;
 }
 
@@ -97,7 +103,7 @@ sub list (@list) {
 }
 
 sub uncons ($cons) {
-  die unless rtype($cons) eq 'cons';
+  assert_rtype cons => $cons;
   @{$cons->[1]}[1,2];
 }
 
@@ -110,15 +116,16 @@ sub flatten ($cons) {
 sub scope_fail ($scope, $args) { die "No such name: ".raw(car $args) }
 
 sub make_scope ($hash, $next = mkv(Native => native => \&scope_fail)) {
-  mkv Scope => var => mkv Native => native => wrap(sub ($scope, $args) {
-    my $first = car $args;
-    unless (type($first) eq 'String') {
-      die "Scope lookup unexpectedly called with argument "
-        .write_string($first);
-    }
-    return $_ for grep defined, $hash->{raw($first)};
-    return combine($scope, $next, $args)
-  });
+  mkv Scope => var => mkv Native => native =>
+    set_subname __SCOPE__ => wrap(sub ($scope, $args) {
+      my $first = car $args;
+      unless (type($first) eq 'String') {
+        die "Scope lookup unexpectedly called with argument "
+          .write_string($first);
+      }
+      return $_ for grep defined, $hash->{raw($first)};
+      return combine($scope, $next, $args)
+    });
 }
 
 our $event_id = 'A000';
@@ -137,7 +144,7 @@ sub combine ($scope, $call, $args) {
     } elsif ($type eq 'Fexpr') {
       combine_fexpr($scope, $call, $args);
     } else {
-      die "Can't combine: $type";
+      die "Can't combine type $type: ".write_string($call);
     }
   };
 }
@@ -180,7 +187,7 @@ sub progn ($scope, $args) {
 }
 
 sub wrap :prototype($) ($opv_sub) {
-  sub ($scope, $lstp) {
+  set_subname __WRAPPED__ => sub ($scope, $lstp) {
     my $lst = eval0_00 $scope, $lstp;
     $opv_sub->($scope, $lst)
   }

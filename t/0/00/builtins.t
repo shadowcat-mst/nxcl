@@ -75,7 +75,7 @@ $ [ [ _deref [ _getscope ] ] '_type' ] 'foo'
 $ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 <   [ _deref [ _getscope ] ] [ _car args ]
 < ] ]
-> Fexpr()
+> Fexpr([ [ _deref [ _getscope ] ] [ _car args ] ])
 # [ fexpr (x) { [ _deref [ _getscope ] ] x } '_type ] 'foo;
 $ [
 <   [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [

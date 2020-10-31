@@ -16,15 +16,15 @@ sub write_string {
 }
 
 sub trace_enter ($type, $id, $val, $retref) {
-  warn "${id} ENTER ${type} ${\write_string($val)}\n";
+  warn "${id} ENTER ${type} { ${\write_string($val)}\n";
   return {
     %T,
     stack => [ @{$T{stack}||[]}, [ $type, $id, $val ] ],
     on_leave => Scope::Guard->new(sub {
       if (defined $$retref) {
-        warn "${id} LEAVE ${type} ${\write_string($$retref)}\n";
+        warn "${id} LEAVE ${type} } ${\write_string($$retref)}\n";
       } else {
-        warn "${id} ABEND ${type}\n";
+        warn "${id} ABEND ${type} } ${\write_string($val)}\n";
       }
     }),
   };

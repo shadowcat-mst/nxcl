@@ -1,6 +1,7 @@
 package XCL0::00::Builtins;
 
 use Mojo::Base -strict, -signatures;
+use Sub::Util qw(set_subname);
 
 use XCL0::00::Runtime qw(
   mkv car cdr uncons flatten
@@ -31,7 +32,7 @@ my %raw = (
     }
   },
 
-  _eval0_00 => wrap \&eval0_00,
+  _eval0_00 => wrap sub ($scope, $lst) { eval0_00(car($lst), car($lst, 1)) },
 
   _set => do {
     my $code = XCL0::00::Runtime->can('set');
@@ -82,7 +83,7 @@ my %raw = (
   } qw(cons nil chars bool native val var)),
   (map {
     my $code = XCL0::00::Runtime->can($_);
-    ('_'.($_ =~ s/p$/?/r) => wrap sub ($scope, $lst) { $code->(car $lst) })
+    ('_'.($_ =~ s/p$/?/r) => wrap set_subname 'opv_'.$_ => sub ($scope, $lst) { $code->(car $lst) })
   } qw(valp refp val deref car cdr)),
   _wrap => wrap sub ($scope, $lst) {
     my $opv = car $lst;
@@ -97,7 +98,8 @@ my %raw = (
   },
 );
 
-my %cooked = map +($_ => mkv Native => native => $raw{$_}), keys %raw;
+my %cooked = map +($_ => mkv Native => native => set_subname($_, $raw{$_})),
+               keys %raw;
 
 sub builtin_list { sort keys %cooked }
 
