@@ -49,3 +49,10 @@ $ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 > Native(Runtime::__WRAPPED__)
 $ define 'foo' 'Fu'; _id foo
 > 'Fu'
+$ define '_call'
+<   [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+<     _rmkcons 'Call' [ _car args ] [ _cdr args ]
+<   ] ] ] ]; _id 'x'
+> 'x'
+$ _eval0_00 [ _getscope ] [ _call _id foo ]
+> 'Fu'
