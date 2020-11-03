@@ -24,7 +24,7 @@ sub write_string {
   &XCL0::00::Writer::write_string;
 }
 
-sub panic ($str, $v) {
+sub panic ($str, $v = undef) {
   die join(': ', $str, defined($v) ? write_string($v) : ())."\n";
 }
 
