@@ -20,10 +20,10 @@ sub data_test ($data, $evaluator) {
     die unless $line =~ /^\$ (.*)$/;
     my (@inlines, @outlines) = ($1);
     my $t = { idx => $idx, in => \@inlines, out => \@outlines };
-    while (@test_text and $test_text[0][1] =~ /^< (.*)$/) {
+    while (@test_text and $test_text[0][1] =~ /^> (.*)$/) {
       shift @test_text; push @inlines, $1
     }
-    while (@test_text and $test_text[0][1] =~ /^> (.*)$/) {
+    while (@test_text and $test_text[0][1] =~ /^< (.*)$/) {
       shift @test_text; push @outlines, $1
     }
     push @tests, $t;
