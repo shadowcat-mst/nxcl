@@ -162,3 +162,7 @@ $ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 > ] ] ] ]
 > [ _list [ _list 'x' '1' ] [ _list 'y' '2' ] ] 'z'
 < ''
+$ _panic 'Argh'
+! Argh
+$ _panic 'Argh' [ _list 'foo' 'bar' ]
+! Argh: ('foo', 'bar')

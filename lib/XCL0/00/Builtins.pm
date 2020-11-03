@@ -4,7 +4,7 @@ use Mojo::Base -strict, -signatures;
 use Sub::Util qw(set_subname);
 
 use XCL0::00::Runtime qw(
-  panic mkv car cdr uncons flatten
+  panic mkv car cdr flatten
   eval0_00 progn set deref
   type rtype rtruep rboolp rcharsp
   raw list make_scope wrap combine
@@ -21,14 +21,19 @@ my %raw = (
   _list => wrap sub ($scope, $lst) { $lst },
   _type => wrap sub ($scope, $lst) { mkv String => chars => type(car $lst) },
 
+  _panic => wrap sub ($scope, $lst) {
+    my ($str, $v) = flatten $lst;
+    panic 'Expected string, got' => $str unless type($str) eq 'String';
+    panic raw($str) => $v;
+  },
+
   _wutcol => sub ($scope, $lst) {
-    my ($if, $blocks) = uncons $lst;
-    my ($then, $else) = uncons $blocks;
+    my ($if, $then, $else) = flatten $lst;
     my $res = eval0_00 $scope, $if;
     if (rtruep $res) {
       return eval0_00 $scope, $then;
     } else {
-      return eval0_00 $scope, car $else;
+      return eval0_00 $scope, $else;
     }
   },
 

@@ -9,22 +9,31 @@ our @EXPORT = qw(data_test);
 sub data_test ($data, $evaluator) {
   my @test_text = do {
     my $idx = 0;
-    map [ $idx++, $_ ], <$data>;
+    grep $_->[1] !~ /^#/, map [ $idx++, $_ ], <$data>;
   };
 
   my @tests;
 
   while (my $start = shift @test_text) {
     my ($idx, $line) = @$start;
-    next if $line =~ /^#/;
-    die unless $line =~ /^\$ (.*)$/;
-    my (@inlines, @outlines) = ($1);
-    my $t = { idx => $idx, in => \@inlines, out => \@outlines };
-    while (@test_text and $test_text[0][1] =~ /^> (.*)$/) {
-      shift @test_text; push @inlines, $1
-    }
-    while (@test_text and $test_text[0][1] =~ /^< (.*)$/) {
-      shift @test_text; push @outlines, $1
+    die "Test case must start with $ line, not ${line}"
+      unless $line =~ /^\$ (.*)$/;
+    my (@inlines, @outlines, @errlines) = ($1);
+    my $t = {
+      idx => $idx,
+      in => \@inlines,
+      out => \@outlines,
+      err => \@errlines,
+    };
+    TEST: while (my $next = shift @test_text) {
+      my ($type, $payload) = $next->[1] =~ /^([<>!\$]) (.*)$/
+        or die "Test line must start with <>!, got ${line}";
+      if ($type eq '$') {
+        unshift @test_text, $next;
+        last TEST;
+      }
+      state %map = ('>' => 'in', '<' => 'out', '!' => 'err');
+      push @{$t->{$map{$type}}}, $payload;
     }
     push @tests, $t;
   }
@@ -33,11 +42,19 @@ sub data_test ($data, $evaluator) {
   foreach my $test (@tests) {
     my $src = join "\n", @{$test->{in}};
     diag "-> $src";
-    my $out = $evaluator->($src);
-    diag "<- $out";
-    is 
-      $out,
-      join("\n", @{$test->{out}}),
-      "Data test ".$test->{idx};
+    if (my $out = eval { $evaluator->($src) }) {
+      diag "<- $out";
+      is
+        $out,
+        join("\n", @{$test->{out}}),
+        "Data test ".$test->{idx}." output";
+    } else {
+      chomp(my $err = $@);
+      diag "<- !$err";
+      is
+        $err,
+        join("\n", @{$test->{err}}),
+        "Data test ".$test->{idx}." error";
+    }
   }
 }
