@@ -4,7 +4,7 @@ use Mojo::Base -strict, -signatures;
 use Sub::Util qw(set_subname);
 
 use XCL0::00::Runtime qw(
-  mkv car cdr uncons flatten
+  panic mkv car cdr uncons flatten
   eval0_00 progn set deref
   type rtype rtruep rboolp rcharsp
   raw list make_scope wrap combine
@@ -41,22 +41,26 @@ my %raw = (
   _progn => \&progn,
   _eq_bool => wrap sub ($scope, $lst) {
     my ($l, $r) = flatten $lst;
-    die unless rboolp $l and rboolp $r;
+    panic 'Args must both be boolean, got' => list($l, $r)
+      unless rboolp $l and rboolp $r;
     mkv(Bool => bool => 0+!!(raw($l) == raw($r)))
   },
   _eq_string => wrap sub ($scope, $lst) {
     my ($l, $r) = flatten $lst;
-    die unless type($l) eq 'String' and type($r) eq 'String';
+    panic 'Args must both be strings, got' => list($l, $r)
+      unless type($l) eq 'String' and type($r) eq 'String';
     mkv(Bool => bool => 0+!!(raw($l) eq raw($r)))
   },
   _gt_string => wrap sub ($scope, $lst) {
     my ($l, $r) = flatten $lst;
-    die unless type($l) eq 'String' and type($r) eq 'String';
+    panic 'Args must both be strings, got' => list($l, $r)
+      unless type($l) eq 'String' and type($r) eq 'String';
     mkv(Bool => bool => 0+!!(raw($l) gt raw($r)))
   },
   _concat_string => wrap sub ($scope, $lst) {
     my ($l, $r) = (car($lst), car($lst, 1));
-    die unless type($l) eq 'String' and type($r) eq 'String';
+    panic 'Args must both be strings, got' => list($l, $r)
+      unless type($l) eq 'String' and type($r) eq 'String';
     mkv(String => chars => raw($l).raw($r))
   },
 

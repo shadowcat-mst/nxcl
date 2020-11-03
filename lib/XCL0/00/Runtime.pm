@@ -6,6 +6,7 @@ use Sub::Util qw(set_subname);
 use Exporter 'import';
 
 our @EXPORT_OK = qw(
+  panic assert_rtype
   mkv
   rtype type
   rconsp rnilp rcharsp rboolp rnativep rvalp rvarp rtruep rfalsep
@@ -23,6 +24,10 @@ sub write_string {
   &XCL0::00::Writer::write_string;
 }
 
+sub panic ($str, $v) {
+  die join(': ', $str, defined($v) ? write_string($v) : ())."\n";
+}
+
 sub mkv ($type, $repr, @v) { [ $type => [ $repr => @v ] ] }
 
 sub type ($v) { $v->[0] }
@@ -37,7 +42,7 @@ sub rvalp ($v) { rtype($v) eq 'val' }
 sub rvarp ($v) { rtype($v) eq 'var' }
 
 sub assert_rtype ($rtype, $v) {
-  die "Expected rtype $rtype, got ".write_string($v)
+  panic "Expected rtype $rtype, got" => $v
     unless rtype($v) eq $rtype;
   return $v; # for inline use
 }
@@ -66,7 +71,7 @@ sub cdr ($cons, $n = 1) {
 sub refp ($v) { rtype($v) eq 'val' or rtype($v) eq 'var' }
 
 sub deref ($v) {
-  die "Expected ref, got: ".write_string($v) unless refp($v);
+  panic "Expected ref, got" => write_string($v) unless refp($v);
   $v->[1][1]
 }
 
@@ -76,7 +81,7 @@ sub valp ($v) {
 }
 
 sub val ($v) {
-  die "Expected val, got: ".write_string($v) unless valp($v);
+  panic "Expected val, got" => $v unless valp($v);
   my $r = $v->[1];
   return mkv String => $r if rcharsp $v;
   return mkv Bool => $r if rboolp $v;
@@ -85,7 +90,7 @@ sub val ($v) {
 }
 
 sub raw ($v) {
-  die "Expected val, got: ".write_string($v) unless valp($v);
+  panic "Expected val, got" => $v unless valp($v);
   $v->[1][1];
 }
 
@@ -113,15 +118,14 @@ sub flatten ($cons) {
   return ($car, flatten($cdr));
 }
 
-sub scope_fail ($scope, $args) { die "No such name: ".raw(car $args) }
+sub scope_fail ($scope, $args) { panic "No such name: ".raw(car $args) }
 
 sub make_scope ($hash, $next = mkv(Native => native => \&scope_fail)) {
   mkv Scope => var => mkv Native => native =>
     set_subname __SCOPE__ => wrap(sub ($scope, $args) {
       my $first = car $args;
       unless (type($first) eq 'String') {
-        die "Scope lookup unexpectedly called with argument "
-          .write_string($first);
+        panic "Scope lookup expected string, got" => $first;
       }
       return $_ for grep defined, $hash->{raw($first)};
       return combine($scope, $next, $args)
@@ -144,7 +148,7 @@ sub combine ($scope, $call, $args) {
     } elsif ($type eq 'Fexpr') {
       combine_fexpr($scope, $call, $args);
     } else {
-      die "Can't combine type $type: ".write_string($call);
+      panic "Can't combine value of type $type" => $call;
     }
   };
 }
