@@ -44,15 +44,25 @@ $ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 >               [ _deref scope ]
 >               [ _list [ _escape [ _car args ] ] ] ]
 >         ] ]
->       ] ]
+>       ] ];
+>       _list
 >   ] ] ] ]
-< Native(Runtime::__WRAPPED__)
+< ()
 $ define 'foo' 'Fu'; _id foo
 < 'Fu'
 $ define '_call'
 >   [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 >     _rmkcons 'Call' [ _car args ] [ _cdr args ]
->   ] ] ] ]; _id 'x'
-< 'x'
+>   ] ] ] ]
+< ()
 $ _eval0_00 [ _getscope ] [ _call _id foo ]
 < 'Fu'
+$ define 'call-scoped' [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+>   define 'inner-scope' [ _rmkvar 'Scope' [ _deref scope ] ];
+>   _eval0_00 inner-scope [ _car args ]
+> ] ] ]
+< ()
+$ call-scoped [ define 'bar' 'Yorkie'; _id bar ]
+< 'Yorkie'
+$ _id bar
+! No such name: bar

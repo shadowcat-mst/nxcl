@@ -85,6 +85,13 @@ my %raw = (
   _rtrue => sub ($, $) { mkv(Bool => bool => 1) },
   _rfalse => sub ($, $) { mkv(Bool => bool => 0) },
   (map {
+    my $rtype = $_;
+    "_rmk${rtype}" => wrap sub ($scope, $lst) {
+      my ($typep, $v) = flatten $lst;
+      mkv(raw($typep), $rtype, $v);
+    }
+  } qw(var val)),
+  (map {
     my $code = XCL0::00::Runtime->can("r${_}p");
     ("_r${_}?" => wrap sub ($scope, $lst) {
       mkv Bool => bool => 0+!!$code->(car $lst) 
