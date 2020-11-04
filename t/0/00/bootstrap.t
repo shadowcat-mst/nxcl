@@ -39,7 +39,7 @@ $ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 >         [ _rmkcons 'Call' _wutcol [ _list
 >           [ _rmkcons 'Call' _eq_string
 >             [ _list [ _escape [ _car args ] ] [ _car args ] ] ]
->             [ _car [ _cdr args ] ]
+>             [ _rmkcons 'Call' _escape [ _list [ _car [ _cdr args ] ] ] ]
 >             [ _rmkcons 'Call'
 >               [ _deref scope ]
 >               [ _list [ _escape [ _car args ] ] ] ]
@@ -66,3 +66,22 @@ $ call-scoped [ define 'bar' 'Yorkie'; _id bar ]
 < 'Yorkie'
 $ _id bar
 ! No such name: bar
+# define _defmulti [ fexpr (names, values) {
+#   scope.eval [ call \define [ first names ] [ first values ] ];
+#   thisfunc [ rest names ] [ rest values ];
+# } ]
+$ define '_defmulti' [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+>   define 'names' [ _car args ];
+>   define 'values' [ _eval0_00 scope [ _car [ _cdr args ] ] ];
+>   _eval0_00 scope [ _call define [ _val [ _car names ] ] [ _car values ] ];
+>   _wutcol [ _rnil? [ _cdr names ] ]
+>     [ _list ]
+>     [ _eval0_00 scope
+>       [ _call thisfunc [ _cdr names ] [ _call _escape [ _cdr values ] ] ] ]
+> ] ] ]
+< ()
+$ call-scoped [
+>   _defmulti [ x y z ] [ _list 'x1' 'y2' 'z3' ];
+>   _list z y x
+> ]
+< ('z3', 'y2', 'x1')

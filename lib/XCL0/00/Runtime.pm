@@ -83,9 +83,9 @@ sub valp ($v) {
 sub val ($v) {
   panic "Expected val, got" => $v unless valp($v);
   my $r = $v->[1];
-  return mkv String => $r if rcharsp $v;
-  return mkv Bool => $r if rboolp $v;
-  return mkv Native => $r if rnativep $v;
+  return mkv String => @$r if rcharsp $v;
+  return mkv Bool => @$r if rboolp $v;
+  return mkv Native => @$r if rnativep $v;
   return deref $v;
 }
 
