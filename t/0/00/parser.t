@@ -24,3 +24,7 @@ $ x 'x1'; y 'y1';
 < [ _progn [ x 'x1' ] [ y 'y1' ] ]
 $ x [ y 'y1'; z 'z1' ]
 < [ x [ _progn [ y 'y1' ] [ z 'z1' ] ] ]
+$ x [ y [ a 'y1']; z 'z1' ]
+< [ x [ _progn [ y [ a 'y1' ] ] [ z 'z1' ] ] ]
+$ x [ [ y; z ] ]
+< [ x [ [ _progn [ y ] [ z ] ] ] ]
