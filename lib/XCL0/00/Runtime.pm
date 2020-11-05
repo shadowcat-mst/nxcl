@@ -83,9 +83,9 @@ sub valp ($v) {
 sub val ($v) {
   panic "Expected val, got" => $v unless valp($v);
   my $r = $v->[1];
-  return mkv String => @$r if rcharsp $v;
-  return mkv Bool => @$r if rboolp $v;
-  return mkv Native => @$r if rnativep $v;
+  return mkv String00 => @$r if rcharsp $v;
+  return mkv Bool00 => @$r if rboolp $v;
+  return mkv Native00 => @$r if rnativep $v;
   return deref $v;
 }
 
@@ -120,11 +120,11 @@ sub flatten ($cons) {
 
 sub scope_fail ($scope, $args) { panic "No such name: ".raw(car $args) }
 
-sub make_scope ($hash, $next = mkv(Native => native => \&scope_fail)) {
-  mkv Scope => var => mkv Native => native =>
+sub make_scope ($hash, $next = mkv(Native00 => native => \&scope_fail)) {
+  mkv Scope => var => mkv Native00 => native =>
     set_subname __SCOPE__ => wrap(sub ($scope, $args) {
       my $first = car $args;
-      unless (type($first) eq 'String') {
+      unless (type($first) eq 'String00') {
         panic "Scope lookup expected string, got" => $first;
       }
       return $_ for grep defined, $hash->{raw($first)};
@@ -138,14 +138,14 @@ sub combine ($scope, $call, $args) {
   my $res;
   local *T = trace_enter(
     COMB => $event_id++,
-    mkv(Call => cons => $call => $args),
+    mkv(Call00 => cons => $call => $args),
     \$res
   ) if tracing;
   my $type = type($call);
   return $res = do {
-    if ($type eq 'Native') {
+    if ($type eq 'Native00') {
       raw($call)->($scope, $args);
-    } elsif ($type eq 'Fexpr') {
+    } elsif ($type eq 'Fexpr00') {
       combine_fexpr($scope, $call, $args);
     } else {
       panic "Can't combine value of type $type" => $call;
@@ -169,11 +169,11 @@ sub eval0_00 ($scope, $v) {
   local *T = trace_enter(EVAL => $event_id++, $v, \$res) if tracing;
   my $type = type($v);
   return $res = do {
-    if ($type eq 'Name') {
-      combine($scope, deref($scope), list(mkv String => chars => raw $v));
+    if ($type eq 'Name00') {
+      combine($scope, deref($scope), list(mkv String00 => chars => raw $v));
     } elsif ($type eq 'List') {
       list map eval0_00($scope, $_), flatten $v;
-    } elsif ($type eq 'Call') {
+    } elsif ($type eq 'Call00') {
       my ($callp, $args) = uncons $v;
       my $call = eval0_00($scope, $callp);
       combine($scope, $call, $args);

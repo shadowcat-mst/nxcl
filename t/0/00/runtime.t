@@ -14,7 +14,7 @@ is rtype($v), 'y';
 
 is raw($v), 'z';
 
-my $abc_list = list map mkv(String => string => $_), qw(a b c);
+my $abc_list = list map mkv(String00 => string => $_), qw(a b c);
 
 is raw(car($abc_list)), 'a';
 
@@ -32,38 +32,38 @@ is raw(car(cdr($abc_list, 2))), 'c';
 
 is [ map raw($_), flatten($abc_list) ], [ qw(a b c) ];
 
-my $scope = make_scope({ x => mkv(Bool => bool => 1) });
+my $scope = make_scope({ x => mkv(Bool00 => bool => 1) });
 
-is combine($scope, deref($scope), list mkv(String => chars => 'x')),
-  [ Bool => [ bool => 1 ] ];
+is combine($scope, deref($scope), list mkv(String00 => chars => 'x')),
+  [ Bool00 => [ bool => 1 ] ];
 
-is eval0_00($scope, mkv(Name => chars => 'x')),
-  [ Bool => [ bool => 1 ] ];
+is eval0_00($scope, mkv(Name00 => chars => 'x')),
+  [ Bool00 => [ bool => 1 ] ];
 
-is eval0_00($scope, mkv(String => chars => 'foo')),
-  [ String => [ chars => 'foo' ] ];
+is eval0_00($scope, mkv(String00 => chars => 'foo')),
+  [ String00 => [ chars => 'foo' ] ];
 
 is eval0_00($scope, list(
-      mkv(Name => chars => 'x'),
-      mkv(String => chars => 'foo')
+      mkv(Name00 => chars => 'x'),
+      mkv(String00 => chars => 'foo')
   )),
-  list(mkv(Bool => bool => 1), mkv(String => chars => 'foo'));
+  list(mkv(Bool00 => bool => 1), mkv(String00 => chars => 'foo'));
 
-my $concat = mkv(Native => native => sub ($scope, $args) {
-  mkv String => chars => join '', map raw($_), flatten($args);
+my $concat = mkv(Native00 => native => sub ($scope, $args) {
+  mkv String00 => chars => join '', map raw($_), flatten($args);
 });
 
-my $foobar_list = list(map mkv(String => chars => $_), qw(foo bar));
+my $foobar_list = list(map mkv(String00 => chars => $_), qw(foo bar));
 
-is eval0_00($scope, mkv(Call => cons => $concat, $foobar_list)),
-  mkv(String => chars => 'foobar');
+is eval0_00($scope, mkv(Call00 => cons => $concat, $foobar_list)),
+  mkv(String00 => chars => 'foobar');
 
-my $fid = mkv(Fexpr => cons =>
+my $fid = mkv(Fexpr00 => cons =>
   $scope,
-  mkv(Name => chars => 'args'),
+  mkv(Name00 => chars => 'args'),
 );
 
-is eval0_00($scope, mkv(Call => cons => $fid, $foobar_list)),
+is eval0_00($scope, mkv(Call00 => cons => $fid, $foobar_list)),
   $foobar_list;
 
 done_testing;

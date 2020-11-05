@@ -20,11 +20,11 @@ my %raw = (
   _id => wrap sub ($scope, $lst) { car $lst },
   #_listo => sub ($scope, $lst) { $lst },
   _list => wrap sub ($scope, $lst) { $lst },
-  _type => wrap sub ($scope, $lst) { mkv String => chars => type(car $lst) },
+  _type => wrap sub ($scope, $lst) { mkv String00 => chars => type(car $lst) },
 
   _panic => wrap sub ($scope, $lst) {
     my ($str, $v) = flatten $lst;
-    panic 'Expected string, got' => $str unless type($str) eq 'String';
+    panic 'Expected string, got' => $str unless type($str) eq 'String00';
     panic raw($str) => $v;
   },
 
@@ -49,28 +49,28 @@ my %raw = (
     my ($l, $r) = flatten $lst;
     panic 'Args must both be boolean, got' => list($l, $r)
       unless rboolp $l and rboolp $r;
-    mkv(Bool => bool => 0+!!(raw($l) == raw($r)))
+    mkv(Bool00 => bool => 0+!!(raw($l) == raw($r)))
   },
   _eq_string => wrap sub ($scope, $lst) {
     my ($l, $r) = flatten $lst;
     panic 'Args must both be strings, got' => list($l, $r)
-      unless type($l) eq 'String' and type($r) eq 'String';
-    mkv(Bool => bool => 0+!!(raw($l) eq raw($r)))
+      unless type($l) eq 'String00' and type($r) eq 'String00';
+    mkv(Bool00 => bool => 0+!!(raw($l) eq raw($r)))
   },
   _gt_string => wrap sub ($scope, $lst) {
     my ($l, $r) = flatten $lst;
     panic 'Args must both be strings, got' => list($l, $r)
-      unless type($l) eq 'String' and type($r) eq 'String';
-    mkv(Bool => bool => 0+!!(raw($l) gt raw($r)))
+      unless type($l) eq 'String00' and type($r) eq 'String00';
+    mkv(Bool00 => bool => 0+!!(raw($l) gt raw($r)))
   },
   _concat_string => wrap sub ($scope, $lst) {
     my ($l, $r) = (car($lst), car($lst, 1));
     panic 'Args must both be strings, got' => list($l, $r)
-      unless type($l) eq 'String' and type($r) eq 'String';
-    mkv(String => chars => raw($l).raw($r))
+      unless type($l) eq 'String00' and type($r) eq 'String00';
+    mkv(String00 => chars => raw($l).raw($r))
   },
 
-  _rtype => wrap sub ($scope, $lst) { mkv String => chars => rtype(car $lst) },
+  _rtype => wrap sub ($scope, $lst) { mkv String00 => chars => rtype(car $lst) },
 
   _rmkchars => wrap sub ($scope, $lst) {
     my ($typep, $v) = flatten $lst;
@@ -83,8 +83,8 @@ my %raw = (
   _rmknil => wrap sub ($scope, $lst) {
     mkv(raw(car($lst)), 'nil');
   },
-  _rtrue => sub ($, $) { mkv(Bool => bool => 1) },
-  _rfalse => sub ($, $) { mkv(Bool => bool => 0) },
+  _rtrue => sub ($, $) { mkv(Bool00 => bool => 1) },
+  _rfalse => sub ($, $) { mkv(Bool00 => bool => 0) },
   (map {
     my $rtype = $_;
     "_rmk${rtype}" => wrap sub ($scope, $lst) {
@@ -95,7 +95,7 @@ my %raw = (
   (map {
     my $code = XCL0::00::Runtime->can("r${_}p");
     ("_r${_}?" => wrap sub ($scope, $lst) {
-      mkv Bool => bool => 0+!!$code->(car $lst) 
+      mkv Bool00 => bool => 0+!!$code->(car $lst) 
     })
   } qw(cons nil chars bool native val var)),
   (map {
@@ -107,15 +107,15 @@ my %raw = (
     my $apv = wrap sub ($scope, $lst) {
       combine($scope, $opv, $lst)
     };
-    mkv Native => native => $apv;
+    mkv Native00 => native => $apv;
   },
   _scope0_00 => sub ($, $) { builtin_scope() },
   _names0_00 => sub ($, $) {
-    list map mkv(String => chars => $_), builtin_list()
+    list map mkv(String00 => chars => $_), builtin_list()
   },
 );
 
-my %cooked = map +($_ => mkv Native => native => set_subname($_, $raw{$_})),
+my %cooked = map +($_ => mkv Native00 => native => set_subname($_, $raw{$_})),
                keys %raw;
 
 sub builtin_list { sort keys %cooked }

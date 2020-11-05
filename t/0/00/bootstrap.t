@@ -17,7 +17,7 @@ done_testing;
 
 __DATA__
 $ _type 'foo'
-< 'String'
+< 'String00'
 # [
 #   lambda (definer) { scope.eval \$[ $$definer 'define' $$definer ] }
 #   lambda (newname, newvalue) {
@@ -28,19 +28,19 @@ $ _type 'foo'
 #     } ]
 #   }
 # ]
-$ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
->   _eval0_00 scope [ _rmkcons 'Call'
+$ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
+>   _eval0_00 scope [ _rmkcons 'Call00'
 >    [ _car args ] [ _list 'define' [ _car args ] ]
 >   ]
 > ] ] ] ]
->   [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+>   [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >     _set scope
->       [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ]
->         [ _rmkcons 'Call' _wutcol [ _list
->           [ _rmkcons 'Call' _eq_string
+>       [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ]
+>         [ _rmkcons 'Call00' _wutcol [ _list
+>           [ _rmkcons 'Call00' _eq_string
 >             [ _list [ _escape [ _car args ] ] [ _car args ] ] ]
->             [ _rmkcons 'Call' _escape [ _list [ _car [ _cdr args ] ] ] ]
->             [ _rmkcons 'Call'
+>             [ _rmkcons 'Call00' _escape [ _list [ _car [ _cdr args ] ] ] ]
+>             [ _rmkcons 'Call00'
 >               [ _deref scope ]
 >               [ _list [ _escape [ _car args ] ] ] ]
 >         ] ]
@@ -50,12 +50,12 @@ $ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 < ()
 $ define 'foo' 'Fu'; _id foo
 < 'Fu'
-$ define '_fexpr' [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
->   _rmkcons 'Fexpr' [ _deref scope ] [ _car args ]
+$ define '_fexpr' [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
+>   _rmkcons 'Fexpr00' [ _deref scope ] [ _car args ]
 > ] ] ]
 < ()
 $ define '_call' [ _wrap [ _fexpr [
->   _rmkcons 'Call' [ _car args ] [ _cdr args ]
+>   _rmkcons 'Call00' [ _car args ] [ _cdr args ]
 > ] ] ]
 < ()
 $ _eval0_00 [ _getscope ] [ _call _id foo ]

@@ -13,14 +13,14 @@ sub _tok ($str) {
   $tok = do {
     if (/^[A-Za-z_]/) {
       s/^([A-Za-z_0-9\-?]+)// or die;
-      [ Name => [ chars => $1 ] ];
+      [ Name00 => [ chars => $1 ] ];
     } elsif (/^'/) {
       s{'((?:[^'\\\\]+|\\\\.)*)'}{} or die;
-      [ String => [ chars => $1 ] ];
+      [ String00 => [ chars => $1 ] ];
     } elsif (s/^\[//) {
-      [ EnterCall => [ 'nil' ] ];
+      [ EnterCall00 => [ 'nil' ] ];
     } elsif (s/^\]//) {
-      [ LeaveCall => [ 'nil' ] ];
+      [ LeaveCall00 => [ 'nil' ] ];
     } elsif (s/^;//) {
       [ SemiColon => [ 'nil' ] ];
     } else {
@@ -47,7 +47,7 @@ sub _list ($first, @rest) {
 }
 
 sub _call (@args) {
-  [ Call => _list(@args)->[1] ]
+  [ Call00 => _list(@args)->[1] ]
 }
 
 sub prs (@tok) {
@@ -67,8 +67,8 @@ sub prs_call ($end, @tok) {
       next;
     }
     my $ret;
-    if ($m->[0] eq 'EnterCall') {
-      ($ret, @tok) = prs_call(LeaveCall => @tok)
+    if ($m->[0] eq 'EnterCall00') {
+      ($ret, @tok) = prs_call(LeaveCall00 => @tok)
     } else {
       $ret = $m;
     }
@@ -78,7 +78,7 @@ sub prs_call ($end, @tok) {
   my @call = map +(@$_ ? _call(@$_) : ()), @reslist;
   die unless @call; # ?
   return ($call[0], @tok) if @call == 1;
-  return (_call([ Name => [ chars => '_progn' ] ], @call), @tok);
+  return (_call([ Name00 => [ chars => '_progn' ] ], @call), @tok);
 }
 
 sub read_string ($string) {
