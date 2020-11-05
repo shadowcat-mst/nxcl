@@ -54,10 +54,9 @@ $ define '_fexpr' [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 >   _rmkcons 'Fexpr' [ _deref scope ] [ _car args ]
 > ] ] ]
 < ()
-$ define '_call'
->   [ _wrap [ _fexpr [
->     _rmkcons 'Call' [ _car args ] [ _cdr args ]
->   ] ] ]
+$ define '_call' [ _wrap [ _fexpr [
+>   _rmkcons 'Call' [ _car args ] [ _cdr args ]
+> ] ] ]
 < ()
 $ _eval0_00 [ _getscope ] [ _call _id foo ]
 < 'Fu'
