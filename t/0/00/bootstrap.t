@@ -88,3 +88,12 @@ $ call-scoped [
 >   _list z y x
 > ]
 < ('z3', 'y2', 'x1')
+$ define 'fexpr' [ _fexpr [
+>   define 'arglist' [ _car args ];
+>   define 'body' [ _car [ _cdr args ] ];
+>   define 'unpack' [ _call _defmulti arglist [ _escape args ] ];
+>   _eval0_00 scope [ _call _fexpr [ _call _progn unpack body ] ]
+> ] ]
+< ()
+$ [ fexpr [ x y ] [ _concat_string x y ] ] 'foo' 'bar'
+< 'foobar'
