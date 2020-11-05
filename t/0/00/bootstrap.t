@@ -50,17 +50,21 @@ $ [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 < ()
 $ define 'foo' 'Fu'; _id foo
 < 'Fu'
+$ define '_fexpr' [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+>   _rmkcons 'Fexpr' [ _deref scope ] [ _car args ]
+> ] ] ]
+< ()
 $ define '_call'
->   [ _wrap [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+>   [ _wrap [ _fexpr [
 >     _rmkcons 'Call' [ _car args ] [ _cdr args ]
->   ] ] ] ]
+>   ] ] ]
 < ()
 $ _eval0_00 [ _getscope ] [ _call _id foo ]
 < 'Fu'
-$ define 'call-scoped' [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+$ define 'call-scoped' [ _fexpr [
 >   define 'inner-scope' [ _rmkvar 'Scope' [ _deref scope ] ];
 >   _eval0_00 inner-scope [ _car args ]
-> ] ] ]
+> ] ]
 < ()
 $ call-scoped [ define 'bar' 'Yorkie'; _id bar ]
 < 'Yorkie'
@@ -70,7 +74,7 @@ $ _id bar
 #   scope.eval [ call \define [ first names ] [ first values ] ];
 #   thisfunc [ rest names ] [ rest values ];
 # } ]
-$ define '_defmulti' [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
+$ define '_defmulti' [ _fexpr [
 >   define 'names' [ _car args ];
 >   define 'values' [ _eval0_00 scope [ _car [ _cdr args ] ] ];
 >   _eval0_00 scope [ _call define [ _val [ _car names ] ] [ _car values ] ];
@@ -78,7 +82,7 @@ $ define '_defmulti' [ _rmkcons 'Fexpr' [ _deref [ _getscope ] ] [ _escape [
 >     [ _list ]
 >     [ _eval0_00 scope
 >       [ _call thisfunc [ _cdr names ] [ _call _escape [ _cdr values ] ] ] ]
-> ] ] ]
+> ] ]
 < ()
 $ call-scoped [
 >   _defmulti [ x y z ] [ _list 'x1' 'y2' 'z3' ];
