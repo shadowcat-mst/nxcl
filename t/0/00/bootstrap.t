@@ -97,3 +97,8 @@ $ define 'fexpr' [ _fexpr [
 < ()
 $ [ fexpr [ x y ] [ _concat_string x y ] ] 'foo' 'bar'
 < 'foobar'
+$ _eval0_00 [ _getscope ]
+>   [ _call
+>     [ _call fexpr [ _listo x y ] [ _escape [ _concat_string x y ] ] ]
+>     'foo' 'bar' ]
+< 'foobar'
