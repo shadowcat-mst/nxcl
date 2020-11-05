@@ -18,7 +18,7 @@ my %raw = (
   _getscope => sub ($scope, $) { $scope },
   _escape => sub ($scope, $lst) { car $lst },
   _id => wrap sub ($scope, $lst) { car $lst },
-  _listo => sub ($scope, $lst) { $lst },
+  #_listo => sub ($scope, $lst) { $lst },
   _list => wrap sub ($scope, $lst) { $lst },
   _type => wrap sub ($scope, $lst) { mkv String => chars => type(car $lst) },
 
