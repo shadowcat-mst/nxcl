@@ -97,7 +97,7 @@ $ define 'fexpr' [ _fexpr [
 < ()
 $ [ fexpr [ x y ] [ _concat_string x y ] ] 'foo' 'bar'
 < 'foobar'
-$ define '_listo' [ _fexpr [ _id args ] ]
+$ define '_listo' [ _fexpr args ]
 < ()
 $ _eval0_00 [ _getscope ]
 >   [ _call
