@@ -104,3 +104,50 @@ $ _eval0_00 [ _getscope ]
 >     [ _call fexpr [ _listo x y ] [ _escape [ _concat_string x y ] ] ]
 >     'foo' 'bar' ]
 < 'foobar'
+$ define 'alist-get-entry' [ _wrap [ fexpr [ alist key ] [
+>   _wutcol [ _rnil? alist ]
+>     [ _panic 'No such key' key ]
+>     [ _wutcol [ _eq_string [ _car [ _car alist ] ] key ]
+>       [ _car alist ]
+>       [ [ _wrap thisfunc ] [ _cdr alist ] key ] ]
+> ] ] ]
+< ()
+$ alist-get-entry [_list] 'foo'
+! No such key: 'foo'
+$ define 'ex-alist' [ _list [ _list 'x' 'x1' ] [ _list 'z' 'z1' ] ]
+< ()
+$ alist-get-entry ex-alist 'z'
+< ('z', 'z1')
+$ define 'alist-get-value' [ _wrap [ fexpr [ alist key ] [
+>   _car [ _cdr [ alist-get-entry alist key ] ]
+> ] ] ]
+< ()
+$ alist-get-value ex-alist 'z'
+< 'z1'
+# let alist-set-value (alist, key, value) {
+#   ?: [ empty? alist ]
+#     [ list [ list key value ] ]
+#   ?: [ eq [ car [ car alist ] ] key ]
+#     [ cons [ list key value ] [ cdr alist ] ]
+#   ?: [ gt [ car [ car alist ] ] key ]
+#     [ cons [ list key value ] alist ]
+#   cons [ car alist ] [ thisfunc [ cdr alist ] key value ]
+# }
+$ define 'alist-set-value' [ _wrap [ fexpr [ alist key value ] [
+>   _wutcol [ _rnil? alist ]
+>     [ _list [ _list key value ] ]
+>     [ define 'firstkey' [ _car [ _car alist ] ];
+>       _wutcol [ _eq_string firstkey key ]
+>         [ _rmkcons 'List' [ _list key value ] [ _cdr alist ] ]
+>         [ _wutcol [ _gt_string firstkey key ]
+>           [ _rmkcons 'List' [ _list key value ] alist ]
+>           [ _rmkcons 'List' [ _car alist ]
+>             [ [ _wrap thisfunc ] [ _cdr alist ] key value ] ] ] ]
+> ] ] ]
+< ()
+$ alist-set-value [_list] 'a' 'a1'
+< (('a', 'a1'))
+$ alist-set-value ex-alist 'y' 'y1'
+< (('x', 'x1'), ('y', 'y1'), ('z', 'z1'))
+$ alist-set-value ex-alist 'z' 'z2'
+< (('x', 'x1'), ('z', 'z2'))
