@@ -22,7 +22,7 @@ sub _tok ($str) {
     } elsif (s/^\]//) {
       [ LeaveCall00 => [ 'nil' ] ];
     } elsif (s/^;//) {
-      [ SemiColon => [ 'nil' ] ];
+      [ SemiColon00 => [ 'nil' ] ];
     } else {
       die $_;
     }
@@ -62,7 +62,7 @@ sub prs_call ($end, @tok) {
       $end_ok = 1;
       last;
     }
-    if ($m->[0] eq 'SemiColon') {
+    if ($m->[0] eq 'SemiColon00') {
       push(@reslist, $res = []);
       next;
     }
