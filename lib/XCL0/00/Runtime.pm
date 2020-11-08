@@ -81,11 +81,11 @@ sub valp ($v) {
 }
 
 sub val ($v) {
-  panic "Expected val, got" => $v unless valp($v);
   my $r = $v->[1];
+  return mkv Fexpr00 => @$r if $r->[0] eq 'Fexpr00';
+  panic "Expected val, got" => $v unless valp($v);
   return mkv String00 => @$r if rcharsp $v;
   return mkv Bool00 => @$r if rboolp $v;
-  return mkv Native00 => @$r if rnativep $v;
   return deref $v;
 }
 
@@ -126,8 +126,8 @@ sub flatten ($cons) {
 
 sub scope_fail ($scope, $args) { panic "No such name: ".raw(car $args) }
 
-sub make_scope ($hash, $next = mkv(Native00 => native => \&scope_fail)) {
-  mkv Scope => var => mkv Native00 => native =>
+sub make_scope ($hash, $next = mkv(Fexpr00 => native => \&scope_fail)) {
+  mkv Scope => var => mkv Fexpr00 => native =>
     set_subname __SCOPE__ => sub ($scope, $args) {
       my $first = car $args;
       unless (type($first) eq 'String00') {
@@ -147,14 +147,16 @@ sub combine ($scope, $call, $args) {
     mkv(Call00 => cons => $call => $args),
     \$res
   ) if tracing;
-  my $type = type($call);
+  panic "Can't combine value of type ".type($call) => $call
+    unless type($call) eq 'Fexpr00';
   return $res = do {
-    if ($type eq 'Native00') {
+    my $rtype = rtype($call);
+    if ($rtype eq 'native') {
       raw($call)->($scope, $args);
-    } elsif ($type eq 'Fexpr00') {
+    } elsif ($rtype eq 'cons') {
       combine_fexpr($scope, $call, $args);
     } else {
-      panic "Can't combine value of type $type" => $call;
+      panic "Invalid rtype $rtype for fexpr" => $call;
     }
   };
 }

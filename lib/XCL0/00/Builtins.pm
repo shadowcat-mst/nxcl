@@ -45,6 +45,10 @@ my %raw = (
     wrap sub ($scope, $lst) { $code->(car($lst), car($lst, 1)) }
   },
   _progn => \&progn,
+  _eq_ref => wrap sub ($scope, $lst) {
+    my ($l, $r) = flatten $lst;
+    mkv(Bool00 => bool => 0+!!($l == $r))
+  },
   _eq_bool => wrap sub ($scope, $lst) {
     my ($l, $r) = flatten $lst;
     panic 'Args must both be boolean, got' => list($l, $r)
@@ -107,7 +111,7 @@ my %raw = (
     my $apv = wrap sub ($scope, $lst) {
       combine($scope, $opv, $lst)
     };
-    mkv Native00 => native => $apv;
+    mkv Fexpr00 => native => $apv;
   },
   _scope0_00 => sub ($, $) { builtin_scope() },
   _names0_00 => sub ($, $) {
@@ -115,7 +119,7 @@ my %raw = (
   },
 );
 
-my %cooked = map +($_ => mkv Native00 => native => set_subname($_, $raw{$_})),
+my %cooked = map +($_ => mkv Fexpr00 => native => set_subname($_, $raw{$_})),
                keys %raw;
 
 sub builtin_list { sort keys %cooked }

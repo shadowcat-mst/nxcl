@@ -20,10 +20,10 @@ sub write_string ($v) {
   if ($type eq 'List00') {
     return '('.join(', ', map write_string($_), flatten($v)).')';
   }
-  if ($type eq 'Native00') {
-    return 'Native00('.(subname(raw $v) =~ s/^XCL0::00:://r).')';
-  }
-  if ($type eq 'Fexpr00') {
+  if ($type eq 'Native00' or $type eq 'Fexpr00') {
+    if (rtype($v) eq 'native') {
+      return 'Fexpr00(native '.(subname(raw $v) =~ s/^XCL0::00:://r).')';
+    }
     return 'Fexpr00('.write_string(cdr $v).')';
   }
   return $type.'()';

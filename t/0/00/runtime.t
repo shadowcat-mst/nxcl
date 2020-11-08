@@ -49,7 +49,7 @@ is eval0_00($scope, list(
   )),
   list(mkv(Bool00 => bool => 1), mkv(String00 => chars => 'foo'));
 
-my $concat = mkv(Native00 => native => sub ($scope, $args) {
+my $concat = mkv(Fexpr00 => native => sub ($scope, $args) {
   mkv String00 => chars => join '', map raw($_), flatten($args);
 });
 
