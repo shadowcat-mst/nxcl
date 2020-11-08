@@ -102,9 +102,11 @@ sub set ($var, $value) {
 }
 
 sub list (@list) {
-  return mkv List => 'nil' unless @list;
-  my ($first, @rest) = @list;
-  mkv 'List', cons => $first, list(@rest);
+  my $ret = mkv List => 'nil';
+  foreach my $el (reverse @list) {
+    $ret = mkv List => cons => $el, $ret;
+  }
+  return $ret;
 }
 
 sub uncons ($cons) {
@@ -113,9 +115,13 @@ sub uncons ($cons) {
 }
 
 sub flatten ($cons) {
-  return () if rnilp $cons;
-  my ($car, $cdr) = uncons $cons;
-  return ($car, flatten($cdr));
+  my @ret;
+  while ($cons->[1][0] eq 'cons') {
+    my ($car, $cdr) = @{$cons->[1]}[1,2];
+    push @ret, $car;
+    $cons = $cdr;
+  }
+  return @ret;
 }
 
 sub scope_fail ($scope, $args) { panic "No such name: ".raw(car $args) }
@@ -164,13 +170,17 @@ sub combine_fexpr ($scope, $fexpr, $args) {
   eval0_00($callscope, $body);
 }
 
+sub lookup ($scope, $v) {
+  combine($scope, deref($scope), list(mkv String00 => chars => raw $v));
+}
+
 sub eval0_00 ($scope, $v) {
   my $res;
   local *T = trace_enter(EVAL => $event_id++, $v, \$res) if tracing;
   my $type = type($v);
   return $res = do {
     if ($type eq 'Name00') {
-      combine($scope, deref($scope), list(mkv String00 => chars => raw $v));
+      lookup($scope, $v);
     } elsif ($type eq 'List') {
       list map eval0_00($scope, $_), flatten $v;
     } elsif ($type eq 'Call00') {
@@ -183,11 +193,14 @@ sub eval0_00 ($scope, $v) {
   };
 }
 
-sub progn ($scope, $args) {
-  my ($first, $rest) = uncons $args;
-  my $res = eval0_00 $scope, $first;
-  return $res if rnilp $rest;
-  progn($scope, $rest);
+sub progn ($scope, $cons) {
+  my $res;
+  while (!rnilp $cons) {
+    my ($first, $rest) = uncons $cons;
+    $res = eval0_00 $scope, $first;
+    $cons = $rest;
+  }
+  return $res;
 }
 
 sub wrap :prototype($) ($opv_sub) {
