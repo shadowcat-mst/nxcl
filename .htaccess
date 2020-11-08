@@ -1,2 +1,2 @@
 Options +Indexes
-ForceType text/plain
+AddType text/plain .pm .t
