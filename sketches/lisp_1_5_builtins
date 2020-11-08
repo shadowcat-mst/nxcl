@@ -1,0 +1,119 @@
+## Not an xcl file but instead the lisp 1.5 builtins list
+
+car x
+cdr x
+cons x y
+
+atom x # _type($x) eq 'Name00'
+
+eq x y    # reference equality
+equal x y # structural equality
+
+list @list
+
+null x # _rnil? x
+
+rplaca # set-car!
+rplacd # set-cdr!
+
+# short-circuiting
+
+and @clauses
+or @clauses
+
+not x
+
+# Interpreter and prog feature
+
+apply
+eval
+evlis
+quote
+label
+function
+prog
+go
+return
+set
+setq
+
+define ((name1 lambda1) ...)
+deflist # define and set proplist
+attrib x e # append e to x
+
+# more proplist funcs
+
+prop x y u
+get x y
+cset ob val
+csetq ob val
+remprop x ind
+flag lst ind
+remflag lst ind
+
+pair x y # zip two lists into an alist
+sassoc x y u # find key x in alist y, fallback to u
+
+subst x y z
+sublis x y
+
+append x y
+conc @v
+nconc x y
+copy x
+reverse lst
+member x lst
+length x
+efface x lst # remove first instance of x from lst
+
+maplist x f
+mapcon x f # nconc
+search x p f u # f(el) for first el in x such that p(el), or u(nil)
+
+plus @n
+minus x
+difference x y
+times @n
+divide x y # returns cons[int(x/y), remainder]
+quotient x y
+remainder x y
+add1 x
+sub1 x
+max @n
+min @n
+recip x
+expt x y # **
+lessp x y
+greaterp x y
+fixp x   # int?
+floatp x # float?
+logor
+logand
+logxor
+leftshift x y # x * (2**y)
+array x # declares arrays
+
+trace lst # activate tracing for function names in lst
+untrace lst
+
+count
+uncount
+speak
+error
+errorset
+
+prog2 x y
+cp1 x # no idea
+gensym
+select q ((q1 e1) ...) e # case q (q1 e1) ... default e
+
+# assorted card loading et. al. crap skipped
+
+(prog2 (excise #t) (reclaim)) # deletes the compiler and assembler and GCs ;)
+
+# The LISP Library
+
+traceset lst # traces top-level setqs within a function list
+untraceset lst
+
+# remaining library functions and constant list also skipped
