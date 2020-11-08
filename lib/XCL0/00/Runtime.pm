@@ -15,7 +15,7 @@ our @EXPORT_OK = qw(
   set
   list uncons flatten
   make_scope eval0_00 combine
-  wutcol progn
+  wutcol progn sassoc
   wrap
 );
 
@@ -211,6 +211,15 @@ sub progn ($scope, $cons) {
     $cons = $rest;
   }
   return $res;
+}
+
+sub sassoc ($scope, $needle, $alis, $fallback) {
+  my $find = raw $needle;
+  while (!rnilp $alis) {
+    (my $pair, $alis) = uncons $alis;
+    return $pair if raw(car($pair)) eq $find;
+  }
+  return combine($scope, $fallback, mkv List00 => 'nil');
 }
 
 sub wrap :prototype($) ($opv_sub) {
