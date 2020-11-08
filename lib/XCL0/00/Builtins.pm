@@ -5,7 +5,7 @@ use Sub::Util qw(set_subname);
 
 use XCL0::00::Runtime qw(
   panic mkv car cdr flatten
-  eval0_00 progn set deref
+  eval0_00 progn set deref wutcol
   type rtype rtruep rboolp rcharsp
   raw list make_scope wrap combine
 );
@@ -29,13 +29,8 @@ my %raw = (
   },
 
   _wutcol => sub ($scope, $lst) {
-    my ($if, $then, $else) = flatten $lst;
-    my $res = eval0_00 $scope, $if;
-    if (rtruep $res) {
-      return eval0_00 $scope, $then;
-    } else {
-      return eval0_00 $scope, $else;
-    }
+    panic 'Expected (if, then, else)' unless 3 == (my @args = flatten $lst);
+    wutcol $scope, @args;
   },
 
   _eval0_00 => wrap sub ($scope, $lst) { eval0_00(car($lst), car($lst, 1)) },

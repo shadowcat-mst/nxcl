@@ -15,7 +15,7 @@ our @EXPORT_OK = qw(
   set
   list uncons flatten
   make_scope eval0_00 combine
-  progn
+  wutcol progn
   wrap
 );
 
@@ -193,6 +193,14 @@ sub eval0_00 ($scope, $v) {
       $v;
     }
   };
+}
+
+sub wutcol ($scope, $if, $then, $else) {
+  my $res = eval0_00 $scope, $if;
+  if (rtruep $res) {
+    return eval0_00 $scope, $then;
+  }
+  return eval0_00 $scope, $else;
 }
 
 sub progn ($scope, $cons) {
