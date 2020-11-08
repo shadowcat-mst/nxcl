@@ -17,7 +17,7 @@ sub write_string ($v) {
   if ($type eq 'Call00') {
     return join ' ', '[', (map write_string($_), flatten($v)), ']';
   }
-  if ($type eq 'List') {
+  if ($type eq 'List00') {
     return '('.join(', ', map write_string($_), flatten($v)).')';
   }
   if ($type eq 'Native00') {

@@ -40,9 +40,9 @@ sub tok ($str) {
 }
 
 sub _list ($first, @rest) {
-  [ List => [ cons =>
+  [ List00 => [ cons =>
     $first,
-    (@rest ? _list(@rest) : [ List => [ 'nil' ] ])
+    (@rest ? _list(@rest) : [ List00 => [ 'nil' ] ])
   ] ]
 }
 

@@ -141,10 +141,10 @@ $ define 'alist-set-value' [ _wrap [ fexpr [ alist key value ] [
 >     [ _list [ _list key value ] ]
 >     [ define 'firstkey' [ _car [ _car alist ] ];
 >       _wutcol [ _eq_string firstkey key ]
->         [ _rmkcons 'List' [ _list key value ] [ _cdr alist ] ]
+>         [ _rmkcons 'List00' [ _list key value ] [ _cdr alist ] ]
 >         [ _wutcol [ _gt_string firstkey key ]
->           [ _rmkcons 'List' [ _list key value ] alist ]
->           [ _rmkcons 'List' [ _car alist ]
+>           [ _rmkcons 'List00' [ _list key value ] alist ]
+>           [ _rmkcons 'List00' [ _car alist ]
 >             [ [ _wrap thisfunc ] [ _cdr alist ] key value ] ] ] ]
 > ] ] ]
 < ()

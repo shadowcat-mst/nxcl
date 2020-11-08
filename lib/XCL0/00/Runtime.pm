@@ -102,9 +102,9 @@ sub set ($var, $value) {
 }
 
 sub list (@list) {
-  my $ret = mkv List => 'nil';
+  my $ret = mkv List00 => 'nil';
   foreach my $el (reverse @list) {
-    $ret = mkv List => cons => $el, $ret;
+    $ret = mkv List00 => cons => $el, $ret;
   }
   return $ret;
 }
@@ -181,7 +181,7 @@ sub eval0_00 ($scope, $v) {
   return $res = do {
     if ($type eq 'Name00') {
       lookup($scope, $v);
-    } elsif ($type eq 'List') {
+    } elsif ($type eq 'List00') {
       list map eval0_00($scope, $_), flatten $v;
     } elsif ($type eq 'Call00') {
       my ($callp, $args) = uncons $v;
