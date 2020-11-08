@@ -79,27 +79,27 @@ $ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 # [ fexpr (x) { [ _deref [ _getscope ] ] x } '_type ] 'foo;
 $ [
 >   [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->     [ _deref [ _getscope ] ] [ _car args ]
+>     [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
 >   ] ] ] '_type'
 > ] 'foo'
 < 'String00'
 # _set [ _getscope ] fexpr (x) { [ _deref [ _getscope ] ] x }; _type 'foo'
 $ _set [ _getscope ]
 >   [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->     [ _deref [ _getscope ] ] [ _car args ]
+>     [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
 >   ] ] ];
 > _type 'foo'
 < 'String00'
 # _set [ _getscope ] fexpr (x) {
 #   ?: [ _eq_string x 'x' ]
 #     'is_x'
-#   [ _deref [ _getscope ] ] x
+#   [ _wrap [ _deref [ _getscope ] ] ] x
 # }
 $ _set [ _getscope ]
 >   [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >     _wutcol [ _eq_string [ _car args ] 'x' ]
 >      'is_x'
->    [ [ _deref [ _getscope ] ] [ _car args ] ]
+>    [ [ _wrap [ _deref [ _getscope ] ] ] [ _car args ] ]
 >   ] ] ];
 > _id x
 < 'is_x'

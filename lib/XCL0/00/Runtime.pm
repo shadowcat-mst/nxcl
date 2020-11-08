@@ -128,14 +128,14 @@ sub scope_fail ($scope, $args) { panic "No such name: ".raw(car $args) }
 
 sub make_scope ($hash, $next = mkv(Native00 => native => \&scope_fail)) {
   mkv Scope => var => mkv Native00 => native =>
-    set_subname __SCOPE__ => wrap(sub ($scope, $args) {
+    set_subname __SCOPE__ => sub ($scope, $args) {
       my $first = car $args;
       unless (type($first) eq 'String00') {
         panic "Scope lookup expected string, got" => $first;
       }
       return $_ for grep defined, $hash->{raw($first)};
       return combine($scope, $next, $args)
-    });
+    };
 }
 
 our $event_id = 'A000';

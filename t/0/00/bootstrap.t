@@ -35,7 +35,7 @@ $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 > ] ] ] ]
 >   [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >     _set scope
->       [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ]
+>       [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ]
 >         [ _rmkcons 'Call00' _wutcol [ _list
 >           [ _rmkcons 'Call00'
 >               _eq_string [ _list
@@ -43,11 +43,11 @@ $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >                 [ _car args ] ] ]
 >             [ _rmkcons 'Call00' _escape [ _list [ _car [ _cdr args ] ] ] ]
 >             [ _rmkcons 'Call00'
->               [ _deref scope ]
+>               [ _wrap [ _deref scope ] ]
 >               [ _list
 >                 [ _rmkcons 'Call00' _car [ _list [ _escape args ] ] ] ] ]
 >         ] ]
->       ] ];
+>       ];
 >       _list
 >   ] ] ] ]
 < ()
