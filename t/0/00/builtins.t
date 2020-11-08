@@ -166,3 +166,7 @@ $ _panic 'Argh'
 ! Argh
 $ _panic 'Argh' [ _list 'foo' 'bar' ]
 ! Argh: ('foo', 'bar')
+$ _eq_ref 'foo' 'foo'
+< false
+$ _eq_ref [ _getscope ] [ _getscope ]
+< true
