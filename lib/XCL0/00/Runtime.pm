@@ -129,6 +129,9 @@ sub scope_fail ($scope, $args) { panic "No such name: ".raw(car $args) }
 sub make_scope ($hash, $next = mkv(Fexpr00 => native => \&scope_fail)) {
   mkv Ref00 => var => mkv Fexpr00 => native =>
     set_subname __SCOPE__ => sub ($scope, $args) {
+      if (rnilp $args) {
+        return mkv Fexpr00 => native => __SUB__
+      }
       my $first = car $args;
       unless (type($first) eq 'String00') {
         panic "Scope lookup expected string, got" => $first;
@@ -219,7 +222,7 @@ sub sassoc ($scope, $needle, $alis, $fallback) {
     (my $pair, $alis) = uncons $alis;
     return $pair if raw(car($pair)) eq $find;
   }
-  return combine($scope, $fallback, mkv List00 => 'nil');
+  return combine($scope, $fallback, list($needle));
 }
 
 sub wrap :prototype($) ($opv_sub) {

@@ -171,6 +171,6 @@ $ _eq_ref 'foo' 'foo'
 $ _eq_ref [ _getscope ] [ _getscope ]
 < true
 $ _sassoc 'foo' [_list] _list
-< ()
+< ('foo')
 $ _sassoc 'foo' [_list [ _list 'a' 'b' ] [ _list 'foo' 'bar' ] ] _list
 < ('foo', 'bar')
