@@ -130,7 +130,7 @@ sub make_scope ($hash, $next = mkv(Fexpr00 => native => \&scope_fail)) {
   mkv Ref00 => var => mkv Fexpr00 => native =>
     set_subname __SCOPE__ => sub ($scope, $args) {
       if (rnilp $args) {
-        return mkv Fexpr00 => native => __SUB__
+        return list();
       }
       my $first = car $args;
       unless (type($first) eq 'String00') {
