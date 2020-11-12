@@ -147,3 +147,20 @@ let define = lambda (newname, newvalue) {
     }
   } ]
 }
+
+################################
+
+let make-lookup = (alis, next) => { fexpr (name) { sassoc name alis next } }
+
+let add-name-to = (store, name, value) => {
+  # could be just = store() || ((), store);
+  let guts = store();
+  let (alis, next) = ?: [ empty? guts ] ((), store) guts;
+  make-lookup ((name, value), @alis) next;
+}
+
+let define = (name, value) => {
+  let store = deref scope;
+  let newstore = add-name-to store name value;
+  _set scope newstore;
+}
