@@ -12,6 +12,8 @@ sub data_test ($data, $evaluator) {
     grep $_->[1] !~ /^#/, map [ $idx++, $_ ], <$data>;
   };
 
+  close $data;
+
   my @tests;
 
   while (my $start = shift @test_text) {

@@ -5,9 +5,10 @@ use Sub::Util qw(set_subname);
 
 use XCL0::00::Runtime qw(
   panic mkv car cdr flatten
-  eval0_00 progn set deref wutcol sassoc
+  eval0_00 progn set deref wutcol salis skvlis
   type rtype rtruep rboolp rcharsp
   raw list make_scope wrap combine
+  $Scope_Fail
 );
 
 use Exporter 'import';
@@ -39,10 +40,15 @@ my %raw = (
     panic 'Expected (if, then, else)' unless 3 == (my @args = flatten $lst);
     wutcol $scope, @args;
   },
-  _sassoc => wrap sub ($scope, $lst) {
+  _salis => wrap sub ($scope, $lst) {
     panic 'Expected (key, alis, fallback)'
       unless 3 == (my @args = flatten $lst);
-    sassoc($scope, @args);
+    salis($scope, @args);
+  },
+  _skvlis => wrap sub ($scope, $lst) {
+    panic 'Expected (key, klis, vlis, fallback)'
+      unless 4 == (my @args = flatten $lst);
+    skvlis($scope, @args);
   },
 
   _eq_ref => wrap sub ($scope, $lst) {
@@ -106,6 +112,9 @@ my %raw = (
     my $code = XCL0::00::Runtime->can($_);
     ('_'.($_ =~ s/p$/?/r) => wrap set_subname 'opv_'.$_ => sub ($scope, $lst) { $code->(car $lst) })
   } qw(valp refp val deref car cdr)),
+  _combine => wrap sub ($scope, $lst) {
+    combine($scope, uncons($lst));
+  },
   _wrap => wrap sub ($scope, $lst) {
     my $opv = car $lst;
     my $apv = wrap sub ($scope, $lst) {
@@ -114,18 +123,18 @@ my %raw = (
     mkv Fexpr00 => native => $apv;
   },
   _scope0_00 => sub ($, $) { builtin_scope() },
-  _names0_00 => sub ($, $) {
-    list map mkv(String00 => chars => $_), builtin_list()
-  },
 );
 
 my %cooked = map +($_ => mkv Fexpr00 => native => set_subname($_, $raw{$_})),
                keys %raw;
 
+$cooked{_scope_fail} = $Scope_Fail;
+
 sub builtin_list { sort keys %cooked }
 
 sub builtin_scope {
-  make_scope \%cooked;
+  state $scope = make_scope \%cooked;
+  mkv Scope00 => var => raw $scope;
 }
 
 1;

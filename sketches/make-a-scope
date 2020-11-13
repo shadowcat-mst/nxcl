@@ -164,3 +164,20 @@ let define = (name, value) => {
   let newstore = add-name-to store name value;
   _set scope newstore;
 }
+
+################################
+
+let kvstore = (klis, vlis, next) => {
+  fexpr (@args) {
+    ?: [ empty? args ]
+      (klis, vlis, next)
+    svklis [first args] klis vlis next
+  }
+}
+
+let define = (name, value) => {
+  let (klis, vlis, next) = [ [ deref scope ] ];
+  _set scope [ kvstore [ cons name klis ] [ cons value vlis ] next ];
+}
+
+

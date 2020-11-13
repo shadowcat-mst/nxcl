@@ -15,8 +15,9 @@ our @EXPORT_OK = qw(
   set
   list uncons flatten
   make_scope eval0_00 combine
-  wutcol progn sassoc
+  wutcol progn salis skvlis
   wrap
+  $Scope_Fail
 );
 
 sub write_string {
@@ -124,19 +125,30 @@ sub flatten ($cons) {
   return @ret;
 }
 
-sub scope_fail ($scope, $args) { panic "No such name: ".raw(car $args) }
+sub scope_fail ($scope, $args) {
+  if (rnilp $args) {
+    return state $empty = list();
+  }
+  list(car $args);
+}
 
-sub make_scope ($hash, $next = mkv(Fexpr00 => native => \&scope_fail)) {
+our $Scope_Fail = mkv(Fexpr00 => native => \&scope_fail);
+
+sub make_scope ($hash, $next = $Scope_Fail) {
   mkv Ref00 => var => mkv Fexpr00 => native =>
     set_subname __SCOPE__ => sub ($scope, $args) {
       if (rnilp $args) {
-        return list();
+        return state $zero_args = list(
+          list(map mkv(String00 => chars => $_), sort keys %$hash),
+          list(@{$hash}{sort keys %$hash}),
+          $next
+        );
       }
       my $first = car $args;
       unless (type($first) eq 'String00') {
         panic "Scope lookup expected string, got" => $first;
       }
-      return $_ for grep defined, $hash->{raw($first)};
+      return list($first, $_) for grep defined, $hash->{raw($first)};
       return combine($scope, $next, $args)
     };
 }
@@ -176,7 +188,14 @@ sub combine_fexpr ($scope, $fexpr, $args) {
 }
 
 sub lookup ($scope, $v) {
-  combine($scope, deref($scope), list(mkv String00 => chars => raw $v));
+  my $res = combine(
+    $scope, deref($scope), list(mkv String00 => chars => raw $v)
+  );
+  my $cdr = cdr $res;
+  if (rnilp $cdr) {
+    panic "No such name", $v;
+  }
+  car $cdr;
 }
 
 sub eval0_00 ($scope, $v) {
@@ -216,11 +235,21 @@ sub progn ($scope, $cons) {
   return $res;
 }
 
-sub sassoc ($scope, $needle, $alis, $fallback) {
+sub salis ($scope, $needle, $alis, $fallback) {
   my $find = raw $needle;
   while (!rnilp $alis) {
     (my $pair, $alis) = uncons $alis;
     return $pair if raw(car($pair)) eq $find;
+  }
+  return combine($scope, $fallback, list($needle));
+}
+
+sub skvlis ($scope, $needle, $klis, $vlis, $fallback) {
+  my $find = raw $needle;
+  while (!rnilp $klis) {
+    (my $key, $klis) = uncons $klis;
+    (my $val, $vlis) = uncons $vlis;
+    return list($key, $val) if raw($key) eq $find;
   }
   return combine($scope, $fallback, list($needle));
 }

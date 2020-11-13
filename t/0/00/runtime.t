@@ -34,7 +34,7 @@ is [ map raw($_), flatten($abc_list) ], [ qw(a b c) ];
 
 my $scope = make_scope({ x => mkv(Bool00 => bool => 1) });
 
-is combine($scope, deref($scope), list mkv(String00 => chars => 'x')),
+is car(combine($scope, deref($scope), list mkv(String00 => chars => 'x')), 1),
   [ Bool00 => [ bool => 1 ] ];
 
 is eval0_00($scope, mkv(Name00 => chars => 'x')),

@@ -23,7 +23,7 @@ $ _type 'foo'
 #   lambda (newname, newvalue) {
 #     _set scope [ lambda (name) \${
 #       ?: [ name == $$newname ]
-#         $$newvalue
+#         (name, $$newvalue)
 #         [ $$[deref scope] name ]
 #     } ]
 #   }
@@ -41,7 +41,10 @@ $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >               _eq_string [ _list
 >                 [ _rmkcons 'Call00' _car [ _list [ _escape args ] ] ]
 >                 [ _car args ] ] ]
->             [ _rmkcons 'Call00' _escape [ _list [ _car [ _cdr args ] ] ] ]
+>             [ _rmkcons 'Call00' _list [
+>                 _list [ _car args ]
+>                 [ _rmkcons 'Call00' _escape [ _list [ _car [ _cdr args ] ] ] ]
+>             ] ]
 >             [ _rmkcons 'Call00'
 >               [ _wrap [ _deref scope ] ]
 >               [ _list

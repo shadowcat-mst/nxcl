@@ -70,18 +70,18 @@ $ [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 > ] ] ] 'y'
 < 'b'
 # _type 'foo'
-$ [ [ _deref [ _getscope ] ] '_type' ] 'foo'
+$ [ _car [ _cdr [ [ _deref [ _getscope ] ] '_type' ] ] ] 'foo'
 < 'String00'
 $ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >   [ _deref [ _getscope ] ] [ _car args ]
 > ] ]
 < Fexpr00([ [ _deref [ _getscope ] ] [ _car args ] ])
 # [ fexpr (x) { [ _deref [ _getscope ] ] x } '_type ] 'foo;
-$ [
+$ [ _car [ _cdr [
 >   [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >     [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
 >   ] ] ] '_type'
-> ] 'foo'
+> ] ] ] 'foo'
 < 'String00'
 # _set [ _getscope ] fexpr (x) { [ _deref [ _getscope ] ] x }; _type 'foo'
 $ _set [ _getscope ]
@@ -92,13 +92,13 @@ $ _set [ _getscope ]
 < 'String00'
 # _set [ _getscope ] fexpr (x) {
 #   ?: [ _eq_string x 'x' ]
-#     'is_x'
+#     ('x', 'is_x')
 #   [ _wrap [ _deref [ _getscope ] ] ] x
 # }
 $ _set [ _getscope ]
 >   [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >     _wutcol [ _eq_string [ _car args ] 'x' ]
->      'is_x'
+>      [ _list 'x' 'is_x' ]
 >    [ [ _wrap [ _deref [ _getscope ] ] ] [ _car args ] ]
 >   ] ] ];
 > _id x
@@ -170,7 +170,7 @@ $ _eq_ref 'foo' 'foo'
 < false
 $ _eq_ref [ _getscope ] [ _getscope ]
 < true
-$ _sassoc 'foo' [_list] _list
+$ _salis 'foo' [_list] _list
 < ('foo')
-$ _sassoc 'foo' [_list [ _list 'a' 'b' ] [ _list 'foo' 'bar' ] ] _list
+$ _salis 'foo' [_list [ _list 'a' 'b' ] [ _list 'foo' 'bar' ] ] _list
 < ('foo', 'bar')
