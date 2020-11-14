@@ -46,7 +46,7 @@ my %raw = (
     salis($scope, @args);
   },
   _skvlis => wrap sub ($scope, $lst) {
-    panic 'Expected (key, klis, vlis, fallback)'
+    panic 'Expected (key, klis, vlis, fallback), got', $lst
       unless 4 == (my @args = flatten $lst);
     skvlis($scope, @args);
   },
@@ -83,22 +83,27 @@ my %raw = (
   _rtype => wrap sub ($scope, $lst) { mkv String00 => chars => rtype(car $lst) },
 
   _rmkchars => wrap sub ($scope, $lst) {
-    my ($typep, $v) = flatten $lst;
+    panic "Expected (type, value), got", $lst
+      unless 2 == (my ($typep, $v) = flatten $lst);
     mkv(raw($typep), 'chars', raw($v));
   },
   _rmkcons => wrap sub ($scope, $lst) {
-    my ($typep, @v) = flatten($lst);
+    panic "Expected (type, first, rest), got", $lst
+      unless 3 == (my ($typep, @v) = flatten($lst));
     mkv(raw($typep), 'cons', @v);
   },
   _rmknil => wrap sub ($scope, $lst) {
-    mkv(raw(car($lst)), 'nil');
+    panic "Expected (type), got", $lst
+      unless 1 == (my ($typep) = flatten $lst);
+    mkv(raw($typep), 'nil');
   },
   _rtrue => sub ($, $) { mkv(Bool00 => bool => 1) },
   _rfalse => sub ($, $) { mkv(Bool00 => bool => 0) },
   (map {
     my $rtype = $_;
     "_rmk${rtype}" => wrap sub ($scope, $lst) {
-      my ($typep, $v) = flatten $lst;
+      panic "Expected (type, value), got", $lst
+        unless 2 == (my ($typep, $v) = flatten $lst);
       mkv(raw($typep), $rtype, $v);
     }
   } qw(var val)),
@@ -112,9 +117,10 @@ my %raw = (
     my $code = XCL0::00::Runtime->can($_);
     ('_'.($_ =~ s/p$/?/r) => wrap set_subname 'opv_'.$_ => sub ($scope, $lst) { $code->(car $lst) })
   } qw(valp refp val deref car cdr)),
-  _combine => wrap sub ($scope, $lst) {
-    combine($scope, uncons($lst));
-  },
+  # probably worth having but needs more thought
+  #_combine => wrap sub ($scope, $lst) {
+  #  combine($scope, uncons($lst));
+  #},
   _wrap => wrap sub ($scope, $lst) {
     my $opv = car $lst;
     my $apv = wrap sub ($scope, $lst) {

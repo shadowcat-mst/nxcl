@@ -20,9 +20,13 @@ sub write_string ($v) {
   if ($type eq 'List00') {
     return '('.join(', ', map write_string($_), flatten($v)).')';
   }
-  if ($type eq 'Native00' or $type eq 'Fexpr00') {
+  if ($type eq 'Fexpr00') {
     if (rtype($v) eq 'native') {
-      return 'Fexpr00(native '.(subname(raw $v) =~ s/^XCL0::00:://r).')';
+      my $name = subname(raw $v);
+      if (my ($bif) = $name =~ /^XCL0::00::Builtins::(.*)$/) {
+        return 'Bif00('.$bif.')';
+      }
+      return 'Fexpr00(native '.$name.')';
     }
     return 'Fexpr00('.write_string(cdr $v).')';
   }
