@@ -122,11 +122,7 @@ my %raw = (
   #  combine($scope, uncons($lst));
   #},
   _wrap => wrap sub ($scope, $lst) {
-    my $opv = car $lst;
-    my $apv = wrap sub ($scope, $lst) {
-      combine($scope, $opv, $lst)
-    };
-    mkv Fexpr00 => native => $apv;
+    return mkv Apv00 => val => car $lst;
   },
   _scope0_00 => sub ($, $) { builtin_scope() },
 );

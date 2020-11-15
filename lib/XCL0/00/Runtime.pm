@@ -10,7 +10,7 @@ our @EXPORT_OK = qw(
   rtype type
   rconsp rnilp rcharsp rboolp rnativep rvalp rvarp rtruep rfalsep
   car cdr
-  valp val raw deref
+  refp valp val raw deref
   set
   list uncons flatten
   make_scope eval0_00 combine
@@ -161,6 +161,10 @@ sub combine ($scope, $call, $args) {
     mkv(Call00 => cons => $call => $args),
     \$res
   ) if tracing;
+  if (type($call) eq 'Apv00') {
+    $args = eval0_00($scope, $args);
+    $call = deref $call;
+  }
   panic "Can't combine value of type ".type($call) => $call
     unless type($call) eq 'Fexpr00';
   return $res = do {

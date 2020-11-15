@@ -1,7 +1,7 @@
 package XCL0::00::Writer;
 
 use XCL0::Exporter;
-use XCL0::00::Runtime qw(type rtype raw flatten car cdr);
+use XCL0::00::Runtime qw(type rtype raw flatten car cdr refp deref);
 use Sub::Util qw(subname);
 
 our @EXPORT_OK = qw(write_string);
@@ -28,6 +28,9 @@ sub write_string ($v) {
       return 'Fexpr00(native '.$name.')';
     }
     return 'Fexpr00('.write_string(cdr $v).')';
+  }
+  if (refp $v) {
+    return $type.'('.write_string(deref $v).')';
   }
   return $type.'()';
 }
