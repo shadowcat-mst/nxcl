@@ -67,7 +67,7 @@ $ define '_call' [ _wrap [ _fexpr [
 $ _eval0_00 [ _getscope ] [ _call _id foo ]
 < 'Fu'
 $ define 'call-scoped' [ _fexpr [
->   define 'inner-scope' [ _rmkvar 'Scope' [ _deref scope ] ];
+>   define 'inner-scope' [ _rmkvar 'Scope00' [ _deref scope ] ];
 >   _eval0_00 inner-scope [ _car args ]
 > ] ]
 < ()
