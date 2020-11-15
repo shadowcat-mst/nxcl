@@ -1,9 +1,8 @@
 package XCL0::00::Writer;
 
+use XCL0::Exporter;
 use XCL0::00::Runtime qw(type rtype raw flatten car cdr);
-use Mojo::Base -strict, -signatures;
 use Sub::Util qw(subname);
-use Exporter 'import';
 
 our @EXPORT_OK = qw(write_string);
 

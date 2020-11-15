@@ -1,6 +1,6 @@
 package XCL0::00::Builtins;
 
-use Mojo::Base -strict, -signatures;
+use XCL0::Exporter;
 use Sub::Util qw(set_subname);
 
 use XCL0::00::Runtime qw(

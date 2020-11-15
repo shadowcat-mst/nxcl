@@ -1,7 +1,6 @@
 package XCL0::00::Tracing;
 
-use Mojo::Base -strict, -signatures;
-use Exporter 'import';
+use XCL0::Exporter;
 use Scope::Guard;
 
 our @EXPORT = qw(*T tracing trace_enter trace_stack);

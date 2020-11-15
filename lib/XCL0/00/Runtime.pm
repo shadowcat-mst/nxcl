@@ -1,9 +1,8 @@
 package XCL0::00::Runtime;
 
-use Mojo::Base -strict, -signatures;
+use XCL0::Exporter;
 use XCL0::00::Tracing;
 use Sub::Util qw(set_subname);
-use Exporter 'import';
 
 our @EXPORT_OK = qw(
   panic assert_rtype

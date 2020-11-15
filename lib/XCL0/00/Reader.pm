@@ -1,7 +1,6 @@
 package XCL0::00::Reader;
 
-use Mojo::Base -strict, -signatures;
-use Exporter 'import';
+use XCL0::Exporter;
 
 our @EXPORT_OK = qw(read_string);
 
