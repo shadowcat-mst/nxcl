@@ -121,8 +121,21 @@ $ define 'kvadd' [ [ _wrap _lambda ] [
 < ()
 $ [ kvadd [ [ kvstore [ _list ] [ _list ] _list ] ] 'x' 'y' ] 'x'
 < ('x', 'y')
-# define 'kvdef' [ _lambda [
-#   _set scope [
-#     kvadd [ [ _deref scope ] ] [ _car args ] [ _car [ _cdr args ] ]
-#   ]
-# ] ]
+$ define 'kvdef' [ _lambda [
+>   _set scope [
+>     kvadd [ [ _deref scope ] ] [ _car args ] [ _car [ _cdr args ] ]
+>   ];
+>   _list
+> ] ]
+< ()
+$ _set [ _getscope ] [
+>   kvstore
+>     [ _list 'define' 'kvstore' 'kvadd' ]
+>     [ _list kvdef kvstore kvadd ]
+>     [ _deref [ _scope0_00 ] ]
+> ]; _list
+< ()
+$ _id foo
+! No such name: foo
+$ define 'foo' 'Fu'; _id foo
+< 'Fu'
