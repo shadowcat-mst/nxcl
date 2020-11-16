@@ -22,7 +22,7 @@ sub write_string ($v) {
   if ($type eq 'Fexpr00') {
     if (rtype($v) eq 'native') {
       my $name = subname(raw $v);
-      if (my ($bif) = $name =~ /^XCL0::00::Builtins::(.*)$/) {
+      if (my ($bif) = $name =~ /^XCL0::00::\w+::(.*)$/) {
         return 'Bif00('.$bif.')';
       }
       return 'Fexpr00(native '.$name.')';
