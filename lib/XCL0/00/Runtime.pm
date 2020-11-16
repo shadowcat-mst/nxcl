@@ -134,22 +134,24 @@ sub scope_fail ($scope, $args) {
 our $Scope_Fail = mkv(Fexpr00 => native => \&scope_fail);
 
 sub make_scope ($hash, $next = $Scope_Fail) {
-  mkv Ref00 => var => mkv Fexpr00 => native =>
-    set_subname __SCOPE__ => sub ($scope, $args) {
-      if (rnilp $args) {
-        return state $zero_args = list(
-          list(map mkv(String00 => chars => $_), sort keys %$hash),
-          list(@{$hash}{sort keys %$hash}),
-          $next
-        );
-      }
-      my $first = car $args;
-      unless (type($first) eq 'String00') {
-        panic "Scope lookup expected string, got" => $first;
-      }
-      return list($first, $_) for grep defined, $hash->{raw($first)};
-      return combine($scope, $next, $args)
-    };
+  my $scope_sub = sub ($scope, $args) {
+    if (rnilp $args) {
+      return state $zero_args = list(
+        list(map mkv(String00 => chars => $_), sort keys %$hash),
+        list(@{$hash}{sort keys %$hash}),
+        $next
+      );
+    }
+    my $first = car $args;
+    unless (type($first) eq 'String00') {
+      panic "Scope lookup expected string, got" => $first;
+    }
+    return list($first, $_) for grep defined, $hash->{raw($first)};
+    return combine($scope, $next, $args)
+  };
+  my ($hex) = $scope_sub =~ m/\(0x(\w+)\)/;
+  mkv Scope00 => var => mkv Fexpr00 => native =>
+    set_subname "SCOPE'${hex}'" => $scope_sub;
 }
 
 our $event_id = 'A000';
