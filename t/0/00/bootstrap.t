@@ -30,7 +30,7 @@ $ _type 'foo'
 # ]
 $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >   _eval0_00 callscope [ _rmkcons 'Call00'
->    [ _car args ] [ _list 'define' [ _car args ] ]
+>    [ _car thisargs ] [ _list 'define' [ _car thisargs ] ]
 >   ]
 > ] ] ] ]
 >   [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
@@ -39,16 +39,16 @@ $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >         [ _rmkcons 'Call00' _wutcol [ _list
 >           [ _rmkcons 'Call00'
 >               _eq_string [ _list
->                 [ _rmkcons 'Call00' _car [ _list [ _escape args ] ] ]
->                 [ _car args ] ] ]
+>                 [ _rmkcons 'Call00' _car [ _list [ _escape thisargs ] ] ]
+>                 [ _car thisargs ] ] ]
 >             [ _rmkcons 'Call00' _list [
->                 _list [ _car args ]
->                 [ _rmkcons 'Call00' _escape [ _list [ _car [ _cdr args ] ] ] ]
+>                 _list [ _car thisargs ]
+>                 [ _rmkcons 'Call00' _escape [ _list [ _car [ _cdr thisargs ] ] ] ]
 >             ] ]
 >             [ _rmkcons 'Call00'
 >               [ _wrap [ _deref callscope ] ]
 >               [ _list
->                 [ _rmkcons 'Call00' _car [ _list [ _escape args ] ] ] ] ]
+>                 [ _rmkcons 'Call00' _car [ _list [ _escape thisargs ] ] ] ] ]
 >         ] ]
 >       ];
 >       _list
@@ -57,18 +57,18 @@ $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 $ define 'foo' 'Fu'; _id foo
 < 'Fu'
 $ define '_fexpr' [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->   _rmkcons 'Fexpr00' [ _deref callscope ] [ _car args ]
+>   _rmkcons 'Fexpr00' [ _deref callscope ] [ _car thisargs ]
 > ] ] ]
 < ()
 $ define '_call' [ _wrap [ _fexpr [
->   _rmkcons 'Call00' [ _car args ] [ _cdr args ]
+>   _rmkcons 'Call00' [ _car thisargs ] [ _cdr thisargs ]
 > ] ] ]
 < ()
 $ _eval0_00 [ _getscope ] [ _call _id foo ]
 < 'Fu'
 $ define 'call-scoped' [ _fexpr [
 >   define 'inner-scope' [ _rmkvar 'Scope00' [ _deref callscope ] ];
->   _eval0_00 inner-scope [ _car args ]
+>   _eval0_00 inner-scope [ _car thisargs ]
 > ] ]
 < ()
 $ call-scoped [ define 'bar' 'Yorkie'; _id bar ]
@@ -80,8 +80,8 @@ $ _id bar
 #   thisfunc [ rest names ] [ rest values ];
 # } ]
 $ define '_defmulti' [ _fexpr [
->   define 'names' [ _car args ];
->   define 'values' [ _eval0_00 callscope [ _car [ _cdr args ] ] ];
+>   define 'names' [ _car thisargs ];
+>   define 'values' [ _eval0_00 callscope [ _car [ _cdr thisargs ] ] ];
 >   _eval0_00 callscope [ _call define [ _val [ _car names ] ] [ _car values ] ];
 >   _wutcol [ _rnil? [ _cdr names ] ]
 >     [ _list ]
@@ -95,15 +95,15 @@ $ call-scoped [
 > ]
 < ('z3', 'y2', 'x1')
 $ define 'fexpr' [ _fexpr [
->   define 'arglist' [ _car args ];
->   define 'body' [ _car [ _cdr args ] ];
->   define 'unpack' [ _call _defmulti arglist [ _escape args ] ];
+>   define 'argnames' [ _car thisargs ];
+>   define 'body' [ _car [ _cdr thisargs ] ];
+>   define 'unpack' [ _call _defmulti argnames [ _escape thisargs ] ];
 >   _eval0_00 callscope [ _call _fexpr [ _call _progn unpack body ] ]
 > ] ]
 < ()
 $ [ fexpr [ x y ] [ _concat_string x y ] ] 'foo' 'bar'
 < 'foobar'
-$ define '_listo' [ _fexpr args ]
+$ define '_listo' [ _fexpr thisargs ]
 < ()
 $ _eval0_00 [ _getscope ]
 >   [ _call

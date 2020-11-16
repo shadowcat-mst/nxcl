@@ -30,7 +30,7 @@ $ _type 'foo'
 # ]
 $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >   _eval0_00 callscope [ _rmkcons 'Call00'
->    [ _car args ] [ _list 'define' [ _car args ] ]
+>    [ _car thisargs ] [ _list 'define' [ _car thisargs ] ]
 >   ]
 > ] ] ] ]
 >   [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
@@ -39,16 +39,16 @@ $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >         [ _rmkcons 'Call00' _wutcol [ _list
 >           [ _rmkcons 'Call00'
 >               _eq_string [ _list
->                 [ _rmkcons 'Call00' _car [ _list [ _escape args ] ] ]
->                 [ _car args ] ] ]
+>                 [ _rmkcons 'Call00' _car [ _list [ _escape thisargs ] ] ]
+>                 [ _car thisargs ] ] ]
 >             [ _rmkcons 'Call00' _list [
->                 _list [ _car args ]
->                 [ _rmkcons 'Call00' _escape [ _list [ _car [ _cdr args ] ] ] ]
+>                 _list [ _car thisargs ]
+>                 [ _rmkcons 'Call00' _escape [ _list [ _car [ _cdr thisargs ] ] ] ]
 >             ] ]
 >             [ _rmkcons 'Call00'
 >               [ _wrap [ _deref callscope ] ]
 >               [ _list
->                 [ _rmkcons 'Call00' _car [ _list [ _escape args ] ] ] ] ]
+>                 [ _rmkcons 'Call00' _car [ _list [ _escape thisargs ] ] ] ] ]
 >         ] ]
 >       ];
 >       _list
@@ -57,29 +57,29 @@ $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 $ define 'foo' 'Fu'; _id foo
 < 'Fu'
 $ define '_fexpr' [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->    _rmkcons 'Fexpr00' [ _deref callscope ] [ _car args ]
+>    _rmkcons 'Fexpr00' [ _deref callscope ] [ _car thisargs ]
 > ] ] ]
 < ()
 $ define '_call' [ _wrap [ _fexpr [
->   _rmkcons 'Call00' [ _car args ] [ _cdr args ]
+>   _rmkcons 'Call00' [ _car thisargs ] [ _cdr thisargs ]
 > ] ] ]
 < ()
 $ define '_lambda' [ _fexpr [
 >   _wrap [
->     _eval0_00 callscope [ _call _fexpr [ _car args ] ]
+>     _eval0_00 callscope [ _call _fexpr [ _car thisargs ] ]
 >   ]
 > ] ]
 < ()
 $ define 'kvstore' [ [ _wrap _lambda ] [
 >   _call [ _wrap _fexpr ] [
 >       _call _call _wutcol
->         [ _call _call _rnil? [ _call _escape [ _escape args ] ] ]
->         [ _escape args ]
+>         [ _call _call _rnil? [ _call _escape [ _escape thisargs ] ] ]
+>         [ _escape thisargs ]
 >         [ _call _rmkcons 'Call00'
 >           _skvlis
 >           [ _call _rmkcons 'List00'
->             [ _call _call _car [ _call _escape [ _escape args ] ] ]
->             [ _escape args ] ] ]
+>             [ _call _call _car [ _call _escape [ _escape thisargs ] ] ]
+>             [ _escape thisargs ] ] ]
 >   ]
 > ] ]
 < ()
@@ -104,26 +104,26 @@ $ define 'kvadd' [ [ _wrap _lambda ] [
 >     [ _call _rmkcons 'List00'
 #       # name
 >       [ _call _car [ _call _cdr
->         [ _escape args ] ] ]
+>         [ _escape thisargs ] ] ]
 #       # klis
->       [ _call _car [ _call _car [ _escape args ] ] ] ]
+>       [ _call _car [ _call _car [ _escape thisargs ] ] ] ]
 #     # cons
 >     [ _call _rmkcons 'List00'
 #       # value
 >       [ _call _car [ _call _cdr [ _call _cdr
->         [ _escape args ] ] ] ]
+>         [ _escape thisargs ] ] ] ]
 #       # vlis
->       [ _call _car [ _call _cdr [ _call _car [ _escape args ] ] ] ] ]
+>       [ _call _car [ _call _cdr [ _call _car [ _escape thisargs ] ] ] ] ]
 #     # next
 >     [ _call _car [ _call _cdr [ _call _cdr [ _call _car
->       [ _escape args ] ] ] ] ]
+>       [ _escape thisargs ] ] ] ] ]
 > ] ]
 < ()
 $ [ kvadd [ [ kvstore [ _list ] [ _list ] _list ] ] 'x' 'y' ] 'x'
 < ('x', 'y')
 $ define 'kvdef' [ _lambda [
 >   _set callscope [
->     kvadd [ [ _deref callscope ] ] [ _car args ] [ _car [ _cdr args ] ]
+>     kvadd [ [ _deref callscope ] ] [ _car thisargs ] [ _car [ _cdr thisargs ] ]
 >   ];
 >   _list
 > ] ]

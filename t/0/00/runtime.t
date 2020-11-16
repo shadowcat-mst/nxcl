@@ -60,7 +60,7 @@ is eval0_00($scope, mkv(Call00 => cons => $concat, $foobar_list)),
 
 my $fid = mkv(Fexpr00 => cons =>
   $scope,
-  mkv(Name00 => chars => 'args'),
+  mkv(Name00 => chars => 'thisargs'),
 );
 
 is eval0_00($scope, mkv(Call00 => cons => $fid, $foobar_list)),

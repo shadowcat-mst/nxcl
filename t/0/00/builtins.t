@@ -53,7 +53,7 @@ $ _rnil? [ _list ]
 $ _rtrue; _rfalse
 < false
 # fexpr (x, y) { x } -> 'x'
-$ [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [ _car args ] ] ] 'x' 'y'
+$ [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [ _car thisargs ] ] ] 'x' 'y'
 < 'x'
 $ _wutcol [ _rtrue ] 'x' 'y'
 < 'x'
@@ -61,32 +61,32 @@ $ _wutcol [ _rfalse ] 'x' 'y'
 < 'y'
 # == 'a' [ fexpr (s) { ?: [ s == 'x' ] 'a' 'b' } 'x' ]
 $ _eq_string 'a' [ [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->   _wutcol [ _eq_string 'x' [ _car args ] ] 'a' 'b'
+>   _wutcol [ _eq_string 'x' [ _car thisargs ] ] 'a' 'b'
 > ] ] ] 'x' ]
 < true
 # fexpr (s) { ?: [ s == 'x' ] 'a' 'b' } 'y'
 $ [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->   _wutcol [ _eq_string 'x' [ _car args ] ] 'a' 'b'
+>   _wutcol [ _eq_string 'x' [ _car thisargs ] ] 'a' 'b'
 > ] ] ] 'y'
 < 'b'
 # _type 'foo'
 $ [ _car [ _cdr [ [ _deref [ _getscope ] ] '_type' ] ] ] 'foo'
 < 'String00'
 $ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->   [ _deref [ _getscope ] ] [ _car args ]
+>   [ _deref [ _getscope ] ] [ _car thisargs ]
 > ] ]
-< Fexpr00([ [ _deref [ _getscope ] ] [ _car args ] ])
+< Fexpr00([ [ _deref [ _getscope ] ] [ _car thisargs ] ])
 # [ fexpr (x) { [ _deref [ _getscope ] ] x } '_type ] 'foo;
 $ [ _car [ _cdr [
 >   [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->     [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
+>     [ _wrap [ _deref [ _getscope ] ] ] [ _car thisargs ]
 >   ] ] ] '_type'
 > ] ] ] 'foo'
 < 'String00'
 # _set [ _getscope ] fexpr (x) { [ _deref [ _getscope ] ] x }; _type 'foo'
 $ _set [ _getscope ]
 >   [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->     [ _wrap [ _deref [ _getscope ] ] ] [ _car args ]
+>     [ _wrap [ _deref [ _getscope ] ] ] [ _car thisargs ]
 >   ] ] ];
 > _type 'foo'
 < 'String00'
@@ -97,16 +97,16 @@ $ _set [ _getscope ]
 # }
 $ _set [ _getscope ]
 >   [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->     _wutcol [ _eq_string [ _car args ] 'x' ]
+>     _wutcol [ _eq_string [ _car thisargs ] 'x' ]
 >      [ _list 'x' 'is_x' ]
->    [ [ _wrap [ _deref [ _getscope ] ] ] [ _car args ] ]
+>    [ [ _wrap [ _deref [ _getscope ] ] ] [ _car thisargs ] ]
 >   ] ] ];
 > _id x
 < 'is_x'
 # [ fexpr (y) [ call _concat_string 'foo' y ] ] 'bar'
 $ [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [
 >       _rmkcons 'Call00' _concat_string
->         [ _list 'foo' [ _escape [ _car args ] ] ]
+>         [ _list 'foo' [ _escape [ _car thisargs ] ] ]
 > ] ] 'bar'
 < 'foobar'
 # [ [ fexpr (x) { fexpr (y) { _concat_string x y } } ] 'foo' ] 'bar'
@@ -114,7 +114,7 @@ $ [
 >   [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >     _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [
 >        _rmkcons 'Call00' _concat_string
->          [ _list [ _car args ] [ _escape [ _car args ] ] ]
+>          [ _list [ _car thisargs ] [ _escape [ _car thisargs ] ] ]
 >     ]
 >   ] ] ]
 >   'foo'
@@ -130,34 +130,34 @@ $ [
 # }
 # thisfunc ( ('x', '1'), ('y', '2') ) 'x'
 $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->   _wutcol [ _rnil? [ _car args ] ]
+>   _wutcol [ _rnil? [ _car thisargs ] ]
 >     ''
 >     [ _wutcol
->         [ _eq_string [ _car [ _car [ _car args ] ] ] [ _car [ _cdr args ] ] ]
->         [ _car [ _cdr [ _car [ _car args ] ] ] ]
->         [ [ _wrap thisfunc ] [ _cdr [ _car args ] ] [ _car [ _cdr args ] ] ]
+>         [ _eq_string [ _car [ _car [ _car thisargs ] ] ] [ _car [ _cdr thisargs ] ] ]
+>         [ _car [ _cdr [ _car [ _car thisargs ] ] ] ]
+>         [ [ _wrap thisfunc ] [ _cdr [ _car thisargs ] ] [ _car [ _cdr thisargs ] ] ]
 >     ]
 > ] ] ] ]
 > [ _list [ _list 'x' '1' ] [ _list 'y' '2' ] ] 'x'
 < '1'
 $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->   _wutcol [ _rnil? [ _car args ] ]
+>   _wutcol [ _rnil? [ _car thisargs ] ]
 >     ''
 >     [ _wutcol
->         [ _eq_string [ _car [ _car [ _car args ] ] ] [ _car [ _cdr args ] ] ]
->         [ _car [ _cdr [ _car [ _car args ] ] ] ]
->         [ [ _wrap thisfunc ] [ _cdr [ _car args ] ] [ _car [ _cdr args ] ] ]
+>         [ _eq_string [ _car [ _car [ _car thisargs ] ] ] [ _car [ _cdr thisargs ] ] ]
+>         [ _car [ _cdr [ _car [ _car thisargs ] ] ] ]
+>         [ [ _wrap thisfunc ] [ _cdr [ _car thisargs ] ] [ _car [ _cdr thisargs ] ] ]
 >     ]
 > ] ] ] ]
 > [ _list [ _list 'x' '1' ] [ _list 'y' '2' ] ] 'y'
 < '2'
 $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->   _wutcol [ _rnil? [ _car args ] ]
+>   _wutcol [ _rnil? [ _car thisargs ] ]
 >     ''
 >     [ _wutcol
->         [ _eq_string [ _car [ _car [ _car args ] ] ] [ _car [ _cdr args ] ] ]
->         [ _car [ _cdr [ _car [ _car args ] ] ] ]
->         [ [ _wrap thisfunc ] [ _cdr [ _car args ] ] [ _car [ _cdr args ] ] ]
+>         [ _eq_string [ _car [ _car [ _car thisargs ] ] ] [ _car [ _cdr thisargs ] ] ]
+>         [ _car [ _cdr [ _car [ _car thisargs ] ] ] ]
+>         [ [ _wrap thisfunc ] [ _cdr [ _car thisargs ] ] [ _car [ _cdr thisargs ] ] ]
 >     ]
 > ] ] ] ]
 > [ _list [ _list 'x' '1' ] [ _list 'y' '2' ] ] 'z'

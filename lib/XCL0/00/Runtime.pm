@@ -186,7 +186,7 @@ sub combine_fexpr ($scope, $fexpr, $args) {
   my %add = (
     callscope => $scope,
     thisfunc => $fexpr,
-    args => $args,
+    thisargs => $args,
   );
   my $callscope = make_scope(\%add, $inscope);
   eval0_00($callscope, $body);
