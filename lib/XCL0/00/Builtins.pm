@@ -115,7 +115,7 @@ my %raw = (
   } qw(cons nil chars bool native val var)),
   (map {
     my $code = XCL0::00::Runtime->can($_);
-    ('_'.($_ =~ s/p$/?/r) => wrap set_subname 'opv_'.$_ => sub ($scope, $lst) { $code->(car $lst) })
+    ('_'.($_ =~ s/p$/?/r) => wrap sub ($scope, $lst) { $code->(car $lst) })
   } qw(valp refp val deref car cdr)),
   # probably worth having but needs more thought
   #_combine => wrap sub ($scope, $lst) {
