@@ -184,7 +184,7 @@ sub combine ($scope, $call, $args) {
 sub combine_fexpr ($scope, $fexpr, $args) {
   my ($inscope, $body) = uncons $fexpr;
   my %add = (
-    scope => $scope,
+    callscope => $scope,
     thisfunc => $fexpr,
     args => $args,
   );

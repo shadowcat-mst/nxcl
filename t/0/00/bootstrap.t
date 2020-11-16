@@ -19,22 +19,22 @@ __DATA__
 $ _type 'foo'
 < 'String00'
 # [
-#   lambda (definer) { scope.eval \$[ $$definer 'define' $$definer ] }
+#   lambda (definer) { callscope.eval \$[ $$definer 'define' $$definer ] }
 #   lambda (newname, newvalue) {
-#     _set scope [ lambda (name) \${
+#     _set callscope [ lambda (name) \${
 #       ?: [ name == $$newname ]
 #         (name, $$newvalue)
-#         [ $$[deref scope] name ]
+#         [ $$[deref callscope] name ]
 #     } ]
 #   }
 # ]
 $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->   _eval0_00 scope [ _rmkcons 'Call00'
+>   _eval0_00 callscope [ _rmkcons 'Call00'
 >    [ _car args ] [ _list 'define' [ _car args ] ]
 >   ]
 > ] ] ] ]
 >   [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->     _set scope
+>     _set callscope
 >       [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ]
 >         [ _rmkcons 'Call00' _wutcol [ _list
 >           [ _rmkcons 'Call00'
@@ -46,7 +46,7 @@ $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >                 [ _rmkcons 'Call00' _escape [ _list [ _car [ _cdr args ] ] ] ]
 >             ] ]
 >             [ _rmkcons 'Call00'
->               [ _wrap [ _deref scope ] ]
+>               [ _wrap [ _deref callscope ] ]
 >               [ _list
 >                 [ _rmkcons 'Call00' _car [ _list [ _escape args ] ] ] ] ]
 >         ] ]
@@ -57,7 +57,7 @@ $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 $ define 'foo' 'Fu'; _id foo
 < 'Fu'
 $ define '_fexpr' [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->   _rmkcons 'Fexpr00' [ _deref scope ] [ _car args ]
+>   _rmkcons 'Fexpr00' [ _deref callscope ] [ _car args ]
 > ] ] ]
 < ()
 $ define '_call' [ _wrap [ _fexpr [
@@ -67,7 +67,7 @@ $ define '_call' [ _wrap [ _fexpr [
 $ _eval0_00 [ _getscope ] [ _call _id foo ]
 < 'Fu'
 $ define 'call-scoped' [ _fexpr [
->   define 'inner-scope' [ _rmkvar 'Scope00' [ _deref scope ] ];
+>   define 'inner-scope' [ _rmkvar 'Scope00' [ _deref callscope ] ];
 >   _eval0_00 inner-scope [ _car args ]
 > ] ]
 < ()
@@ -76,16 +76,16 @@ $ call-scoped [ define 'bar' 'Yorkie'; _id bar ]
 $ _id bar
 ! No such name: bar
 # define _defmulti [ fexpr (names, values) {
-#   scope.eval [ call \define [ first names ] [ first values ] ];
+#   callscope.eval [ call \define [ first names ] [ first values ] ];
 #   thisfunc [ rest names ] [ rest values ];
 # } ]
 $ define '_defmulti' [ _fexpr [
 >   define 'names' [ _car args ];
->   define 'values' [ _eval0_00 scope [ _car [ _cdr args ] ] ];
->   _eval0_00 scope [ _call define [ _val [ _car names ] ] [ _car values ] ];
+>   define 'values' [ _eval0_00 callscope [ _car [ _cdr args ] ] ];
+>   _eval0_00 callscope [ _call define [ _val [ _car names ] ] [ _car values ] ];
 >   _wutcol [ _rnil? [ _cdr names ] ]
 >     [ _list ]
->     [ _eval0_00 scope
+>     [ _eval0_00 callscope
 >       [ _call thisfunc [ _cdr names ] [ _call _escape [ _cdr values ] ] ] ]
 > ] ]
 < ()
@@ -98,7 +98,7 @@ $ define 'fexpr' [ _fexpr [
 >   define 'arglist' [ _car args ];
 >   define 'body' [ _car [ _cdr args ] ];
 >   define 'unpack' [ _call _defmulti arglist [ _escape args ] ];
->   _eval0_00 scope [ _call _fexpr [ _call _progn unpack body ] ]
+>   _eval0_00 callscope [ _call _fexpr [ _call _progn unpack body ] ]
 > ] ]
 < ()
 $ [ fexpr [ x y ] [ _concat_string x y ] ] 'foo' 'bar'

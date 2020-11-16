@@ -19,22 +19,22 @@ __DATA__
 $ _type 'foo'
 < 'String00'
 # [
-#   lambda (definer) { scope.eval \$[ $$definer 'define' $$definer ] }
+#   lambda (definer) { callscope.eval \$[ $$definer 'define' $$definer ] }
 #   lambda (newname, newvalue) {
-#     _set scope [ lambda (name) \${
+#     _set callscope [ lambda (name) \${
 #       ?: [ name == $$newname ]
 #         $$newvalue
-#         [ $$[deref scope] name ]
+#         [ $$[deref callscope] name ]
 #     } ]
 #   }
 # ]
 $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->   _eval0_00 scope [ _rmkcons 'Call00'
+>   _eval0_00 callscope [ _rmkcons 'Call00'
 >    [ _car args ] [ _list 'define' [ _car args ] ]
 >   ]
 > ] ] ] ]
 >   [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->     _set scope
+>     _set callscope
 >       [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ]
 >         [ _rmkcons 'Call00' _wutcol [ _list
 >           [ _rmkcons 'Call00'
@@ -46,7 +46,7 @@ $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >                 [ _rmkcons 'Call00' _escape [ _list [ _car [ _cdr args ] ] ] ]
 >             ] ]
 >             [ _rmkcons 'Call00'
->               [ _wrap [ _deref scope ] ]
+>               [ _wrap [ _deref callscope ] ]
 >               [ _list
 >                 [ _rmkcons 'Call00' _car [ _list [ _escape args ] ] ] ] ]
 >         ] ]
@@ -57,7 +57,7 @@ $ [ _wrap [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 $ define 'foo' 'Fu'; _id foo
 < 'Fu'
 $ define '_fexpr' [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
->    _rmkcons 'Fexpr00' [ _deref scope ] [ _car args ]
+>    _rmkcons 'Fexpr00' [ _deref callscope ] [ _car args ]
 > ] ] ]
 < ()
 $ define '_call' [ _wrap [ _fexpr [
@@ -66,7 +66,7 @@ $ define '_call' [ _wrap [ _fexpr [
 < ()
 $ define '_lambda' [ _fexpr [
 >   _wrap [
->     _eval0_00 scope [ _call _fexpr [ _car args ] ]
+>     _eval0_00 callscope [ _call _fexpr [ _car args ] ]
 >   ]
 > ] ]
 < ()
@@ -122,8 +122,8 @@ $ define 'kvadd' [ [ _wrap _lambda ] [
 $ [ kvadd [ [ kvstore [ _list ] [ _list ] _list ] ] 'x' 'y' ] 'x'
 < ('x', 'y')
 $ define 'kvdef' [ _lambda [
->   _set scope [
->     kvadd [ [ _deref scope ] ] [ _car args ] [ _car [ _cdr args ] ]
+>   _set callscope [
+>     kvadd [ [ _deref callscope ] ] [ _car args ] [ _car [ _cdr args ] ]
 >   ];
 >   _list
 > ] ]
