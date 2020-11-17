@@ -4,7 +4,7 @@ use XCL0::Exporter;
 use Sub::Util qw(set_subname);
 
 use XCL0::00::Runtime qw(
-  panic mkv car cdr flatten
+  debug panic mkv car cdr flatten
   eval0_00 progn set deref wutcol salis skvlis
   type rtype rtruep rboolp rcharsp
   raw list make_scope wrap combine
@@ -23,6 +23,9 @@ my %raw = (
   _list => wrap sub ($scope, $lst) { $lst },
   _type => wrap sub ($scope, $lst) { mkv String00 => chars => type(car $lst) },
 
+  _debug => wrap sub ($scope, $lst) {
+    debug(flatten $lst);
+  },
   _panic => wrap sub ($scope, $lst) {
     my ($str, $v) = flatten $lst;
     panic 'Expected string, got' => $str unless type($str) eq 'String00';

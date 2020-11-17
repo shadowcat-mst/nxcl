@@ -5,7 +5,7 @@ use XCL0::00::Tracing;
 use Sub::Util qw(set_subname);
 
 our @EXPORT_OK = qw(
-  panic assert_rtype
+  debug panic assert_rtype
   mkv
   rtype type
   rconsp rnilp rcharsp rboolp rnativep rvalp rvarp rtruep rfalsep
@@ -22,6 +22,11 @@ our @EXPORT_OK = qw(
 sub write_string {
   require XCL0::00::Writer;
   &XCL0::00::Writer::write_string;
+}
+
+sub debug (@v) {
+  warn join(' ', map write_string($_), @v)."\n";
+  $v[-1];
 }
 
 sub panic ($str, $v = undef) {
@@ -151,7 +156,7 @@ sub make_scope ($hash, $next = $Scope_Fail) {
   };
   my ($hex) = $scope_sub =~ m/\(0x(\w+)\)/;
   mkv Scope00 => var => mkv Fexpr00 => native =>
-    set_subname "SCOPE'${hex}'" => $scope_sub;
+    set_subname "SCOPE_${hex}" => $scope_sub;
 }
 
 our $event_id = 'A000';

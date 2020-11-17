@@ -7,6 +7,7 @@ use Sub::Util qw(subname);
 our @EXPORT_OK = qw(write_string);
 
 sub write_string ($v) {
+  return '??NULL??' unless defined($v);
   my $type = type $v;
   return raw($v) if $type eq 'Name00';
   return q{'}.raw($v).q{'} if $type eq 'String00'; # yes, I know.
