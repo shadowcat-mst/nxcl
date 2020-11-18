@@ -151,7 +151,9 @@ sub make_scope ($hash, $next = $Scope_Fail) {
     unless (type($first) eq 'String00') {
       panic "Scope lookup expected string, got" => $first;
     }
-    return list($first, $_) for grep defined, $hash->{raw($first)};
+    # The do {} is required to prevent the hash lookup being treated as an
+    # lvalue and thereby autovivifying the key with an undef value.
+    return list($first, $_) for grep defined, do { $hash->{raw($first)} };
     return combine($scope, $next, $args)
   };
   my ($hex) = $scope_sub =~ m/\(0x(\w+)\)/;

@@ -139,3 +139,22 @@ $ _id foo
 ! No such name: foo
 $ define 'foo' 'Fu'; _id foo
 < 'Fu'
+$ define '_fexpr' [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
+>    _rmkcons 'Fexpr00' [ _deref callscope ] [ _car thisargs ]
+> ] ] ]
+< ()
+$ define '_call' [ _wrap [ _fexpr [
+>   _rmkcons 'Call00' [ _car thisargs ] [ _cdr thisargs ]
+> ] ] ]
+< ()
+$ _eval0_00 [ _getscope ] [ _call _id foo ]
+< 'Fu'
+$ define 'call-scoped' [ _fexpr [
+>   define 'inner-scope' [ _rmkvar 'Scope00' [ _deref callscope ] ];
+>   _eval0_00 inner-scope [ _car thisargs ]
+> ] ]
+< ()
+$ call-scoped [ define 'bar' 'Yorkie'; _id bar ]
+< 'Yorkie'
+$ _id bar
+! No such name: bar
