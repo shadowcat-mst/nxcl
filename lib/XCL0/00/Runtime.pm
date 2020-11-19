@@ -109,6 +109,7 @@ sub set ($var, $value) {
 sub list (@list) {
   my $ret = mkv List00 => 'nil';
   foreach my $el (reverse @list) {
+    panic "Null value in list()" unless defined $el;
     $ret = mkv List00 => cons => $el, $ret;
   }
   return $ret;
