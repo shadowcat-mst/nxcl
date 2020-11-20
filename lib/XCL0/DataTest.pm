@@ -1,8 +1,7 @@
 package XCL0::DataTest;
 
+use XCL0::Exporter;
 use Test2::V0;
-use Mojo::Base -strict, -signatures;
-use Exporter 'import';
 
 our @EXPORT = qw(data_test);
 
