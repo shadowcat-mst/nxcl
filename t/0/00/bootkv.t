@@ -70,6 +70,24 @@ $ define '_lambda' [ _fexpr [
 >   ]
 > ] ]
 < ()
+$ define '_listo' [ _fexpr thisargs ]
+< ()
+# let _mapcons = (f, l) => {
+#   ?: [ empty? l ]
+#     ()
+#   cons [ f [ first l ] ] [ thisfunc f [ rest l ] ]
+# }
+$ define '_mapcons' [ _wrap [ _fexpr [
+>   _wutcol [ _rnil? [ _car [ _cdr thisargs ] ] ]
+>     [ _list ]
+>     [ _rmkcons 'List00'
+>       [ [ _car thisargs ] [ _car [ _car [ _cdr thisargs ] ] ] ]
+>       [ [ _wrap thisfunc ]
+>           [ _car thisargs ] [ _cdr [ _car [ _cdr thisargs ] ] ] ] ]
+> ] ] ]
+< ()
+$ _mapcons _val [ _listo x y z ]
+< ('x', 'y', 'z')
 $ define 'kvstore' [ [ _wrap _lambda ] [
 >   _call [ _wrap _fexpr ] [
 >       _call _call _wutcol
