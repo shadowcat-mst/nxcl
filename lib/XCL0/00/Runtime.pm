@@ -212,9 +212,11 @@ sub lookup ($scope, $v) {
 }
 
 sub eval0_00 ($scope, $v) {
+  state %special = map +($_ => 1), qw(Name00 List00 Call00);
   my $res;
-  local *T = trace_enter(EVAL => $event_id++, $v, \$res) if tracing;
   my $type = type($v);
+  return $v unless $special{$type};
+  local *T = trace_enter(EVAL => $event_id++, $v, \$res) if tracing;
   return $res = do {
     if ($type eq 'Name00') {
       lookup($scope, $v);
@@ -225,7 +227,7 @@ sub eval0_00 ($scope, $v) {
       my $call = eval0_00($scope, $callp);
       combine($scope, $call, $args);
     } else {
-      $v;
+      panic 'Notreached';
     }
   };
 }
