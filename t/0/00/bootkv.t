@@ -88,8 +88,8 @@ $ define '_mapcons' [ _wrap [ _fexpr [
 < ()
 $ _mapcons _val [ _listo x y z ]
 < ('x', 'y', 'z')
-$ define '_escapify' [ _lambda [
->  _call _escape [ _car thisargs ] ]
+$ define '_escapify' [ [ _wrap _lambda ] [
+>  _call _call _escape [ _call _car [ _escape thisargs ] ]
 > ] ];
 < ()
 $ _escapify [ _escape x ]
