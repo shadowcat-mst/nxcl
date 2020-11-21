@@ -1,7 +1,7 @@
 package XCL0::DataTest;
 
 use XCL0::Exporter;
-use Test2::V0;
+use Test2::V0 -no_warnings => 1; # don't reactivate signatures warnings
 
 our @EXPORT = qw(data_test);
 
