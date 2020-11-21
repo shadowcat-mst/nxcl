@@ -88,6 +88,12 @@ $ define '_mapcons' [ _wrap [ _fexpr [
 < ()
 $ _mapcons _val [ _listo x y z ]
 < ('x', 'y', 'z')
+$ define '_escapify' [ _lambda [
+>  _call _escape [ _car thisargs ] ]
+> ] ];
+< ()
+$ _escapify [ _escape x ]
+< [ Bif00(_escape) x ]
 $ define 'kvstore' [ [ _wrap _lambda ] [
 >   _call [ _wrap _fexpr ] [
 >       _call _call _wutcol
@@ -97,9 +103,9 @@ $ define 'kvstore' [ [ _wrap _lambda ] [
 >           _skvlis
 >           [ _call _rmkcons 'List00'
 >             [ _call _call _car [ _call _escape [ _escape thisargs ] ] ]
->             [ _escape thisargs ] ] ]
+>             [ _call _mapcons _escapify [ _escape thisargs ] ] ] ]
 >   ]
-> ] ]
+> ] ];
 < ()
 $ [ _car [ _cdr [
 >   [ kvstore [ _list ] [ _list ] [ _deref [ _scope0_00 ] ] ] '_id'
