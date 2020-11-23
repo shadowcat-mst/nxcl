@@ -15,8 +15,6 @@ our @EXPORT_OK = qw(
   list uncons flatten
   make_scope eval0_00 combine
   wutcol progn salis skvlis
-  wrap
-  $Scope_Fail
 );
 
 sub write_string {
@@ -267,13 +265,6 @@ sub skvlis ($scope, $needle, $klis, $vlis, $fallback) {
     return list($key, $val) if raw($key) eq $find;
   }
   return combine($scope, $fallback, list($needle));
-}
-
-sub wrap :prototype($) ($opv_sub) {
-  set_subname __WRAPPED__ => sub ($scope, $lstp) {
-    my $lst = eval0_00 $scope, $lstp;
-    $opv_sub->($scope, $lst)
-  }
 }
 
 1;

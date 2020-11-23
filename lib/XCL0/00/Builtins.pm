@@ -7,7 +7,7 @@ use XCL0::00::Runtime qw(
   debug panic mkv car cdr flatten set
   eval0_00 progn set deref wutcol salis skvlis
   type rtype rtruep rboolp rcharsp
-  raw list make_scope wrap combine
+  raw list make_scope combine
 );
 
 use Exporter 'import';
