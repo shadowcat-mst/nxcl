@@ -5,7 +5,7 @@ use XCL0::00::Tracing;
 use Sub::Util qw(set_subname);
 
 our @EXPORT_OK = qw(
-  debug panic assert_rtype
+  debug panic assert_rtype set
   mkv
   rtype type
   rconsp rnilp rcharsp rboolp rnativep rvalp rvarp rtruep rfalsep
