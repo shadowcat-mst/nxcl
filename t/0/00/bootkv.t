@@ -98,7 +98,7 @@ $ define 'kvstore' [ [ _wrap _lambda ] [
 >   _call [ _wrap _fexpr ] [
 >       _call _call _wutcol
 >         [ _call _call _rnil? [ _call _escape [ _escape thisargs ] ] ]
->         [ _escape thisargs ]
+>         [ _escape [ _call _escape thisargs ] ]
 >         [ _call _rmkcons 'Call00'
 >           _skvlis
 >           [ _call _rmkcons 'List00'
@@ -182,3 +182,25 @@ $ call-scoped [ define 'bar' 'Yorkie'; _id bar ]
 < 'Yorkie'
 $ _id bar
 ! No such name: bar
+$ define '_mapcons' [ _wrap [ _fexpr [
+>   _wutcol [ _rnil? [ _car [ _cdr thisargs ] ] ]
+>     [ _list ]
+>     [ _rmkcons 'List00'
+>       [ [ _car thisargs ] [ _car [ _car [ _cdr thisargs ] ] ] ]
+>       [ [ _wrap thisfunc ]
+>           [ _car thisargs ] [ _cdr [ _car [ _cdr thisargs ] ] ] ] ]
+> ] ] ]
+< ()
+$ define 'fexpr' [ _fexpr [
+>   _set [ _getscope ]
+>     [ kvstore [ _list ] [ _list ] [ _deref [ _getscope ] ] ];
+>   define 'argnames' [ _mapcons _val [ _car thisargs ] ];
+>   define 'body' [ _car [ _cdr thisargs ] ];
+>   define 'unpack' [ _call _set [ _call _getscope ]
+>     [ _call kvstore argnames
+>       [ _escape thisargs ] [ _call _deref [ _call _getscope ] ] ] ];
+>   _eval0_00 callscope [ _call _fexpr [ _call _progn unpack body ] ]
+> ] ]
+< ()
+$ [ fexpr [ x y ] [ _concat_string x y ] ] 'foo' 'bar'
+< 'foobar'

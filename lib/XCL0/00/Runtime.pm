@@ -28,6 +28,8 @@ sub debug (@v) {
 }
 
 sub panic ($str, $v = undef) {
+  local our $Panicking;
+  die "Recursive panic" if $Panicking++;
   die join(': ', $str, defined($v) ? write_string($v) : ())."\n";
 }
 

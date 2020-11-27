@@ -7,6 +7,9 @@ use Sub::Util qw(subname);
 our @EXPORT_OK = qw(write_string);
 
 sub write_string ($v) {
+  our $Depth;
+  local $Depth = $Depth;
+  return '??DEEP??' if ++$Depth > 10;
   return '??NULL??' unless defined($v);
   my $type = type $v;
   return raw($v) if $type eq 'Name00';
