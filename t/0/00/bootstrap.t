@@ -118,18 +118,10 @@ $ define 'alist-get-entry' [ _wrap [ fexpr [ alist key ] [
 >       [ [ _wrap thisfunc ] [ _cdr alist ] key ] ]
 > ] ] ]
 < ()
-$ alist-get-entry [_list] 'foo'
-! No such key: 'foo'
-$ define 'ex-alist' [ _list [ _list 'x' 'x1' ] [ _list 'z' 'z1' ] ]
-< ()
-$ alist-get-entry ex-alist 'z'
-< ('z', 'z1')
 $ define 'alist-get-value' [ _wrap [ fexpr [ alist key ] [
 >   _car [ _cdr [ alist-get-entry alist key ] ]
 > ] ] ]
 < ()
-$ alist-get-value ex-alist 'z'
-< 'z1'
 # let alist-set-value (alist, key, value) {
 #   ?: [ empty? alist ]
 #     [ list [ list key value ] ]
@@ -151,6 +143,14 @@ $ define 'alist-set-value' [ _wrap [ fexpr [ alist key value ] [
 >             [ [ _wrap thisfunc ] [ _cdr alist ] key value ] ] ] ]
 > ] ] ]
 < ()
+$ alist-get-entry [_list] 'foo'
+! No such key: 'foo'
+$ define 'ex-alist' [ _list [ _list 'x' 'x1' ] [ _list 'z' 'z1' ] ]
+< ()
+$ alist-get-entry ex-alist 'z'
+< ('z', 'z1')
+$ alist-get-value ex-alist 'z'
+< 'z1'
 $ alist-set-value [_list] 'a' 'a1'
 < (('a', 'a1'))
 $ alist-set-value ex-alist 'y' 'y1'
