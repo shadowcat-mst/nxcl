@@ -60,8 +60,13 @@ $ define '_fexpr' [ _rmkcons 'Fexpr00' [ _deref [ _getscope ] ] [ _escape [
 >    _rmkcons 'Fexpr00' [ _deref callscope ] [ _car thisargs ]
 > ] ] ]
 < ()
-$ define '_call' [ _wrap [ _fexpr [
->   _rmkcons 'Call00' [ _car thisargs ] [ _cdr thisargs ]
+$ define '_call' [ _wrap [ [ _wrap _fexpr ] [
+>   _rmkcons 'Call00'
+>     _rmkcons
+>     [ _list
+>       'Call00'
+>       [ _rmkcons 'Call00' _car [ _list [ _escape thisargs ] ] ]
+>       [ _rmkcons 'Call00' _cdr [ _list [ _escape thisargs ] ] ] ]
 > ] ] ]
 < ()
 $ define '_lambda' [ _fexpr [
@@ -77,13 +82,17 @@ $ define '_listo' [ _fexpr thisargs ]
 #     ()
 #   cons [ f [ first l ] ] [ thisfunc f [ rest l ] ]
 # }
-$ define '_mapcons' [ _wrap [ _fexpr [
->   _wutcol [ _rnil? [ _car [ _cdr thisargs ] ] ]
->     [ _list ]
->     [ _rmkcons 'List00'
->       [ [ _car thisargs ] [ _car [ _car [ _cdr thisargs ] ] ] ]
->       [ [ _wrap thisfunc ]
->           [ _car thisargs ] [ _cdr [ _car [ _cdr thisargs ] ] ] ] ]
+$ define '_mapcons' [ _wrap [ [ _wrap _fexpr ] [
+>   _call _wutcol
+>     [ _call _rnil? [ _call _car [ _call _cdr [ _escape thisargs ] ] ] ]
+>     [ _call _list ]
+>     [ _call _rmkcons 'List00'
+>       [ _call [ _call _car [ _escape thisargs ] ]
+>         [ _call _car [ _call _car [ _call _cdr [ _escape thisargs ] ] ] ] ]
+>       [ _call [ _call _wrap [ _escape thisfunc ] ]
+>           [ _call _car [ _escape thisargs ] ]
+>           [ _call _cdr [ _call _car [ _call _cdr [ _escape thisargs ] ] ] ]
+>       ] ]
 > ] ] ]
 < ()
 $ _mapcons _val [ _listo x y z ]
