@@ -193,13 +193,17 @@ $ call-scoped [ define 'bar' 'Yorkie'; _id bar ]
 < 'Yorkie'
 $ _id bar
 ! No such name: bar
-$ define '_mapcons' [ _wrap [ _fexpr [
->   _wutcol [ _rnil? [ _car [ _cdr thisargs ] ] ]
->     [ _list ]
->     [ _rmkcons 'List00'
->       [ [ _car thisargs ] [ _car [ _car [ _cdr thisargs ] ] ] ]
->       [ [ _wrap thisfunc ]
->           [ _car thisargs ] [ _cdr [ _car [ _cdr thisargs ] ] ] ] ]
+$ define '_mapcons' [ _wrap [ [ _wrap _fexpr ] [
+>   _call _wutcol
+>     [ _call _rnil? [ _call _car [ _call _cdr [ _escape thisargs ] ] ] ]
+>     [ _call _list ]
+>     [ _call _rmkcons 'List00'
+>       [ _call [ _call _car [ _escape thisargs ] ]
+>         [ _call _car [ _call _car [ _call _cdr [ _escape thisargs ] ] ] ] ]
+>       [ _call [ _call _wrap [ _escape thisfunc ] ]
+>           [ _call _car [ _escape thisargs ] ]
+>           [ _call _cdr [ _call _car [ _call _cdr [ _escape thisargs ] ] ] ]
+>       ] ]
 > ] ] ]
 < ()
 $ define 'fexpr' [ _fexpr [
