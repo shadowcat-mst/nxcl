@@ -110,9 +110,11 @@ $ define 'kvstore' [ [ _wrap _lambda ] [
 >         [ _escape [ _call _escape thisargs ] ]
 >         [ _call _rmkcons 'Call00'
 >           _skvlis
->           [ _call _rmkcons 'List00'
+>           [ _call _list
 >             [ _call _call _car [ _call _escape [ _escape thisargs ] ] ]
->             [ _call _mapcons _escapify [ _escape thisargs ] ] ] ]
+>             [ _call _car [ _escape thisargs ] ]
+>             [ _call _call _escape [ _call _car [ _call _cdr [ _escape thisargs ] ] ] ]
+>             [ _call _car [ _call _cdr [ _call _cdr [ _escape thisargs ] ] ] ] ] ]
 >   ]
 > ] ];
 < ()
