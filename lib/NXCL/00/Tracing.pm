@@ -1,17 +1,17 @@
-package XCL0::00::Tracing;
+package NXCL::00::Tracing;
 
-use XCL0::Exporter;
+use NXCL::Exporter;
 use Scope::Guard;
 
 our @EXPORT = qw(*T tracing trace_enter trace_stack);
 
-use constant tracing => 0+!!$ENV{XCL0_00_TRACING};
+use constant tracing => 0+!!$ENV{NXCL_00_TRACING};
 
 our %T;
 
 sub write_string {
-  require XCL0::00::Writer;
-  &XCL0::00::Writer::write_string;
+  require NXCL::00::Writer;
+  &NXCL::00::Writer::write_string;
 }
 
 sub trace_enter ($type, $id, $val, $retref) {

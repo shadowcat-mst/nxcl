@@ -1,11 +1,11 @@
 use Test2::V0;
 use Mojo::Base -strict, -signatures;
 
-use XCL0::00::Reader qw(read_string);
-use XCL0::00::Writer qw(write_string);
-use XCL0::00::Runtime qw(eval0_00);
-use XCL0::00::Builtins qw(builtin_scope);
-use XCL0::DataTest;
+use NXCL::00::Reader qw(read_string);
+use NXCL::00::Writer qw(write_string);
+use NXCL::00::Runtime qw(eval0_00);
+use NXCL::00::Builtins qw(builtin_scope);
+use NXCL::DataTest;
 
 my $scope = builtin_scope();
 

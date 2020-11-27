@@ -1,9 +1,9 @@
 use Test2::V0;
 use Mojo::Base -strict, -signatures;
 
-use XCL0::00::Reader qw(read_string);
-use XCL0::00::Writer qw(write_string);
-use XCL0::DataTest;
+use NXCL::00::Reader qw(read_string);
+use NXCL::00::Writer qw(write_string);
+use NXCL::DataTest;
 
 data_test \*DATA, sub ($v) { write_string(read_string $v) };
 

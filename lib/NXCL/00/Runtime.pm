@@ -1,7 +1,7 @@
-package XCL0::00::Runtime;
+package NXCL::00::Runtime;
 
-use XCL0::Exporter;
-use XCL0::00::Tracing;
+use NXCL::Exporter;
+use NXCL::00::Tracing;
 use Sub::Util qw(set_subname);
 
 our @EXPORT_OK = qw(
@@ -18,8 +18,8 @@ our @EXPORT_OK = qw(
 );
 
 sub write_string {
-  require XCL0::00::Writer;
-  &XCL0::00::Writer::write_string;
+  require NXCL::00::Writer;
+  &NXCL::00::Writer::write_string;
 }
 
 sub debug (@v) {

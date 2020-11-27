@@ -1,9 +1,9 @@
-package XCL0::00::Builtins;
+package NXCL::00::Builtins;
 
-use XCL0::Exporter;
+use NXCL::Exporter;
 use Sub::Util qw(set_subname);
 
-use XCL0::00::Runtime qw(
+use NXCL::00::Runtime qw(
   debug panic mkv car cdr flatten set
   eval0_00 progn set deref wutcol salis skvlis
   type rtype rtruep rboolp rcharsp
@@ -121,13 +121,13 @@ my %computed = (
     }
   } qw(var val)),
   (map {
-    my $code = XCL0::00::Runtime->can("r${_}p");
+    my $code = NXCL::00::Runtime->can("r${_}p");
     ("__r${_}?" => sub ($scope, $lst) {
       mkv Bool00 => bool => 0+!!$code->(car $lst) 
     })
   } qw(cons nil chars bool native val var)),
   (map {
-    my $code = XCL0::00::Runtime->can($_);
+    my $code = NXCL::00::Runtime->can($_);
     ('__'.($_ =~ s/p$/?/r) => sub ($scope, $lst) { $code->(car $lst) })
   } qw(valp refp val deref car cdr)),
   # probably worth having but needs more thought
@@ -155,7 +155,7 @@ my %cooked = (
       $wrap
         ? mkv(Apv00 => val => mkv(Fexpr00 => native => $sub))
         : mkv(Fexpr00 => native => $sub)))
-  } grep /^_/, keys %XCL0::00::Builtins::
+  } grep /^_/, keys %NXCL::00::Builtins::
 );
 
 sub builtin_list { sort keys %cooked }

@@ -1,4 +1,4 @@
-package XCL0::Exporter;
+package NXCL::Exporter;
 
 use strict;
 use warnings;

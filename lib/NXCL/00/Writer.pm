@@ -1,7 +1,7 @@
-package XCL0::00::Writer;
+package NXCL::00::Writer;
 
-use XCL0::Exporter;
-use XCL0::00::Runtime qw(type rtype raw flatten car cdr refp deref);
+use NXCL::Exporter;
+use NXCL::00::Runtime qw(type rtype raw flatten car cdr refp deref);
 use Sub::Util qw(subname);
 
 our @EXPORT_OK = qw(write_string);
@@ -26,7 +26,7 @@ sub write_string ($v) {
   if ($type eq 'Fexpr00') {
     if (rtype($v) eq 'native') {
       my $name = subname(raw $v);
-      if (my ($bif) = $name =~ /^XCL0::00::\w+::(.*)$/) {
+      if (my ($bif) = $name =~ /^NXCL::00::\w+::(.*)$/) {
         return 'Bif00('.$bif.')';
       }
       return 'Fexpr00(native '.$name.')';

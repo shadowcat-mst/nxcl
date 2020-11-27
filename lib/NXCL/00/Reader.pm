@@ -1,6 +1,6 @@
-package XCL0::00::Reader;
+package NXCL::00::Reader;
 
-use XCL0::Exporter;
+use NXCL::Exporter;
 
 our @EXPORT_OK = qw(read_string);
 
