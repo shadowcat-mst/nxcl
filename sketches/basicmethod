@@ -1,0 +1,41 @@
+# sketch of simple methods for nxcl-01 core type objects
+
+Item.evaluate = id;
+
+Item.invoke = fexpr () { error }
+
+Item.evaluate_against (self, scope) {
+  scope.eval self
+}
+
+Item.combine_against (self, scope, args) {
+  scope.eval self.combine args # approx
+}
+
+Name.evaluate = fexpr (self) { callscope.get-name self }
+
+List.evaluate = fexpr (self) {
+  self.map .evaluate_against(callscope);
+}
+
+Call.evaluate = fexpr (self) {
+  let (callp, @args) = self;
+  let call = callp.evaluate();
+  call.combine_against callscope args;
+}
+
+Native.combine = <native>
+
+Opv.combine = fexpr (self, args) {
+  let (scope, body) = self;
+  scope.with(
+    callscope,
+    :thisfunc self,
+    :thisargs args,
+  ).eval body;
+}
+
+Apv.combine = fexpr (self, argsp) {
+  let args = argsp.evaluate_against callscope;
+  deref(self).combine_against callscope args
+}

@@ -1,0 +1,24 @@
+# notes on how to build an iterator trivially around a lazy list
+
+let lazylist = something();
+
+foreach x in lazylist { ... } # each iteraation happens as elements arrive
+
+# but
+
+say lazylist.count(); # lazy list is still there
+
+let make-iter (lst) {
+  var cur = lst;
+  () => {
+    let ret = first cur;
+    cur = rest cur;
+    $ ret;
+  }
+}
+
+let iter = make-iter something();
+
+while exists(let v = iter()) {
+  ...
+}

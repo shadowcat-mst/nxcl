@@ -1,0 +1,26 @@
+# pseudocode for conditions in a spaghetti stack based system
+
+let find_in_stack (f) {
+
+  let find_first (lst, f) {
+    f(first lst) // thisfunc(rest lst, f)
+  }
+
+  find_first STACK f;
+}
+
+STACK.first().metadata().'condition-handlers'.'foo' = (...) => { ... }
+
+then later:
+
+raise 'foo' 'some-data';
+
+becomes
+
+let raise (type, data) {
+  let handler = find_in_stack(
+    (frame) => { [ frame.metadata().'condition-handler' ](type) }
+  );
+  handler data STACK;
+}
+

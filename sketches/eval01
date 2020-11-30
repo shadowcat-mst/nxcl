@@ -1,0 +1,45 @@
+# nxcl01 evaluation strategy, CEK machine style
+
+invoke 'foo' 'concat' 'bar' # 'foo' ++ 'bar'
+
+desugars to
+
+[ [ [ type-of 'foo' ] 'concat' ] 'foo' 'bar' ]
+
+A000 {
+  prog = [ [ [ type-of 'foo' ] 'concat' ] 'foo' 'bar' ]
+  scope = <builtins>
+  kont = Done
+}
+
+A001 {
+  prog = [ [ type-of 'foo' ] 'concat' ]
+  kont = Combine(ret, ('foo', 'bar')) -> Done
+}
+
+A002 {
+  prog = [ type-of 'foo' ]
+  kont = Combine(ret, ('concat')) -> A001
+}
+
+A003 {
+  prog = type-of
+  kont = Combine(ret, ('foo')) -> A002
+}
+
+A004 {
+  prog = Combine(<builtin:type-of>, ('foo'))
+  kont = Combine(ret, ('concat')) -> A001
+}
+
+A005 {
+  prog = Combine(<type:String>, ('concat'))
+  kont = Combine(ret, ('foo', 'bar')) -> A000
+}
+
+A006 {
+  prog = Combine(<builtin:_string_concat>, ('foo', 'bar'))
+  kont = A000
+}
+
+Done 'foobar'
