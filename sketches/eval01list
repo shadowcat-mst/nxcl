@@ -1,0 +1,54 @@
+# nxcl01 list evaluation strategy, CEK machine style
+
+A000 {
+  prog = EVAL (x, y, z)
+  scope = %(:x 1, :y 2, :z 3, @<builtins>)
+  kont = DONE
+}
+
+A001 {
+  prog = EVAL x
+  kont = ECDR (y, z) -> A000
+}
+
+A002 {
+  prog = ECDR (y, z) 1
+  kont = CONS 1 -> A001
+}
+
+A003 {
+  prog = EVAL y
+  kont = ECDR (z) -> A002
+}
+
+A004 {
+  prog = ECDR (z) 2
+  kont = CONS 2 -> A003
+}
+
+A005 {
+  prog = EVAL z
+  kont = ECDR () -> A004
+}
+
+A006 {
+  prog = EVAL ()
+  kont = CONS 3 -> A005
+}
+
+A007 {
+  prog = CONS 3 ()
+  kont = CONS 2 -> A003
+}
+
+A008 {
+  prog = CONS 2 (3)
+  kont = CONS 1 -> A001
+}
+
+A009 {
+  prog = CONS 1 (2, 3)
+  kont = DONE
+}
+
+DONE (1, 2, 3)
