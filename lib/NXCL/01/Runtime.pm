@@ -2,9 +2,47 @@ package NXCL::01::Runtime;
 
 use NXCL::Exporter;
 use Scalar::Util qw(weaken);
+use Sub::Util qw(set_subname);
 use NXCL::00::Runtime qw(mkv uncons raw rnilp);
 
+sub panic { die };
+
+sub not_combinable {
+  die "Not combinable";
+}
+
+sub evaluate_to_self ($scope, $self, $kstack) {
+  my ($kar, $kdr) = uncons $kstack;
+  return (
+    [ @$kar, $self ],
+    $kdr
+  );
+}
+
+sub combine_to_constant ($constant) {
+  my ($hex) = $constant =~ m/\(0x(\w+)\)/;
+  return set_subname 'combine_to_constant_'.$hex =>
+    sub ($scope, $args, $combiner, $kstack) {
+      return evaluate_to_self($scope, $constant, $kstack);
+    };
+}
+
+sub combine_to_constant_string ($string) {
+  return set_subname 'combine_to_constant_string_'.$string =>
+    combine_to_constant(String($string));
+}
+
+sub combine_OpDict ($scope, $args, $self, $kstack) {
+  my $key = raw(car($args));
+  my $value = raw($self)->{$key};
+  panic unless $value;
+  return evaluate_to_self($scope, $value, $kstack);
+}
+
 our $OpDict_T = mkv(undef, dict => {
+  evaluate => \&evaluate_to_self,
+  combine => \&combine_OpDict,
+  'type-name' => combine_to_constant_string('OpDict'),
 });
 
 {
@@ -14,13 +52,18 @@ our $OpDict_T = mkv(undef, dict => {
   $OpDict_T->[0] = $weak_opdict_t;
 }
 
-sub evaluate_list ($scope, $self, $kstack) {
+sub Type ($name, $vtable = {}) {
+  mkv($OpDict_T, dict => {
+    'type-name' => combine_to_constant_string($name),
+    evaluate => \&evaluate_to_self,
+    combine => \&not_combinable,
+    %$vtable,
+  })
+}
+
+sub evaluate_List ($scope, $self, $kstack) {
   if (rnilp $self) {
-    my ($kar, $kdr) = uncons $kstack;
-    return (
-      [ @$kar, $self ],
-      $kdr
-    );
+    evaluate_to_self($scope, $self, $kstack);
   }
   my ($car, $cdr) = uncons $self;
   return (
@@ -29,8 +72,8 @@ sub evaluate_list ($scope, $self, $kstack) {
   );
 }
 
-our $List_T = mkv($OpDict_T, dict => {
-  evaluate => \&evaluate_list,
+our $List_T = Type('List', {
+  evaluate => \&evaluate_List,
 });
 
 sub nil { mkv $List_T => 'nil' }
@@ -39,7 +82,7 @@ sub cons { mkv $List_T => cons => @_ }
 
 sub list1 ($v) { mkv $List_T => cons => $v => nil() }
 
-our $String_T;
+our $String_T = Type('String');
 
 sub String ($string) { mkv $String_T => chars => $string }
 
