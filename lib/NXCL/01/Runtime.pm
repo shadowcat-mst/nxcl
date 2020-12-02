@@ -3,7 +3,7 @@ package NXCL::01::Runtime;
 use NXCL::Exporter;
 use Scalar::Util qw(weaken);
 use Sub::Util qw(set_subname);
-use NXCL::00::Runtime qw(mkv uncons raw rnilp);
+use NXCL::00::Runtime qw(mkv uncons raw rnilp deref);
 
 sub panic { die };
 
@@ -11,7 +11,7 @@ sub not_combinable {
   die "Not combinable";
 }
 
-sub evaluate_to_self ($scope, $self, $kstack) {
+sub evaluate_to_value ($scope, $self, $kstack) {
   my ($kar, $kdr) = uncons $kstack;
   return (
     [ @$kar, $self ],
@@ -23,7 +23,7 @@ sub combine_to_constant ($constant) {
   my ($hex) = $constant =~ m/\(0x(\w+)\)/;
   return set_subname 'combine_to_constant_'.$hex =>
     sub ($scope, $args, $combiner, $kstack) {
-      return evaluate_to_self($scope, $constant, $kstack);
+      return evaluate_to_value($scope, $constant, $kstack);
     };
 }
 
@@ -36,11 +36,11 @@ sub combine_OpDict ($scope, $args, $self, $kstack) {
   my $key = raw(car($args));
   my $value = raw($self)->{$key};
   panic unless $value;
-  return evaluate_to_self($scope, $value, $kstack);
+  return evaluate_to_value($scope, $value, $kstack);
 }
 
 our $OpDict_T = mkv(undef, dict => {
-  evaluate => \&evaluate_to_self,
+  evaluate => \&evaluate_to_value,
   combine => \&combine_OpDict,
   'type-name' => combine_to_constant_string('OpDict'),
 });
@@ -52,10 +52,12 @@ our $OpDict_T = mkv(undef, dict => {
   $OpDict_T->[0] = $weak_opdict_t;
 }
 
+our %Types = (OpDict => $OpDict_T);
+
 sub Type ($name, $vtable = {}) {
-  mkv($OpDict_T, dict => {
+  $Types{$name} = mkv($OpDict_T, dict => {
     'type-name' => combine_to_constant_string($name),
-    evaluate => \&evaluate_to_self,
+    evaluate => \&evaluate_to_value,
     combine => \&not_combinable,
     %$vtable,
   })
@@ -63,7 +65,7 @@ sub Type ($name, $vtable = {}) {
 
 sub evaluate_List ($scope, $self, $kstack) {
   if (rnilp $self) {
-    evaluate_to_self($scope, $self, $kstack);
+    evaluate_to_value($scope, $self, $kstack);
   }
   my ($car, $cdr) = uncons $self;
   return (
@@ -82,9 +84,55 @@ sub cons { mkv $List_T => cons => @_ }
 
 sub list1 ($v) { mkv $List_T => cons => $v => nil() }
 
-our $String_T = Type('String');
+Type('String');
 
-sub String ($string) { mkv $String_T => chars => $string }
+sub String ($string) { mkv $Types{'String'} => chars => $string }
+
+Type('Scope');
+
+sub Scope ($store) { mkv $Types{'Scope'} => var => $store }
+
+Type('Val', {
+  combine => sub ($scope, $args, $self, $kstack) {
+    panic unless rnilp $args;
+    return evaluate_to_value($scope, deref($self), $kstack);
+  },
+});
+
+sub evaluate_Name ($scope, $self, $kstack) {
+  my $store = deref $scope;
+  my $store_type = type($store);
+  if ($store_type == $OpDict_T) {
+    my $cell = raw($store)->{raw($self)};
+    panic unless $cell;
+    if (type($cell) == $Types{Val}) {
+      return evaluate_to_value($scope, deref($cell), $kstack);
+    }
+    return (
+      [ CMB9 => $scope => nil() => $cell ],
+      $kstack,
+    );
+  }
+  return (
+    [ CMB9 => $scope => list1(String(raw($self))) => $store ],
+    cons([ CMB9 => $scope => nil() ], $kstack),
+  );
+}
+
+Type('Name', {
+  evaluate => \&evaluate_Name,
+});
+
+sub combine_Apv ($scope, $args, $apv, $kstack) {
+  return (
+    [ EVAL => $scope => $args ],
+    cons([ CMB6 => $scope => deref($apv) ], $kstack),
+  );
+}
+
+Type('Apv', {
+  combine => \&combine_Apv,
+});
 
 sub take_step_EVAL ($scope, $value, $kstack) {
   my $type = type($value);
@@ -141,6 +189,9 @@ sub take_step ($prog, $kstack) {
   }
   if ($op eq 'CMB9') {
     return take_step_CMB9($scope, $v1, $v2, $kstack);
+  }
+  if ($op eq 'CMB6') {
+    return take_step_CMB9($scope, $v2, $v1, $kstack);
   }
   if ($op eq 'ECDR') {
     return take_step_ECDR($scope, $v1, $v2, $kstack);
