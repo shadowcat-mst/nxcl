@@ -3,9 +3,10 @@ package NXCL::01::Runtime;
 use NXCL::Exporter;
 use Scalar::Util qw(weaken);
 use Sub::Util qw(set_subname);
-use NXCL::00::Runtime qw(mkv uncons raw rnilp deref);
+use List::Util qw(reduce);
+use NXCL::00::Runtime qw(mkv uncons raw rnilp deref flatten);
 
-sub panic { die };
+sub panic { die $_[0]//'PANIC' };
 
 sub not_combinable {
   die "Not combinable";
@@ -19,7 +20,7 @@ sub evaluate_to_value ($scope, $self, $kstack) {
   );
 }
 
-sub combine_to_constant ($constant) {
+sub make_combine_to_constant ($constant) {
   my ($hex) = $constant =~ m/\(0x(\w+)\)/;
   return set_subname 'combine_to_constant_'.$hex =>
     sub ($scope, $args, $combiner, $kstack) {
@@ -27,9 +28,9 @@ sub combine_to_constant ($constant) {
     };
 }
 
-sub combine_to_constant_string ($string) {
+sub make_combiner_to_constant_string ($string) {
   return set_subname 'combine_to_constant_string_'.$string =>
-    combine_to_constant(String($string));
+    make_combine_to_constant(String($string));
 }
 
 sub combine_OpDict ($scope, $args, $self, $kstack) {
@@ -42,7 +43,7 @@ sub combine_OpDict ($scope, $args, $self, $kstack) {
 our $OpDict_T = mkv(undef, dict => {
   evaluate => \&evaluate_to_value,
   combine => \&combine_OpDict,
-  'type-name' => combine_to_constant_string('OpDict'),
+  'type-name' => make_combiner_to_constant_string('OpDict'),
 });
 
 {
@@ -56,11 +57,19 @@ our %Types = (OpDict => $OpDict_T);
 
 sub Type ($name, $vtable = {}) {
   $Types{$name} = mkv($OpDict_T, dict => {
-    'type-name' => combine_to_constant_string($name),
+    'type-name' => make_combiner_to_constant_string($name),
     evaluate => \&evaluate_to_value,
     combine => \&not_combinable,
     %$vtable,
   })
+}
+
+sub Make ($name, @make) {
+  mkv($Types{$name}, @make);
+}
+
+sub make_bool ($val) {
+  Make(Bool => bool => 0+!!$val);
 }
 
 sub evaluate_List ($scope, $self, $kstack) {
@@ -74,23 +83,139 @@ sub evaluate_List ($scope, $self, $kstack) {
   );
 }
 
-our $List_T = Type('List', {
+Type('List', {
   evaluate => \&evaluate_List,
 });
 
-sub nil { mkv $List_T => 'nil' }
+sub nil { Make List => 'nil' }
 
-sub cons { mkv $List_T => cons => @_ }
+sub cons { Make List => cons => @_ }
 
-sub list1 ($v) { mkv $List_T => cons => $v => nil() }
+sub list1 ($v) { Make List => cons => $v => nil() }
 
-Type('String');
+sub combine_Raw ($scope, $args, $value, $kstack) {
+  deref($value)->($scope, $args, $value, $kstack);
+}
 
-sub String ($string) { mkv $Types{'String'} => chars => $string }
+Type('Raw' => {
+  combine => \&combine_Raw,
+});
+
+sub combine_Sub ($scope, $args, $value, $kstack) {
+  my ($kar, $kdr) = uncons $kstack;
+  return (
+    [ @$kar, deref($value)->($scope, $args) ].
+    $kdr
+  );
+}
+
+Type('Sub' => {
+  combine => \&combine_Sub,
+});
+
+sub combine_Apv ($scope, $args, $apv, $kstack) {
+  return (
+    [ EVAL => $scope => $args ],
+    cons([ CMB6 => $scope => deref($apv) ], $kstack),
+  );
+}
+
+Type('Apv', {
+  combine => \&combine_Apv,
+});
+
+sub Apv ($opv) {
+  Make Apv => val => $opv;
+}
+
+sub String_eq ($scope, $args) {
+  my ($l, $r, @too_many) = flatten $args;
+  panic 'Too many args' if @too_many;
+  panic 'Must be strings' for grep $Types{String} ne $_, $l, $r;
+  make_bool(raw($l) eq raw($r));
+}
+
+sub String_gt ($scope, $args) {
+  my ($l, $r, @too_many) = flatten $args;
+  panic 'Too many args' if @too_many;
+  panic 'Must be strings' for grep $Types{String} ne $_, $l, $r;
+  make_bool(raw($l) gt raw($r));
+}
+
+sub String_concat ($scope, $args) {
+  my @string = flatten $args;
+  panic 'Must be strings' for grep $Types{String} ne $_, @string;
+  Make => String => chars => (join '', map raw($_). @string);
+}
+
+Type('String', {
+  eq => Make(Sub => native => \&String_eq),
+  gt => Make(Sub => native => \&String_gt),
+  concat => Make(Sub => native => \&String_concat),
+});
+
+sub String ($string) { Make(String => chars => $string); }
+
+sub Int_eq ($scope, $args) {
+  my ($l, $r, @too_many) = flatten $args;
+  panic 'Too many args' if @too_many;
+  panic 'Must be ints' for grep $Types{Int} ne $_, $l, $r;
+  return make_bool(raw($l) == raw($r));
+}
+
+sub Int_gt ($scope, $args) {
+  my ($l, $r, @too_many) = flatten $args;
+  panic 'Too many args' if @too_many;
+  panic 'Must be ints' for grep $Types{Int} ne $_, $l, $r;
+  return make_bool(raw($l) > raw($r));
+}
+
+sub Int_div ($scope, $args) {
+  my ($l, $r, @too_many) = flatten $args;
+  panic 'Too many args' if @too_many;
+  panic 'Must be ints' for grep $Types{Int} ne $_, $l, $r;
+  return Make Int => int => int(raw($l) / raw($r));
+}
+
+sub Int_mod ($scope, $args) {
+  my ($l, $r, @too_many) = flatten $args;
+  panic 'Too many args' if @too_many;
+  panic 'Must be ints' for grep $Types{Int} ne $_, $l, $r;
+  return Make Int => int => (raw($l) % raw($r));
+}
+
+sub Int_minus ($scope, $args) {
+  my ($l, $r, @too_many) = flatten $args;
+  panic 'Too many args' if @too_many;
+  panic 'Must be ints' for grep $Types{Int} ne $_, grep defined, $l, $r;
+  return make_bool(raw($l) - raw($r)) if defined($r);
+  return Make Int => int => -raw($l);
+}
+
+sub Int_times ($scope, $args) {
+  my @ints = flatten $args;
+  panic 'Must be ints' for grep $Types{Int} ne $_, @ints;
+  return Make Int => int => reduce { $a * $b }, 5, map raw($_), @ints;
+}
+
+sub Int_plus ($scope, $args) {
+  my @ints = flatten $args;
+  panic 'Must be ints' for grep $Types{Int} ne $_, @ints;
+  return Make Int => int => reduce { $a + $b }, 0, map raw($_), @ints;
+}
+
+Type('Int', {
+  eq => Make(Sub => native => \&Int_eq),
+  gt => Make(Sub => native => \&Int_gt),
+  minus => Make(Sub => native => \&Int_minus),
+  plus => Make(Sub => native => \&Int_plus),
+});
+
+sub Int ($int) { Make String => int => $int }
 
 Type('Scope');
 
-sub Scope ($store) { mkv $Types{'Scope'} => var => $store }
+sub Scope ($store) { Make Scope => var => $store }
 
 Type('Val', {
   combine => sub ($scope, $args, $self, $kstack) {
@@ -121,17 +246,6 @@ sub evaluate_Name ($scope, $self, $kstack) {
 
 Type('Name', {
   evaluate => \&evaluate_Name,
-});
-
-sub combine_Apv ($scope, $args, $apv, $kstack) {
-  return (
-    [ EVAL => $scope => $args ],
-    cons([ CMB6 => $scope => deref($apv) ], $kstack),
-  );
-}
-
-Type('Apv', {
-  combine => \&combine_Apv,
 });
 
 sub take_step_EVAL ($scope, $value, $kstack) {
