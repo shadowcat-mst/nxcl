@@ -22,14 +22,14 @@ sub evaluate_to_value ($scope, $self, $kstack) {
 
 sub make_combine_to_constant ($constant) {
   my ($hex) = $constant =~ m/\(0x(\w+)\)/;
-  return set_subname 'combine_to_constant_'.$hex =>
+  return set_subname 'const_'.$hex =>
     sub ($scope, $args, $combiner, $kstack) {
       return evaluate_to_value($scope, $constant, $kstack);
     };
 }
 
 sub make_combiner_to_constant_string ($string) {
-  return set_subname 'combine_to_constant_string_'.$string =>
+  return set_subname 'const_string_'.$string =>
     make_combine_to_constant(String($string));
 }
 
