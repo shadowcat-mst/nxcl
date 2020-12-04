@@ -207,11 +207,24 @@ sub Int_plus ($scope, $args) {
 Type('Int', {
   eq => Make(Sub => native => \&Int_eq),
   gt => Make(Sub => native => \&Int_gt),
+  div => Make(Sub => native => \&Int_div),
+  mod => Make(Sub => native => \&Int_mod),
   minus => Make(Sub => native => \&Int_minus),
   plus => Make(Sub => native => \&Int_plus),
 });
 
-sub Int ($int) { Make String => int => $int }
+sub Int ($int) { Make Int => int => $int }
+
+sub Bool_eq ($scope, $args) {
+  my ($l, $r, @too_many) = flatten $args;
+  panic 'Too many args' if @too_many;
+  panic 'Must be bools' for grep $Types{Bool} ne $_, $l, $r;
+  return make_bool(raw($l) == raw($r));
+}
+
+Type('Bool', {
+  eq => Make(Sub => native => \&Bool_eq),
+});
 
 Type('Scope');
 
