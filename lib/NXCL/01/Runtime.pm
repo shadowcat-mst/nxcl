@@ -40,23 +40,23 @@ sub combine_OpDict ($scope, $args, $self, $kstack) {
   return evaluate_to_value($scope, $value, $kstack);
 }
 
-our $OpDict_T = mkv(undef, dict => {
+our $OpDict = mkv(undef, dict => {
   evaluate => \&evaluate_to_value,
   combine => \&combine_OpDict,
   'type-name' => make_combiner_to_constant_string('OpDict'),
 });
 
 {
-  my $weak_opdict_t = $OpDict_T;
-  weaken($weak_opdict_t);
+  my $weak_opdict = $OpDict;
+  weaken($weak_opdict);
   # monkeypatch type to circularify
-  $OpDict_T->[0] = $weak_opdict_t;
+  $OpDict->[0] = $weak_opdict;
 }
 
-our %Types = (OpDict => $OpDict_T);
+our %Types = (OpDict => $OpDict);
 
 sub Type ($name, $vtable = {}) {
-  $Types{$name} = mkv($OpDict_T, dict => {
+  $Types{$name} = mkv($OpDict, dict => {
     'type-name' => make_combiner_to_constant_string($name),
     evaluate => \&evaluate_to_value,
     combine => \&not_combinable,
@@ -240,7 +240,7 @@ Type('Val', {
 sub evaluate_Name ($scope, $self, $kstack) {
   my $store = deref $scope;
   my $store_type = type($store);
-  if ($store_type == $OpDict_T) {
+  if ($store_type == $OpDict) {
     my $cell = raw($store)->{raw($self)};
     panic unless $cell;
     if (type($cell) == $Types{Val}) {
@@ -263,7 +263,7 @@ Type('Name', {
 
 sub take_step_EVAL ($scope, $value, $kstack) {
   my $type = type($value);
-  if (type($type) == $OpDict_T) {
+  if (type($type) == $OpDict) {
     my $handler = raw($type)->{'evaluate'};
     if (ref($handler) eq 'CODE') {
       return $handler->($scope, $value, $kstack);
@@ -281,7 +281,7 @@ sub take_step_EVAL ($scope, $value, $kstack) {
 
 sub take_step_CMB9 ($scope, $args, $combiner, $kstack) {
   my $type = type($combiner);
-  if (type($type) == $OpDict_T) {
+  if (type($type) == $OpDict) {
     my $handler = raw($type)->{'combine'};
     if (ref($handler) eq 'CODE') {
       return $handler->($scope, $args, $combiner, $kstack);
