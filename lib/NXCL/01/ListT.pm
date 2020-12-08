@@ -3,17 +3,17 @@ package NXCL::01::ListT;
 use NXCL::00::Runtime qw(uncons flatten);
 use NXCL::01::TypeExporter;
 
-sub empty_List :Thunk ($scope) { List() }
-
-sub List (@members) {
-  my $ret = nil;
+sub make (@members) {
+  my $ret = mkv ListT ,=> 'nil';
   foreach my $m (reverse @members) {
-    $ret = Cons $m, $ret;
+    $ret = mkv ListT ,=> cons => $m, $ret;
   }
   return $ret;
 }
 
-sub List_evaluate :Raw ($scope, $self, $, $kstack) {
+thunk static empty => sub ($) { make() };
+
+raw method evaluate => sub ($scope, $self, $, $kstack) {
   if (rnilp $self) {
     evaluate_to_value($scope, $self, $kstack);
   }
@@ -22,9 +22,11 @@ sub List_evaluate :Raw ($scope, $self, $, $kstack) {
     [ EVAL => $scope => $car ],
     cons([ ECDR => $scope => $cdr ], $kstack),
   );
-}
+};
 
-sub List_scan :Apv :Raw ($scope, $args, $m, $kstack) {
+wrap method scan => '_scan';
+
+raw method scan => sub ($scope, $args, $m, $kstack) {
   my ($self, $scan_by, $accum) = flatten $args;
   if (rnilp $self) {
     return evaluate_to_value($scope, $accum, $kstack);
@@ -37,15 +39,15 @@ sub List_scan :Apv :Raw ($scope, $args, $m, $kstack) {
       $kstack
     )
   );
-}
+};
 
-sub List__scan_step :Raw ($scope, $args, $m, $kstack) {
+raw method _scan_step => sub ($scope, $args, $m, $kstack) {
   my ($self, $scan_by, $accum) = flatten $args;
   return evaluate_to_value(
     $scope,
-    LazyCons($accum, Curry(Method($self, 'scan'), List($scan_by, $accum))),
+    LazyCons($accum, Curry(Method($self, '_scan'), List($scan_by, $accum))),
     $kstack,
   );
-}
+};
 
 1;
