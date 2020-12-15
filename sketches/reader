@@ -144,7 +144,7 @@ class Parser {
   method extract_compoundish(toks) {
     let (compound, toks1) = self._extract_compoundish toks;
     return () unless compound;
-    return (compound, toks1);
+    return (('compound', compound), toks1);
   }
 
   method _extract_compoundish(toks) {
@@ -168,13 +168,13 @@ class Parser {
     self.(extract)(toks);
   }
 
-  method extract_spacecall(:asi = false, toks) {
-    let (spacecall, toks1) = self._extract_spacecall :asi toks;
-    return () unless spacecall;
-    return (spacecall, toks1);
+  method extract_call(:asi = false, toks) {
+    let (call, toks1) = self._extract_call :asi toks;
+    return () unless call;
+    return (('call', call), toks1);
   }
 
-  method _extract_spacecall(:asi, toks) {
+  method _extract_call(:asi, toks) {
     return ((), toks)
       unless let attempt = self.skip_wsish_then \extract_compoundish toks;
     let (found1, toks1) = attempt;
@@ -182,11 +182,11 @@ class Parser {
       and m"\n" self.extract_wsish(toks1).0 ] {
       return ((found1), toks1);
     }
-    let (found2, toks2) = self._extract_spacecall toks1;
+    let (found2, toks2) = self._extract_call toks1;
     return ((found1) ++ found2, toks2);
   }
 
-  let extract_only(type) {
+  let extract_one(type) {
     method ((first, @rest)) {
       ?: [ first.0 == type ]
         rest
@@ -195,16 +195,22 @@ class Parser {
   }
 
   method extract_list(toks) {
-    if [ let toks1 = self.skip_wsish_then extract_only('end_list') toks ] {
+    let (list, toks1) = self._extract_list toks;
+    return () unless list;
+    return (('list', list), toks1);
+  }
+
+  method _extract_list(toks) {
+    if [ let toks1 = self.skip_wsish_then extract_one('end_list') toks ] {
       return ((), toks1)
     }
-    if [ let toks1 = self.skip_wsish_then extract_only('comma') toks ] {
-      return self.extract_list toks1;
+    if [ let toks1 = self.skip_wsish_then extract_one('comma') toks ] {
+      return self._extract_list toks1;
     }
-    let attempt = self.extract_spacecall toks;
+    let attempt = self.extract_call toks;
     fail "Invalid token type $(toks.0.0) in list" unless attempt;
     let (found1, toks1) = attempt;
-    let (found2, toks2) = self.extract_list toks1;
+    let (found2, toks2) = self._extract_list toks1;
     return ((found1) ++ found2, toks2);
   }
 
@@ -216,17 +222,23 @@ class Parser {
     self.extract_stmt_list 'call' toks;
   }
 
-  method _extract_stmt_list_until(type, toks) {
-    if [ let toks1 = self.skip_wsish_then extract_only("end_$(type)") toks ] {
+  method extract_stmt_list(type, toks) {
+    let (slist, toks1) = self._extract_stmt_list(type, toks);
+    return () unless slist;
+    return ((type, slist), toks1);
+  }
+
+  method _extract_stmt_list(type, toks) {
+    if [ let toks1 = self.skip_wsish_then extract_one("end_$(type)") toks ] {
       return ((), toks1)
     }
-    if [ let toks1 = self.skip_wsish_then extract_only('semicolon') toks ] {
+    if [ let toks1 = self.skip_wsish_then extract_one('semicolon') toks ] {
       return self.extract_list toks1;
     }
-    let attempt = self.extract_spacecall :asi(true) toks;
+    let attempt = self.extract_call :asi(true) toks;
     fail "Invalid token type $(toks.0.0) in $(type)" unless attempt;
     let (found1, toks1) = attempt;
-    let (found2, toks2) = self.extract_stmt_list_until type toks1;
+    let (found2, toks2) = self._extract_stmt_list type toks1;
     return ((found1) ++ found2, toks2);
   }
 
