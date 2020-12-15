@@ -1,0 +1,233 @@
+# ported from previous-xcl lib/XCL/Tokenizer.pm
+
+# nerfed 1.3 parsing as number, instead parse it as [ 1 . 3 ]
+
+let chars_for_token = %(
+  :ws " \t\n",
+  :int '0123456789',
+  :word 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_',
+  :symbol [ let symbol_chars = '.!$%&*+-:<=>@\\^|~?' ],
+  :string "'",
+  :comma ",",
+  :semicolon ";",
+  :enter_call '[',
+  :enter_list '(',
+  :enter_block '{',
+  :leave_call ']',
+  :leave_list ')',
+  :leave_block '}',
+  :comment '#',
+);
+
+let token_matchers = %(
+  :ws '(\s+)',
+  :word '(\w+)',
+  :int '([0-9]+)',
+  :symbol "([$(symbol_chars)])",
+  :comment '(#.*?\n)',
+);
+
+let token_types = chars_for_token.keys();
+
+let token_type_for = % @ chars_for_token.pipe ((type, enter_chars)) => {
+  enter_chars.chars().map { (this, type) }
+}
+
+let gen_subst = Regexp.subst '^(.)' '';
+
+let token_extractor = % @ token_types.map {
+  (:(this), Regexp.subst token_matchers(this) '' // gen_subst)
+}
+
+let extract_tok(src) {
+  let fst = src.chars().0;
+  let type = token_type_for(fst) // problem NO_SUCH_TOKEN_TYPE_FOR fst;
+  let subst = token_extractor(type);
+  let (rest, tok_text) = subst(src)
+    // problem NO_TOKEN_MATCH type [src.substr 0 10];
+  ((type, tok_text), rest);
+}
+
+let tokenize(src) {
+  return () unless src;
+  let (tok, rest) = extract_tok src;
+  (tok) ++ tokenize(rest)
+}
+
+# ported from previous-xcl lib/XCL/Parser.pm
+
+#{{{
+
+atom: word|symbol|int|string|call|block|list
+
+compound: <atom><atom>... -> (atom, ...)
+
+spacecall: ws? compound ws compound ... ws? -> (thing, ...)
+
+call_sep: ws? ; ws? ; ... ;ws? -> ';'
+
+call_list: call_sep? spacecall call_sep ... call_sep? -> (spacecall, ...)
+
+expr_sep: ws? , ws? , ... ,ws? -> ','
+
+expr_list: expr_sep? spacecall expr_sep ... expr_sep? -> (spacecall, ...)
+
+call: [ call_list ]
+
+block: { call_list }
+
+list: ( expr_list )
+
+--
+
+if [ lst.length() > 1 ] {
+  say "multiple";
+}
+
+Call(
+  Name(if),
+  Call(Name(>), Compound(Name(lst), Name(.), Name(length), List()), Int(1)),
+  Block(Call(Name(say), String('multiple'))),
+)
+
+if [ lst.length() > 1 ] {
+  say 'multiple';
+}
+
+(
+  (word, if),
+  (ws, ' '),
+  (enter_call, '['),
+  (ws, ' '),
+  (word, lst),
+  (symbol, .),
+  (word, length),
+  (enter_list, '('),
+  (leave_list, ')'),
+  (ws, ' '),
+  (symbol, >),
+  (ws, ' ')
+  (int, 1),
+  (ws, ' '),
+  (leave_call, ']'),
+  (ws, ' '),
+  (enter_block, '{'),
+  (ws, "\n  "),
+  (word, say),
+  (ws, ' '),
+  (string, 'multiple', '\'multiple\''),
+  (semicolon, ';'),
+  (ws, "\n"),
+  (leave_call, '}'),
+  (ws, "\n"),
+  (end),
+);
+
+}}}#
+
+class Parser {
+
+  let is_atomish = % @ qw'word symbol int string'.map { :(this) true };
+
+  let extract_complex = %(
+    :enter_call \extract_call,
+    :enter_block \extract_block,
+    :enter_list \extract_list,
+  );
+
+  method extract_atomish(((type, tok), @rest)) {
+    return ((type, tok), rest) if is_atomish type;
+    return () unless let extract = extract_complex type;
+    return self.(extract)(rest);
+  }
+
+  method extract_compoundish(toks) {
+    let (compound, toks1) = self._extract_compoundish toks;
+    return () unless compound;
+    return (compound, toks1);
+  }
+
+  method _extract_compoundish(toks) {
+    return ((), toks) unless let attempt = self.extract_atomish toks;
+    let (found1, toks1) = attempt;
+    let (found2, toks2) = self._extract_compoundish toks1;
+    return ((found1) ++ found2, toks2);
+  }
+
+  method extract_wsish(toks) {
+    let ((type, tok), @rest) = toks;
+    return ('', toks) unless type == 'ws' or type == 'comment';
+    let (str, toks1) = self.extract_wsish rest;
+    return (tok ++ str, toks1);
+  }
+
+  method skip_wsish_then(extract, toks) {
+    let ((type, tok), @rest) = toks;
+    ?: [ type == 'ws' or type == 'comment' ]
+      self.skip_wsish_then(extract, rest)
+    self.(extract)(toks);
+  }
+
+  method extract_spacecall(:asi = false, toks) {
+    let (spacecall, toks1) = self._extract_spacecall :asi toks;
+    return () unless spacecall;
+    return (spacecall, toks1);
+  }
+
+  method _extract_spacecall(:asi, toks) {
+    return ((), toks)
+      unless let attempt = self.skip_wsish_then \extract_compoundish toks;
+    let (found1, toks1) = attempt;
+    if [ asi
+      and m"\n" self.extract_wsish(toks1).0 ] {
+      return ((found1), toks1);
+    }
+    let (found2, toks2) = self._extract_spacecall toks1;
+    return ((found1) ++ found2, toks2);
+  }
+
+  let extract_only(type) {
+    method ((first, @rest)) {
+      ?: [ first.0 == type ]
+        rest
+      ()
+    }
+  }
+
+  method extract_list(toks) {
+    if [ let toks1 = self.skip_wsish_then extract_only('end_list') toks ] {
+      return ((), toks1)
+    }
+    if [ let toks1 = self.skip_wsish_then extract_only('comma') toks ] {
+      return self.extract_list toks1;
+    }
+    let attempt = self.extract_spacecall toks;
+    fail "Invalid token type $(toks.0.0) in list" unless attempt;
+    let (found1, toks1) = attempt;
+    let (found2, toks2) = self.extract_list toks1;
+    return ((found1) ++ found2, toks2);
+  }
+
+  method extract_block(toks) {
+    self.extract_stmt_list 'block' toks;
+  }
+
+  method extract_call(toks) {
+    self.extract_stmt_list 'call' toks;
+  }
+
+  method _extract_stmt_list_until(type, toks) {
+    if [ let toks1 = self.skip_wsish_then extract_only("end_$(type)") toks ] {
+      return ((), toks1)
+    }
+    if [ let toks1 = self.skip_wsish_then extract_only('semicolon') toks ] {
+      return self.extract_list toks1;
+    }
+    let attempt = self.extract_spacecall :asi(true) toks;
+    fail "Invalid token type $(toks.0.0) in $(type)" unless attempt;
+    let (found1, toks1) = attempt;
+    let (found2, toks2) = self.extract_stmt_list_until type toks1;
+    return ((found1) ++ found2, toks2);
+  }
+
+}
