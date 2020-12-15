@@ -162,10 +162,8 @@ class Parser {
   }
 
   method skip_wsish_then(extract, toks) {
-    let ((type, tok), @rest) = toks;
-    ?: [ type == 'ws' or type == 'comment' ]
-      self.skip_wsish_then(extract, rest)
-    self.(extract)(toks);
+    let ($, toks1) = self.extract_wsish toks;
+    self.(extract)(toks1);
   }
 
   method extract_call(:asi = false, toks) {
@@ -241,5 +239,4 @@ class Parser {
     let (found2, toks2) = self._extract_stmt_list type toks1;
     return ((found1) ++ found2, toks2);
   }
-
 }
