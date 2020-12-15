@@ -166,13 +166,13 @@ class Parser {
     self.(extract)(toks1);
   }
 
-  method extract_call(:asi = false, toks) {
-    let (call, toks1) = self._extract_call :asi toks;
-    return () unless call;
-    return (('call', call), toks1);
+  method extract_stmt(:asi = false, toks) {
+    let (stmt, toks1) = self._extract_stmt :asi toks;
+    return () unless stmt;
+    return (('stmt', stmt), toks1);
   }
 
-  method _extract_call(:asi, toks) {
+  method _extract_stmt(:asi, toks) {
     return ((), toks)
       unless let attempt = self.skip_wsish_then \extract_compoundish toks;
     let (found1, toks1) = attempt;
@@ -180,7 +180,7 @@ class Parser {
       and m"\n" self.extract_wsish(toks1).0 ] {
       return ((found1), toks1);
     }
-    let (found2, toks2) = self._extract_call toks1;
+    let (found2, toks2) = self._extract_stmt toks1;
     return ((found1) ++ found2, toks2);
   }
 
@@ -205,7 +205,7 @@ class Parser {
     if [ let toks1 = self.skip_wsish_then extract_one('comma') toks ] {
       return self._extract_list toks1;
     }
-    let attempt = self.extract_call toks;
+    let attempt = self.extract_stmt toks;
     fail "Invalid token type $(toks.0.0) in list" unless attempt;
     let (found1, toks1) = attempt;
     let (found2, toks2) = self._extract_list toks1;
@@ -233,7 +233,7 @@ class Parser {
     if [ let toks1 = self.skip_wsish_then extract_one('semicolon') toks ] {
       return self.extract_list toks1;
     }
-    let attempt = self.extract_call :asi(true) toks;
+    let attempt = self.extract_stmt :asi(true) toks;
     fail "Invalid token type $(toks.0.0) in $(type)" unless attempt;
     let (found1, toks1) = attempt;
     let (found2, toks2) = self._extract_stmt_list type toks1;
