@@ -136,8 +136,8 @@ class Parser {
   );
 
   method extract_atomish(((type, tok), @rest)) {
-    return ((type, tok), rest) if is_atomish type;
-    return () unless let extract = extract_complex type;
+    return ((type, tok), rest) if exists(is_atomish type);
+    return () unless exists(let extract = extract_complex type);
     return self.(extract)(rest);
   }
 
@@ -169,7 +169,7 @@ class Parser {
   method extract_stmt(:asi = false, toks) {
     let (stmt, toks1) = self._extract_stmt :asi toks;
     return () unless stmt;
-    return (('stmt', stmt), toks1);
+    return (stmt, toks1);
   }
 
   method _extract_stmt(:asi, toks) {
@@ -239,4 +239,46 @@ class Parser {
     let (found2, toks2) = self._extract_stmt_list type toks1;
     return ((found1) ++ found2, toks2);
   }
+}
+
+# ported from previous-xcl lib/XCL/Reifier.pm
+
+# makes: List, Call, ProtoBlock, Compound, progn, Word, Symbol, Int, String
+
+class Reifier {
+
+  method reify ((type, v)) {
+    self.invoke ['reify-' ++ type] (v);
+  }
+
+  method reify-string(v) { $v }
+
+  method reify-word(v) { v.to-name() }
+
+  method reify-symbol(v) { v.to-name() }
+
+  method reify-int(v) { v.to-int() }
+
+  method reify-expr(v) {
+    let (first, @rest) = let v1 = v.map self.reify;
+    return first unless rest;
+    return Call.new v1;
+  }
+
+  method reify-compound(v) {
+    let (first, @rest) = let v1 = v.map self.reify;
+    return first unless rest;
+    return Compound.new v1;
+  }
+
+  method reify-list(v) { v.map self.reify-expr }
+
+  method reify-call(v) {
+    let (@rest, last) = v;
+    ?! rest
+      Call.new(last.map self.reify)
+    Call.new((progn, @ v.map self.reify))
+  }
+
+  method reify-block(v) { ProtoBlock.new self.reify-call(v) }
 }
