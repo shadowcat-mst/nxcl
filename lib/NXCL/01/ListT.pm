@@ -4,9 +4,9 @@ use NXCL::00::Runtime qw(uncons flatten);
 use NXCL::01::TypeExporter;
 
 sub make (@members) {
-  my $ret = mkv ListT ,=> 'nil';
+  my $ret = _make NilR;
   foreach my $m (reverse @members) {
-    $ret = mkv ListT ,=> cons => $m, $ret;
+    $ret = _make ConsR ,=> $m, $ret;
   }
   return $ret;
 }
@@ -33,9 +33,11 @@ raw method scan => sub ($scope, $args, $m, $kstack) {
   }
   my ($car, $cdr) = uncons($self);
   return (
-    [ CMB9 => $scope => List($accum, $car) => $scan_by ],
+    [ CMB9 => $scope => make_List($accum, $car) => $scan_by ],
     cons(
-      [ CMB6 => $scope => Curry(Method($cdr, '_scan_step'), List1 $scan_by) ],
+      [ CMB6 => $scope => make_Curry(
+          make_Method($cdr, '_scan_step'), make_List($scan_by)
+      ) ],
       $kstack
     )
   );
@@ -45,7 +47,13 @@ raw method _scan_step => sub ($scope, $args, $m, $kstack) {
   my ($self, $scan_by, $accum) = flatten $args;
   return evaluate_to_value(
     $scope,
-    LazyCons($accum, Curry(Method($self, '_scan'), List($scan_by, $accum))),
+    make_LazyCons(
+      $accum,
+      make_Curry(
+        make_Method($self, '_scan'),
+        make_List($scan_by, $accum)
+      )
+    ),
     $kstack,
   );
 };
