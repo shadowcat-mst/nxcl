@@ -259,16 +259,14 @@ class Reifier {
 
   method reify-int(v) { v.to-int() }
 
-  method reify-expr(v) {
-    let (first, @rest) = let v1 = v.map self.reify;
-    return first unless rest;
-    return Call.new v1;
-  }
+  method reify-expr(v) { self.reify-one-or Call v }
 
-  method reify-compound(v) {
-    let (first, @rest) = let v1 = v.map self.reify;
-    return first unless rest;
-    return Compound.new v1;
+  method reify-compound(v) { self.reify-one-or Compound v }
+
+  method reify-one-or(T, v) {
+    ?: [ v.count() == 1 ]
+      self.reify(v.0)
+    T.new v.map(self.reify);
   }
 
   method reify-list(v) { v.map self.reify-expr }
