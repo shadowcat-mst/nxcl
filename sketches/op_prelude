@@ -1,0 +1,61 @@
+# inferred from xcl/lib/XCL/Builtins.pm
+
+let $ = id;
+let : = pair;
+let ^ = metadata;
+
+let fexpr = Fexpr.make;
+let lambda = Lambda.make;
+
+let % = Dict.make;
+
+let \ = escape;
+
+let not = Bool.not;
+let ! = not;
+
+# let &current_scope = Scope.current;
+
+# let ++ = increment; # doable
+
+let _HUGOPS = (
+  ('.', \dot),
+  ('=>', \lambda),
+);
+
+let _BINOPS = (
+  (
+    ('*', .multiply()),
+    ('/', .divide()),
+  ),
+  (
+    ('+', .plus()),
+    ('-', .minus()),
+  ),
+  (
+    ('<', .lt()),
+    ('>', .gt()),
+    ('<=', .le()),
+    ('>=', .ge()),
+  ),
+  (
+    ('==', .eq()),
+    ('!=', .ne()),
+  ),
+  (('++', .concat())),
+  (
+    ('&&', .and()),
+    ('||', .or()),
+    ('//', exists_or),
+  ),
+  (('|', .pipe())),
+  (('=', 'assign')),
+  (
+    ('and', .and()),
+    ('or', .or()),
+  ),
+  (
+    ('if', swap Bool.if),
+    ('unless', swap Bool.unless),
+  ),
+);
