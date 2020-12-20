@@ -1,29 +1,38 @@
 # inferred from xcl/lib/XCL/Builtins.pm
 
-let $ = id;
-let : = pair;
-let ^ = metadata;
+# starting namespace requires:
 
-let fexpr = Fexpr.make;
-let lambda = Lambda.make;
+# define
+# dot
+# assign
 
-let % = Dict.make;
+define . dot;
+define $ [dot Scope expr];
+define : [dot PairKey new];
 
-let \ = escape;
+define fexpr [ dot Fexpr new ];
+define lambda [ dot Lambda new ];
 
-let not = Bool.not;
-let ! = not;
+define % [ dot Dict new ];
 
-# let &current_scope = Scope.current;
+define \ [ fexpr (x) x ]; # [ dot Escape new ];
 
-# let ++ = increment; # doable
+define not [ dot Bool not ];
+define ! not;
 
-let _HUGOPS = (
+# let &current_scope Scope.current;
+
+# let ++ increment; # doable
+
+define if [ dot Bool if ];
+define unless [ dot Bool unless ];
+
+define _HUGOPS (
   ('.', \dot),
   ('=>', \lambda),
 );
 
-let _BINOPS = (
+define _BINOPS (
   (
     ('*', .multiply()),
     ('/', .divide()),
@@ -49,13 +58,13 @@ let _BINOPS = (
     ('//', exists_or),
   ),
   (('|', .pipe())),
-  (('=', 'assign')),
+  (('=', assign)),
   (
     ('and', .and()),
     ('or', .or()),
   ),
   (
-    ('if', swap Bool.if),
-    ('unless', swap Bool.unless),
+    ('if', if, :swap),
+    ('unless', unless, :swap)
   ),
 );
