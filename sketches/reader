@@ -280,3 +280,71 @@ class Reifier {
 
   method reify-block(v) { ProtoBlock.new self.reify-call(v) }
 }
+
+class Weaver {
+  has hugops;
+  has binops;
+
+  method weave-one-or(T, v) {
+    ?: [ v.count() == 1 ]
+      self.weave(v.0)
+    T.new v.map(self.weave);
+  }
+
+  method weave (v) {
+    let type = v.type-short-name(); # this is not the true dao
+    self.invoke ['weave-' ++ type] (v);
+  }
+
+  method weave-Int id;
+  method weave-String id;
+  method weave-Name id;
+
+  method weave-List (v) { v.map self.weave }
+
+  method weave-Dict (v) { v.map-values self.weave }
+
+  method weave-Block (v) { v.map self.weave }
+
+  method weave-Call (v) { self.weave-apply Call v }
+
+  method weave-Compound (v) { self.weave-apply Call v }
+
+  method weave-apply (T, v) {
+    self.expand-hugops T v |> self.expand-binops T
+  }
+
+  method expand-hugops (T, v) {
+    self._expand_hugops T ([first v]) [rest v];
+  }
+
+  method _expand_hugops (T, before, rest) {
+    let (x, @after) = rest;
+    where (let op = self.hugops()(x)) {
+      Call.new op self.weave-one-or(T, before) self.weave-one-or(T, after)
+    } else {
+      before ++ self._expand_hugops T [ before ++ (x) ] after
+    }
+  }
+
+  method expand-binops (T, v) {
+    if exists(
+      let first-idx =
+        .map-value{ this.0 } ...
+        .min_by{ this.1 } ...
+        .where{ (this.0, self.binops()(this.1).0) } ...
+        v.pairs()
+    ) {
+      let (before, op, after) = (
+        v(0..$(first-idx)-1),
+        v(self.binops()(first-idx).1),
+        v($(first-idx + 1), $)
+      );
+      return Call.new [op ++
+        (before, after).map(self.weave).map(self.weave-one-or T)
+      ]
+    } else {
+      return v;
+    }
+  }
+}
