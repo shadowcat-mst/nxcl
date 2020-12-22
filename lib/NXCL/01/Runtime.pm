@@ -32,8 +32,8 @@ sub take_step_EVAL ($scope, $value, $kstack) {
   my $type = type($value);
   if (type($type) == OpDictT) {
     my $handler = raw($type)->{'evaluate'};
-    if (ref($handler) eq 'CODE') {
-      return $handler->($scope, $value, undef, $kstack);
+    if (type($handler) == RawNativeT) {
+      return $handler->[1][1]($scope, $value, undef, $kstack);
     }
     return (
       [ CMB9 => $scope, list1($value), $handler ],
@@ -50,8 +50,8 @@ sub take_step_CMB9 ($scope, $args, $combiner, $kstack) {
   my $type = type($combiner);
   if (type($type) == OpDictT) {
     my $handler = raw($type)->{'combine'};
-    if (ref($handler) eq 'CODE') {
-      return $handler->($scope, $args, $combiner, $kstack);
+    if (type($handler) == RawNativeT) {
+      return $handler->[1][1]($scope, $args, $combiner, $kstack);
     }
     return (
       [ CMB9 => $scope, cons($combiner, $args), $handler ],
