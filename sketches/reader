@@ -231,7 +231,7 @@ class Parser {
       return ((), toks1)
     }
     if [ let toks1 = self.skip_wsish_then extract_one('semicolon') toks ] {
-      return self.extract_list toks1;
+      return self.extract_stmt_list type toks1;
     }
     let attempt = self.extract_stmt :asi(true) toks;
     fail "Invalid token type $(toks.0.0) in $(type)" unless attempt;
