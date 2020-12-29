@@ -71,12 +71,16 @@ sub _extract_stmt($self, $args, @toks) {
 }
 
 my sub extract_one($type) {
-  sub ($self, $first, @rest) {
-    if ($first->[0] eq $type) {
-      return @rest;
-    }
-    return ();
-  }
+  $type
+    ? sub ($self, $first, @rest) {
+        if ($first->[0] eq $type) {
+          return @rest;
+        }
+        return ();
+      }
+    : sub ($self, @args) {
+        
+      }
 };
 
 sub extract_list($self, @toks) {
@@ -86,10 +90,10 @@ sub extract_list($self, @toks) {
 }
 
 sub _extract_list($self, @toks) {
-  if (my @toks1 = $self->skip_wsish_then(extract_one 'end_list', @toks)) {
+  if (my @toks1 = $self->skip_wsish_then(extract_one('end_list'), @toks)) {
     return ([], @toks1);
   }
-  if (my @toks1 = $self->skip_wsish_then(extract_one 'comma', @toks)) {
+  if (my @toks1 = $self->skip_wsish_then(extract_one('comma'), @toks)) {
     return $self->_extract_list(@toks1);
   }
   my $attempt = my ($found1, @toks1) = $self->extract_stmt({}, @toks);
@@ -102,22 +106,32 @@ sub extract_block($self, @toks) { $self->extract_stmt_list(block => @toks) }
 
 sub extract_call($self, @toks) { $self->extract_stmt_list(call => @toks) }
 
+sub extract_toplevel_stmt_list($self, @toks) {
+  my ($slist, @toks1) = $self->_extract_stmt_list('', @toks);
+  return () unless @$slist;
+  return ([ call => $slist ], @toks1);
+}
+
 sub extract_stmt_list($self, $type, @toks) {
-  my ($slist, @toks1) = $self->_extract_stmt_list($type, @toks);
+  my ($slist, @toks1) = $self->_extract_stmt_list("end_${type}", @toks);
   return () unless @$slist;
   return ([ $type, $slist ], @toks1);
 }
 
-sub _extract_stmt_list($self, $type, @toks) {
-  if (my @toks1 = $self->skip_wsish_then(extract_one "end_${type}", @toks)) {
-    return ([], @toks1);
+sub _extract_stmt_list($self, $end_type, @toks) {
+  if ($end_type) {
+    if (my @toks1 = $self->skip_wsish_then(extract_one($end_type), @toks)) {
+      return ([], @toks1);
+    }
+  } else {
+    return [] unless @toks;
   }
-  if (my @toks1 = $self->skip_wsish_then(extract_one 'semicolon', @toks)) {
-    return $self->_extract_stmt_list($type, @toks1);
+  if (my @toks1 = $self->skip_wsish_then(extract_one('semicolon'), @toks)) {
+    return $self->_extract_stmt_list($end_type, @toks1);
   }
   my $attempt = my ($found1, @toks1) = $self->extract_stmt({}, @toks);
   die "Eh? ".$toks[0][0] unless $attempt;
-  my ($found2, @toks2) = $self->_extract_stmt_list($type, @toks1);
+  my ($found2, @toks2) = $self->_extract_stmt_list($end_type, @toks1);
   return ([ $found1, @$found2 ], @toks2);
 }
 

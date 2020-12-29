@@ -118,7 +118,7 @@ if [ lst.length() > 1 ] {
   (string, 'multiple', '\'multiple\''),
   (semicolon, ';'),
   (ws, "\n"),
-  (leave_call, '}'),
+  (leave_block, '}'),
   (ws, "\n"),
   (end),
 );

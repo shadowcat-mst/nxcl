@@ -1,5 +1,4 @@
-use Test2::V0;
-use Mojo::Base -strict, -signatures;
+use NXCL::Test;
 
 use NXCL::00::Reader qw(read_string);
 use NXCL::00::Writer qw(write_string);

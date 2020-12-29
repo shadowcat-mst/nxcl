@@ -1,5 +1,4 @@
-use Test2::V0;
-use Mojo::Base -strict, -signatures;
+use NXCL::Test;
 
 use NXCL::00::Runtime qw(
   mkv type rtype raw car cdr list uncons flatten deref
