@@ -10,6 +10,7 @@ sub import {
   feature->import::into(1, ':5.16');
   experimental->import::into(1, 'signatures');
   warnings->import::into(1, FATAL => 'uninitialized');
+  warnings->unimport::out_of(1, 'once');
 }
 
 1;
