@@ -32,7 +32,7 @@ sub parse_uint ($self) {
 
 sub parse_string ($self) {
   my (undef, $str) = $self->expect_just(qr/'(.*?(?<=[^\\])(?:\\\\)*)'/);
-  [ string => $str ];
+  [ string => $str =~ s/\\(['\\])/$1/gr ];
 }
 
 sub parse_compound ($self) {

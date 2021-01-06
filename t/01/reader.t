@@ -76,3 +76,8 @@ $ if [ lst.length() > 1 ] {
 <       ] ],
 <   ] ],
 < ]
+$ 'foo\ bar\' baz\\'
+< [
+<   "script",
+<   [ [ "expr", [ [ "compound", [ [ "string", "foo\\ bar' baz\\" ] ] ] ] ] ],
+< ]
