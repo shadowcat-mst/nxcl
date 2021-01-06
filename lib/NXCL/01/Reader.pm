@@ -30,6 +30,11 @@ sub parse_uint ($self) {
   [ uint => $self->expect_just(qr/[0-9]+/) ]
 }
 
+sub parse_string ($self) {
+  my (undef, $str) = $self->expect_just(qr/'(.*?(?<=[^\\])(?:\\\\)*)'/);
+  [ string => $str ];
+}
+
 sub parse_compound ($self) {
   $self->skip_ws;
   [ compound => $self->nonempty_sequence_of('parse_atomish') ]
@@ -37,7 +42,7 @@ sub parse_compound ($self) {
 
 sub parse_atomish ($self) {
   $self->any_of(
-    qw(parse_word parse_symbol parse_uint
+    qw(parse_word parse_symbol parse_uint parse_string
        parse_call parse_block parse_list)
   );
 }

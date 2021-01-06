@@ -47,4 +47,32 @@ $ x.y()
 $ if [ lst.length() > 1 ] {
 >   say 'multiple';
 > }
-< ???
+< [
+<   "script", [ [
+<       "expr", [ [
+<           "compound", [
+<             [ "word", "if" ], [
+<               "call", [ [
+<                   "expr", [
+<                     [
+<                       "compound", [
+<                         [ "word", "lst" ], [ "symbol", "." ],
+<                         [ "word", "length" ], [ "list", [] ],
+<                       ],
+<                     ],
+<                     [ "compound", [ [ "symbol", ">" ] ] ],
+<                     [ "compound", [ [ "uint", "1" ] ] ],
+<                   ],
+<               ] ],
+<             ], [
+<               "block", [ [
+<                   "expr", [
+<                     [ "compound", [ [ "word", "say" ] ] ],
+<                     [ "compound", [ [ "string", "multiple" ] ] ],
+<                   ],
+<               ] ],
+<             ],
+<           ],
+<       ] ],
+<   ] ],
+< ]
