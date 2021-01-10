@@ -1,5 +1,15 @@
 package NXCL::01::Reader;
 
+# TODO:
+#
+# Retained comments
+# Delimited comments
+# Double quoted strings
+#   $()/$[]/${} interpolations
+#   \x escapes
+# Backticked strings
+# pos() annotation
+
 use NXCL::Package;
 use base qw(Parser::MGC);
 
