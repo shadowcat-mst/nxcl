@@ -36,17 +36,17 @@ sub take_step_EVAL ($scope, $value, $kstack) {
       return $handler->[1][1]($scope, $value, undef, $kstack);
     }
     return (
-      [ CMB9 => $scope, list1($value), $handler ],
+      [ CMB9 => $scope, $handler, list1($value) ],
       $kstack
     );
   }
   return (
-    [ CMB9 => $scope, list1(String 'evaluate'), $type ],
-    cons([ CMB9 => $scope, list1($value) ], $kstack)
+    [ CMB9 => $scope, $type, list1(String 'evaluate') ],
+    cons([ CMB6 => $scope, list1($value) ], $kstack)
   );
 }
 
-sub take_step_CMB9 ($scope, $args, $combiner, $kstack) {
+sub take_step_CMB9 ($scope, $combiner, $args, $kstack) {
   my $type = type($combiner);
   if (type($type) == OpDictT) {
     my $handler = raw($type)->{'combine'};
@@ -54,13 +54,13 @@ sub take_step_CMB9 ($scope, $args, $combiner, $kstack) {
       return $handler->[1][1]($scope, $args, $combiner, $kstack);
     }
     return (
-      [ CMB9 => $scope, cons($combiner, $args), $handler ],
+      [ CMB9 => $scope, $handler, cons($combiner, $args) ],
       $kstack
     );
   }
   return (
-    [ CMB9 => $scope, list1(String 'combine'), $type ],
-    cons([ CMB9 => $scope, cons($combiner, $args) ], $kstack)
+    [ CMB9 => $scope, $type, list1(String 'combine') ],
+    cons([ CMB6 => $scope, cons($combiner, $args) ], $kstack)
   );
 }
 
