@@ -44,7 +44,7 @@ $ x.y()
 <       ] ],
 <   ] ],
 < ]
-$ if [ lst.length() > 1 ] {
+$ if [ lst.count() > 1 ] {
 >   say 'multiple';
 > }
 < [
@@ -57,7 +57,7 @@ $ if [ lst.length() > 1 ] {
 <                     [
 <                       "compound", [
 <                         [ "word", "lst" ], [ "symbol", "." ],
-<                         [ "word", "length" ], [ "list", [] ],
+<                         [ "word", "count" ], [ "list", [] ],
 <                       ],
 <                     ],
 <                     [ "compound", [ [ "symbol", ">" ] ] ],
