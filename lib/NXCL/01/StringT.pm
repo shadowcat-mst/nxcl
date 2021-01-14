@@ -2,7 +2,7 @@ package NXCL::01::StringT;
 
 use NXCL::01::TypeExporter;
 
-sub make ($string) { _make CharsR, => $string); }
+sub make ($string) { _make CharsR, => $string }
 
 wrap method eq => sub ($scope, $args) {
   my ($l, $r, @too_many) = flatten $args;

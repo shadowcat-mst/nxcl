@@ -4,9 +4,9 @@ use NXCL::01::TypeExporter;
 
 sub make ($val) { _make ValR ,=> $val }
 
-raw native combine => sub ($scope, $args, $self, $kstack) {
+method combine => sub ($scope, $args, $self, $kstack) {
   panic unless rnilp $args;
-  return evaluate_to_value($scope, deref($self), $kstack);
+  return evaluate_to_value($scope, deref($self), $NIL, $kstack);
 }
 
 1;

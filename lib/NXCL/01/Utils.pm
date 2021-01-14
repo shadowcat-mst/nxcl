@@ -11,7 +11,7 @@ our @EXPORT_OK = qw(
   make_const_combiner
   make_string_combiner
   Make
-  nil cons list1
+  $NIL
 );
 
 sub panic { die $_[0]//'PANIC' };
@@ -20,10 +20,10 @@ sub not_combinable {
   die "Not combinable";
 }
 
-sub evaluate_to_value ($scope, $self, $kstack) {
+sub evaluate_to_value (undef, $value, undef, $kstack) {
   my ($kar, $kdr) = uncons $kstack;
   return (
-    [ @$kar, $self ],
+    [ @$kar, $value ],
     $kdr
   );
 }
@@ -31,8 +31,8 @@ sub evaluate_to_value ($scope, $self, $kstack) {
 sub make_const_combiner ($constant) {
   my ($hex) = $constant =~ m/\(0x(\w+)\)/;
   return set_subname 'const_'.$hex =>
-    sub ($scope, $args, $combiner, $kstack) {
-      return evaluate_to_value($scope, $constant, $kstack);
+    sub ($scope, $combiner, $args, $kstack) {
+      return evaluate_to_value($scope, $constant, $NIL, $kstack);
     };
 }
 
@@ -45,15 +45,6 @@ sub Make ($name, @make) {
   mkv($NXCL::01::Types::Types{$name}, @make);
 }
 
-sub nil { Make List => 'nil' }
-
-sub Cons { Make List => cons => @_ }
-
-sub List1 ($v) { Make List => cons => $v => nil() }
-
-sub LazyCons { Make LazyList => cons => @_ }
-
-sub FlatCons { Make FlatList => cons => @_ }
-
+our $NIL = Make List => 'nil';
 
 1;

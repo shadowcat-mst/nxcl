@@ -8,7 +8,7 @@ use Sub::Util qw(set_subname);
 
 our %Type_Info;
 
-our @EXPORT = qw(raw wrap method static);
+our @EXPORT = qw(wrap method static);
 
 our @EXPORT_OK = (@EXPORT, qw());
 
@@ -33,7 +33,6 @@ sub static ($name, $code) {
   $Type_Info{$targ}{statics}{$name} = [ $code ];
 }
 
-sub raw ($info) { $info->[1]{raw} = 1 }
 sub wrap ($info) { $info->[1]{wrap} = 1 }
 
 1;

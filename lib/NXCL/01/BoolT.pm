@@ -11,16 +11,16 @@ wrap method eq => sub ($scope, $args) {
   return make(raw($l) == raw($r));
 }
 
-raw method if => sub ($scope, $args, $, $kstack) {
+method ifelse => sub ($scope, $args, $, $kstack) {
   panic 'Wrong arg count' unless 3 ==
     my ($bool, $then, $else) = flatten $args;
   return (
-    [ EVAL => raw($bool) ? $then : $else ],
+    [ EVAL => $scope => raw($bool) ? $then : $else ],
     $kstack,
   );
 }
 
-thunk static true => sub ($, $) { make(1) }
-thunk static false => sub ($, $) { make(0) }
+static true => make_const_combiner(make(1));
+static false => make_const_combiner(make(0));
 
 1;

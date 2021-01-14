@@ -4,14 +4,14 @@ use NXCL::Exporter;
 use Scalar::Util qw(weaken);
 use List::Util qw(reduce);
 use NXCL::00::Runtime qw(
-  mkv
   type
   uncons
   raw
 );
 use NXCL::01::Utils qw(
-  cons
-  list1
+  Cons
+  List1
+  $NIL
 );
 use NXCL::01::Types qw(
   Apv
@@ -30,54 +30,57 @@ use NXCL::01::Types qw(
 
 sub take_step_EVAL ($scope, $value, $kstack) {
   my $type = type($value);
+  if ($Is_Literal{$type}) {
+    return evaluate_to_value($scope, $value, $NIL, $kstack);
+  }
   if (type($type) == OpDictT) {
     my $handler = raw($type)->{'evaluate'};
     if (type($handler) == RawNativeT) {
-      return $handler->[1][1]($scope, $value, undef, $kstack);
+      return raw($handler)->($scope, $value, $NIL, $kstack);
     }
     return (
-      [ CMB9 => $scope, $handler, list1($value) ],
+      [ CMB9 => $scope, $handler, make_List($value) ],
       $kstack
     );
   }
   return (
-    [ CMB9 => $scope, $type, list1(String 'evaluate') ],
-    cons([ CMB6 => $scope, list1($value) ], $kstack)
+    [ CMB9 => $scope, $type, make_List(make_String 'evaluate') ],
+    cons_List([ CMB6 => $scope, make_List($value) ], $kstack)
   );
 }
 
 sub take_step_CMB9 ($scope, $combiner, $args, $kstack) {
   my $type = type($combiner);
+  if ($type == RawNativeT) {
+    return raw($combiner)->($scope, $combiner, $args, $kstack);
+  }
   if (type($type) == OpDictT) {
     my $handler = raw($type)->{'combine'};
     if (type($handler) == RawNativeT) {
-      return $handler->[1][1]($scope, $args, $combiner, $kstack);
+      return raw($handler)->($scope, $combiner, $args, $kstack);
     }
     return (
-      [ CMB9 => $scope, $handler, cons($combiner, $args) ],
+      [ CMB9 => $scope, $handler, cons_List($combiner, $args) ],
       $kstack
     );
   }
   return (
-    [ CMB9 => $scope, $type, list1(String 'combine') ],
-    cons([ CMB6 => $scope, cons($combiner, $args) ], $kstack)
+    [ CMB9 => $scope, $type, make_List(String 'combine') ],
+    cons_List([ CMB6 => $scope, cons($combiner, $args) ], $kstack)
   );
 }
 
 sub take_step_ECDR ($scope, $cdr, $car, $kstack) {
   return (
     [ EVAL => $scope => $cdr ],
-    cons([ CONS => $scope => $car ], $kstack)
+    cons_List([ CONS => $scope => $car ], $kstack)
   );
 }
 
 sub take_step_CONS ($scope, $car, $cdr, $kstack) {
   my ($kar, $kdr) = uncons $kstack;
-  # Assume the newly created pair should be the same type as the cdr rather
-  # than a plain List; this may or may not be a good idea and once we know
-  # this comment should be replaced by an explanation as to which and why.
   return (
-    [ @$kar, mkv(type($cdr) => ConsR ,=> $car, $cdr) ],
+    [ @$kar, cons_List($car, $cdr) ],
     $kdr
   );
 }
@@ -110,7 +113,7 @@ sub take_step ($prog, $kstack) {
   if ($op eq 'JUMP') {
     return take_step_JUMP($scope, $v1, $v2, $kstack);
   }
-  if ($op eq 'DONE') {
+  if ($op eq 'RETV') {
     return $v1;
   }
   die "Unkown op type $op";
