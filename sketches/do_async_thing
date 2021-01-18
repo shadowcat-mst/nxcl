@@ -1,0 +1,56 @@
+
+
+async sub do_thing ($req) { ... }
+
+sub do_async_thing ($scope, $self, $args, $kstack) {
+  my $future = do_thing(car $args);
+  return (
+    [ HOST => wait => $future ],
+    $kstack,
+  );
+}
+
+async sub run_xcl ($prog, $kstack) {
+  while (1) {
+    my ($type, $val, $rstack) = @{run_til_done($prog, $kstack)};
+    if ($type eq 'await') {
+      my $ret = await $val;
+      ($prog, $kstack) = evaluate_to_value(undef, $ret, undef, $rstack);
+      next;
+    }
+    if ($type eq 'yield') {
+      return ($val, $rstack);
+    }
+    if ($type eq 'finis') {
+      return $val;
+    }
+    die "Unknown type: ${type}";
+  }
+}
+
+my $env = XCL::Environment->new(...);
+
+my ($val, $kstack) = $env->eval_string(<code>);
+
+while ($kstack) {
+  print $val;
+  my $in = <$fh>;
+  ($val, $kstack) = $env->resume($in, $kstack);
+}
+
+sub resume ($env, $in, $kstack) {
+  #run_xcl([ JUMP => undef => $kstack => $in ], $NIL);
+  run_xcl(evaluate_to_value(undef, $in, undef, $kstack));
+}
+
+#{{{
+
+let scope = Scope.current().clone();
+
+var val = 'started';
+
+while [let line = yield val] {
+  val = scope.eval_string line;
+}
+
+}}}#

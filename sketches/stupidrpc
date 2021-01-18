@@ -1,0 +1,61 @@
+### trivial server
+
+sub stupidrpc_server ($in, $out, $handlers) {
+  while (defined my $line = <$in>) {
+    my @req = eval { @{decode_json($line)} };
+    unless (@req) {
+      say $out encode_json([ barf => $@ ]);
+      last;
+    }
+    my ($type, @payload) = @req;
+    if ($type eq 'call') {
+      my @ret;
+      my $ok = eval { @ret = $handler->(@payload); 1 };
+      if ($ok) {
+        say $out encode_json([ done => @ret ]);
+      } else {
+        say $out encode_json([ fail => $@ ]);
+      }
+      next;
+    }
+    say $out encode_json([ barf => "Unknown message type: ${type}" ]);
+    last;
+  }
+}
+
+sub stupidrpc_listen ($listen_sock, $handlers) {
+  while (my $conn = $listen_sock->accept) {
+    stupidrpc_server($conn, $conn, $handlers);
+  }
+}
+
+sub stupidrpc_call ($in, $out, @call) {
+  say $out encode_json([ call => @call ]);
+  die "No reply" unless my $line = <$in>;
+  my ($type, @res) = @{decode_json($line)};
+  if ($type eq 'done') {
+    return @res;
+  } elsif ($type eq 'fail') {
+    die $res[0];
+  }
+  die "Unknown message type: ${type}";
+}
+
+sub stupidrpc_interactive ($local_in, $local_out, $rpc_in, $rpc_out) {
+  while (defined my $line = <$local_in>) {
+    my $req = JSONY->load($line);
+    eval {
+      my @res = stupidrpc_call($rpc_in, $rpc_out, @$req);
+      print $local_out jdc(\@res);
+    } or print $local_out "ERROR: ".$@;
+  }
+}
+
+sub stupidrpc_socat_client ($spec) {
+  my $pid = open2( my ($child_out, $child_in), qw(socat -), $spec );
+  eval { stupidrpc_interactive(\*STDIN, \*STDOUT, $child_out, $child_in) };
+  warn "Died: $@" if $@;
+  close $child_out;
+  close $child_in;
+  waitpid $pid;
+}
