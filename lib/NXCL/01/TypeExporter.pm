@@ -8,9 +8,11 @@ use Sub::Util qw(set_subname);
 
 our %Type_Info;
 
-our @EXPORT = qw(wrap method static);
+our @EXPORT = qw(wrap method static _make);
 
 our @EXPORT_OK = (@EXPORT, qw());
+
+sub _make {}
 
 sub import {
   strict->import::into(1);

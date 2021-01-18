@@ -13,7 +13,7 @@ sub bind_method ($scope, $, $args, $kstack) {
 
 our $BIND_METHOD = make_RawNative(\&bind_method);
 
-raw method 'invoker-for' => \&invoker_for;
+method 'invoker-for' => \&invoker_for;
 
 sub invoker_for ($scope, $self, $args, $kstack) {
   my ($method_String) = uncons $args;
@@ -35,7 +35,9 @@ sub invoker_for ($scope, $self, $args, $kstack) {
   );
 };
 
-raw method 'invoke-method' => sub ($scope, $self, $args, $kstack) {
+method 'invoke-method' => \&invoke_method;
+
+sub invoke_method ($scope, $self, $args, $kstack) {
   my ($method_String, $method_args) = uncons $args;
   my $method_name = raw($method_String);
   my $type = type($self);

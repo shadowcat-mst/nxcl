@@ -1,28 +1,33 @@
 package NXCL::01::ListT;
 
-use NXCL::00::Runtime qw(uncons flatten rconsp car);
+use NXCL::01::Utils qw(uncons flatten rconsp);
 use NXCL::01::TypeExporter;
 
-sub make (@members) { cons(@members, $NIL) }
+export make => sub (@members) { cons(@members, $NIL) };
 
-sub cons (@members) {
+export cons => sub (@members) {
   panic unless my $ret = pop @members;
   foreach my $m (reverse @members) {
     $ret = _make ConsR ,=> $m, $ret;
   }
   return $ret;
-}
+};
 
-static empty => make_constant_combiner($NIL);
+for (make_constant_combiner($NIL)) {
+  static empty => $_;
+  export empty => $_;
+}
 
 method first => sub ($scope, $self, $, $kstack) {
   panic unless rconsp $self;
-  evaluate_to_value($scope, car($self), $NIL, $kstack);
+  my ($first) = uncons $self;
+  evaluate_to_value($scope, $first, $NIL, $kstack);
 };
 
 method rest => sub ($scope, $self, $, $kstack) {
   panic unless rconsp $self;
-  evaluate_to_value($scope, cdr($self), $NIL, $kstack);
+  my (undef, $rest) = uncons $self;
+  evaluate_to_value($scope, $rest, $NIL, $kstack);
 };
 
 method evaluate => sub ($scope, $self, $, $kstack) {

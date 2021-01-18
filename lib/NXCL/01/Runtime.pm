@@ -3,36 +3,21 @@ package NXCL::01::Runtime;
 use NXCL::Exporter;
 use Scalar::Util qw(weaken);
 use List::Util qw(reduce);
-use NXCL::00::Runtime qw(
+use NXCL::01::Utils qw(
   type
   uncons
   raw
-);
-use NXCL::01::Utils qw(
-  Cons
-  List1
   $NIL
 );
-use NXCL::01::Types qw(
-  Apv
-  Call
-  Int
-  Native
-  List
-  OpDict
-  Scope
-  Bool
-  Name
-  RawNative
-  String
-  Val
-);
+use NXCL::01::Types qw(OpDict String List);
+
+our @EXPORT_OK = qw(run_til_done);
 
 sub take_step_EVAL ($scope, $value, $kstack) {
   my $type = type($value);
-  if ($Is_Literal{$type}) {
-    return evaluate_to_value($scope, $value, $NIL, $kstack);
-  }
+  #if ($Is_Literal{$type}) {
+  #  return evaluate_to_value($scope, $value, $NIL, $kstack);
+  #}
   if (type($type) == OpDictT) {
     my $handler = raw($type)->{'evaluate'};
     if (type($handler) == RawNativeT) {
@@ -44,7 +29,7 @@ sub take_step_EVAL ($scope, $value, $kstack) {
     );
   }
   return (
-    [ CMB9 => $scope, $type, make_List(make_String 'evaluate') ],
+    [ CMB9 => $scope, $type, make_List(make_String('evaluate')) ],
     cons_List([ CMB6 => $scope, make_List($value) ], $kstack)
   );
 }
@@ -66,7 +51,7 @@ sub take_step_CMB9 ($scope, $combiner, $args, $kstack) {
   }
   return (
     [ CMB9 => $scope, $type, make_List(String 'combine') ],
-    cons_List([ CMB6 => $scope, cons($combiner, $args) ], $kstack)
+    cons_List([ CMB6 => $scope, cons_List($combiner, $args) ], $kstack)
   );
 }
 
@@ -93,6 +78,14 @@ sub take_step_JUMP ($scope, $to, $arg, $kstack) {
   );
 }
 
+sub take_step_MARK ($scope, $, $val, $kstack) {
+  my ($kar, $kdr) = uncons $kstack;
+  return (
+    [ @$kar, $val ],
+    $kdr
+  );
+}
+
 sub take_step ($prog, $kstack) {
   my ($op, $scope, $v1, $v2) = @$prog;
   if ($op eq 'EVAL') {
@@ -113,8 +106,11 @@ sub take_step ($prog, $kstack) {
   if ($op eq 'JUMP') {
     return take_step_JUMP($scope, $v1, $v2, $kstack);
   }
-  if ($op eq 'RETV') {
-    return $v1;
+  if ($op eq 'MARK') {
+    return take_step_MARK($scope, $v1, $v2, $kstack);
+  }
+  if ($op eq 'HOST') {
+    return [ $v1, $v2, $kstack ];
   }
   die "Unkown op type $op";
 }

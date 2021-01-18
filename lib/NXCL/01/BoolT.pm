@@ -2,7 +2,7 @@ package NXCL::01::BoolT;
 
 use NXCL::01::TypeExporter;
 
-sub make ($val) { _make BoolR ,=> 0+!!$val }
+export make => sub ($val) { _make BoolR ,=> 0+!!$val };
 
 wrap method eq => sub ($scope, $args) {
   my ($l, $r, @too_many) = flatten $args;
@@ -20,7 +20,10 @@ method ifelse => sub ($scope, $args, $, $kstack) {
   );
 }
 
-static true => make_const_combiner(make(1));
-static false => make_const_combiner(make(0));
+static true => my $true = make_const_combiner(make(1));
+static false => my $false = make_const_combiner(make(0));
+
+export true => $true;
+export false => $false;
 
 1;

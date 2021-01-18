@@ -5,7 +5,8 @@ use warnings;
 use experimental 'signatures';
 use Scalar::Util qw(weaken);
 use NXCL::01::TypeExporter ();
-use NXCL::01::Utils qw(make_string_combiner);
+use NXCL::01::Utils qw(make_string_combiner panic mkv);
+use NXCL::01::ReprTypes;
 
 sub import ($, @args) {
   my $caller = caller;
@@ -32,7 +33,7 @@ sub make_type_object ($type) {
     evaluate => \&evaluate_to_value,
     combine => \&not_combinable,
     'type-shortname' => make_string_combiner($name),
-    %{_expand_methods($methods},
+    %{_expand_methods($methods)},
   });
 }
 
@@ -40,7 +41,7 @@ sub make_type_object ($type) {
 #   d.map(
 #     ((name, (code, attrs))) => {
 #       :($name) $(
-#         { ?: attrs,'wrap' make_Apv(this) this }
+#         { ?: attrs,'wrap' make_ApMeth(this) this }
 #         [ [ ?: attrs.'raw' make_RawNative make_Native ] code ]
 #       )
 #     }
@@ -52,10 +53,11 @@ sub _expand_methods ($hash) {
     map {
       my ($name, $code, $attrs) = ($_, @{$hash->{$_}});
       ($name =>
-        map { $attrs->{wrap} ? make_Apv($_) : $_ }
-        ($attrs->{raw} ? make_RawNative($code) : make_Native($code))
+        ($attrs->{wrap}
+          ? make_ApMeth(make_Native $code)
+          : make_RawNative($code))
       )
-    } keys %$hash;
+    } keys %$hash
   };
 }
 

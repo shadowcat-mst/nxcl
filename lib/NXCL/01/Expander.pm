@@ -10,8 +10,8 @@ sub expand ($self, $v) {
   $self->${\"expand_${tok_type}"}($payload);
 }
 
-sub make ($self, $type, $v) {
-  $self->makers->{$type}->($v);
+sub make ($self, $type, @v) {
+  $self->makers->{$type}->(@v);
 }
 
 sub expand_word ($self, $name) {
@@ -34,44 +34,44 @@ sub expand_compound ($self, $v) {
   return $self->expand($v->[0]) unless @$v > 1;
   my ($firstp, @restp) = @$v;
   die "Nope" if $firstp->[0] eq 'list';
-  reduce { $self->make(Combine => [ $a, $b ]) }
+  reduce { $self->make(Combine => $a, $b) }
     $self->expand($firstp),
     map $self->expand($_->[0] eq 'list' ? $_ : [ list => [ $_ ] ]),
       @restp;
 }
 
 sub expand_list ($self, $v) {
-  $self->make(List => [ map $self->expand($_), @$v ]);
+  $self->make(List => map $self->expand($_), @$v);
 }
 
 sub expand_block ($self, $v) {
-  $self->make(BlockProto => [ map $self->expand($_), @$v ]);
+  $self->make(BlockProto => map $self->expand($_), @$v);
 }
 
 sub expand_call ($self, $v) {
   # handle the [x] case
   if (@$v == 1 and @{$v->[0][1]} == 1) { # guaranteed to be an expr node
     return $self->make(Call => [
-      $self->make(Combine => [
-        $self->expand($v->[0][0]),
-        $self->make(List => []),
-      ]),
+      $self->make(Combine =>
+        $self->expand($v->[0][1][0]),
+        $self->make(List =>),
+      ),
     ]);
   }
-  $self->make(Call => [ map $self->expand($_), @$v ]);
+  $self->make(Call => map $self->expand($_), @$v);
 }
 
 sub expand_script ($self, $v) {
-  $self->make(Call => [ map $self->expand($_), @$v ]);
+  $self->make(Call => map $self->expand($_), @$v);
 }
 
 sub expand_expr ($self, $v) {
   return $self->expand($v->[0]) unless @$v > 1;
   my ($firstp, @restp) = @$v;
-  $self->make(Combine => [
+  $self->make(Combine =>
     $self->expand($firstp),
-    $self->make(List => [ map $self->expand($_), @restp ])
-  ]);
+    $self->make(List => map $self->expand($_), @restp)
+  );
 }
 
 1;
