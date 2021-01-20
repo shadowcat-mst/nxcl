@@ -2,12 +2,12 @@ package NXCL::01::Utils;
 
 use NXCL::Exporter;
 use Sub::Util qw(set_subname);
+use NXCL::01::ReprTypes qw(ConsR);
 use NXCL::01::TypeFunctions qw(empty_List);
 
 our @EXPORT_OK = qw(
   panic
   not_combinable
-  evaluate_to_value
   make_const_combiner
   make_string_combiner
   $NIL
@@ -17,27 +17,19 @@ our @EXPORT_OK = qw(
   raw uncons flatten
 );
 
-our $NIL;
+# This happens after compile time of 'sub name {' and definition of
+# @EXPORT_OK so our import() should still run fine when ListT.pm calls it
+
+require NXCL::01::ListT;
+our $NIL = $NXCL::01::ListT::NIL;
 
 sub panic { die $_[0]//'PANIC' }
-
-sub not_combinable {
-  die "Not combinable";
-}
-
-sub evaluate_to_value ($, $value, $, $kstack) {
-  my ($kar, $kdr) = uncons($kstack);
-  return (
-    [ @$kar, $value ],
-    $kdr
-  );
-}
 
 sub make_const_combiner ($constant) {
   my ($hex) = $constant =~ m/\(0x(\w+)\)/;
   return set_subname 'const_'.$hex =>
-    sub ($scope, $combiner, $args, $kstack) {
-      return evaluate_to_value($scope, $constant, $NIL, $kstack);
+    sub ($, $, $, $kstack) {
+      return ([ JUST => $constant ], $kstack);
     };
 }
 
@@ -45,8 +37,6 @@ sub make_string_combiner ($string) {
   return set_subname 'const_string_'.$string =>
     make_constant_combiner(make_String($string));
 }
-
-$NIL = empty_List();
 
 ## raw value utils
 
@@ -69,7 +59,7 @@ sub uncons ($cons) { @{$cons->[1]}[1,2] }
 
 sub flatten ($cons) {
   my @ret;
-  while ($cons->[1][0] eq 'cons') {
+  while ($cons->[1][0] == ConsR) {
     my ($car, $cdr) = @{$cons->[1]}[1,2];
     push @ret, $car;
     $cons = $cdr;

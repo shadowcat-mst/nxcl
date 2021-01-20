@@ -8,7 +8,7 @@ use Sub::Util qw(set_subname);
 
 our %Type_Info;
 
-our @EXPORT = qw(wrap method static _make);
+our @EXPORT = qw(wrap method static export _make);
 
 our @EXPORT_OK = (@EXPORT, qw());
 
@@ -20,9 +20,13 @@ sub import {
   feature->import::into(1, ':5.16');
   experimental->import::into(1, 'signatures');
   warnings->import::into(1, FATAL => 'uninitialized');
-  NXCL::01::Utils->import::into(1, qw(evaluate_to_value));
   $Type_Info{+caller} ||= {};
   goto &Exporter::import;
+}
+
+sub export ($name, $code) {
+  my $targ = caller;
+  $Type_Info{$targ}{exports}{$name} = [ $code ];
 }
 
 sub method ($name, $code) {

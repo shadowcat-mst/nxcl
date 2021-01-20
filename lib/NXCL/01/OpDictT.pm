@@ -1,16 +1,16 @@
 package NXCL::01::OpDictT;
 
-use NXCL::01::TypeExporter;
-use NXCL::01::Utils qw(panic);
+use NXCL::01::Utils qw(panic raw uncons);
 use NXCL::01::ReprTypes qw(DictR);
+use NXCL::01::TypeExporter;
 
-sub make ($hash) { _make DictR ,=> $hash }
+export make => sub ($hash) { _make DictR ,=> $hash };
 
-method combine => sub ($scope, $args, $self, $kstack) {
-  my $key = raw(car($args));
+method combine => sub ($scope, $self, $args, $kstack) {
+  my $key = raw(uncons($args)[0]);
   my $value = raw($self)->{$key};
   panic unless $value;
-  return evaluate_to_value($scope, $value, $kstack);
+  return ([ JUST => $value ], $kstack);
 };
 
 1;

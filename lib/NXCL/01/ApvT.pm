@@ -1,6 +1,6 @@
 package NXCL::01::ApvT;
 
-use NXCL::01::Utils qw(rnilp);
+use NXCL::01::Utils qw(raw);
 use NXCL::01::ReprTypes qw(ValR);
 use NXCL::01::TypeFunctions qw(cons_List);
 use NXCL::01::TypeExporter;

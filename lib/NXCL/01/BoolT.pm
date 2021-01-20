@@ -1,13 +1,18 @@
 package NXCL::01::BoolT;
 
+use NXCL::01::Utils qw(type panic raw flatten make_const_combiner);
+use NXCL::01::ReprTypes qw(BoolR);
+use NXCL::01::TypeFunctions qw(BoolT);
 use NXCL::01::TypeExporter;
 
-export make => sub ($val) { _make BoolR ,=> 0+!!$val };
+export make => \&make;
+
+sub make ($val) { _make BoolR ,=> 0+!!$val };
 
 wrap method eq => sub ($scope, $args) {
   my ($l, $r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
-  panic 'Must be bools' for grep $Types{Bool} ne $_, $l, $r;
+  panic 'Must be bools' for grep type($_) ne BoolT, $l, $r;
   return make(raw($l) == raw($r));
 }
 
@@ -20,10 +25,10 @@ method ifelse => sub ($scope, $args, $, $kstack) {
   );
 }
 
-static true => my $true = make_const_combiner(make(1));
-static false => my $false = make_const_combiner(make(0));
+static true => make_const_combiner(my $true = make(1));
+static false => make_const_combiner(my $false = make(0));
 
-export true => $true;
-export false => $false;
+export true => sub { $true };
+export false => sub { $false };
 
 1;

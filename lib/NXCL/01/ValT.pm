@@ -1,12 +1,14 @@
 package NXCL::01::ValT;
 
+use NXCL::01::Utils qw(rnilp raw panic);
+use NXCL::01::ReprTypes qw(ValR);
 use NXCL::01::TypeExporter;
 
-sub make ($val) { _make ValR ,=> $val }
+export make => sub ($val) { _make ValR ,=> $val };
 
 method combine => sub ($scope, $args, $self, $kstack) {
   panic unless rnilp $args;
-  return evaluate_to_value($scope, raw($self), $NIL, $kstack);
-}
+  return ([ JUST => raw($self) ], $kstack);
+};
 
 1;

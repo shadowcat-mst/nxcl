@@ -34,19 +34,15 @@ sub dot_lookup ($scope, $, $args, $kstack) {
 }
 
 sub dot_curryable ($scope, $, $args, $kstack) {
-  evaluate_to_value(
-    $scope,
-    make_Curry($NATIVES{dot_curried}, $args),
-    $NIL,
+  return (
+    [ JUST => make_Curry($NATIVES{dot_curried}, $args) ],
     $kstack
   );
 }
 
 sub dot_curried ($scope, $, $args, $kstack) {
-  evaluate_to_value(
-    $scope,
-    make_Curry($NATIVES{dot_curried_invoke}, make_List($args)),
-    $NIL,
+  return (
+    [ JUST => make_Curry($NATIVES{dot_curried_invoke}, make_List($args)) ],
     $kstack
   );
 }
@@ -71,10 +67,8 @@ sub fdot ($scope, $, $args, $kstack) {
       );
     }
 
-    evaluate_to_value(
-      $scope,
-      make_Curry($NATIVES{dot_curryable}, $method),
-      $NIL,
+    return (
+      [ JUST => make_Curry($NATIVES{dot_curryable}, $method) ],
       $kstack
     );
   }
@@ -88,10 +82,8 @@ sub fdot ($scope, $, $args, $kstack) {
     );
   }
 
-  evaluate_to_value(
-    $scope,
-    make_Curry($NATIVES{dot_lookup}, make_List $callp),
-    $NIL,
+  return (
+    [ JUST => make_Curry($NATIVES{dot_lookup}, make_List $callp) ],
     $kstack
   );
 }

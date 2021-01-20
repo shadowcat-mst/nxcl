@@ -1,10 +1,11 @@
 package NXCL::01::CurryT;
 
-use NXCL::01::TypeExporter;
+use NXCL::01::Utils qw(uncons flatten rnilp);
 use NXCL::01::ReprTypes qw(ConsR);
-use NXCL::01::Utils qw(uncons flatten);
+use NXCL::01::TypeFunctions qw(cons_List);
+use NXCL::01::TypeExporter;
 
-sub make ($combiner, $i_args) { _make ConsR ,=> $combiner, $i_args }
+export make => sub ($combiner, $i_args) { _make ConsR ,=> $combiner, $i_args };
 
 # called args versus implicit args - c_args versus i_args
 

@@ -1,14 +1,16 @@
 package NXCL::01::ObjectT;
 
+use NXCL::01::Utils qw(uncons raw type $NIL);
+use NXCL::01::TypeFunctions qw(
+  make_RawNative make_Curry make_List cons_List OpDictT
+);
 use NXCL::01::TypeExporter;
 
 # no sub make, I don't think creating anything of this type makes sense
 
 sub bind_method ($scope, $, $args, $kstack) {
   my ($obj, $method) = uncons $args;
-  evaluate_to_value(
-    $scope, make_Curry($method, make_List($obj)), $NIL, $kstack
-  );
+  return ([ JUST => make_Curry($method, make_List($obj)) ], $kstack);
 }
 
 our $BIND_METHOD = make_RawNative(\&bind_method);
@@ -21,9 +23,7 @@ sub invoker_for ($scope, $self, $args, $kstack) {
   my $type = type($self);
   if (type($type) == OpDictT) {
     panic unless my $method = raw($type)->{$method_name};
-    return evaluate_to_value(
-      $scope, make_Curry($method, make_List($self)), $NIL, $kstack
-    );
+    return ([ JUST => make_Curry($method, make_List($self)) ], $kstack);
   }
   return (
     [ CMB9 => $scope, $type, make_List($method_String) ],
