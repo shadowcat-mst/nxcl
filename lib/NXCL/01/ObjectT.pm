@@ -17,7 +17,7 @@ our $BIND_METHOD = make_RawNative(\&bind_method);
 
 method 'invoker-for' => \&invoker_for;
 
-sub invoker_for ($scope, $self, $args, $kstack) {
+sub invoker_for ($scope, $cmb, $self, $args, $kstack) {
   my ($method_String) = uncons $args;
   my $method_name = raw($method_String);
   my $type = type($self);
@@ -27,17 +27,15 @@ sub invoker_for ($scope, $self, $args, $kstack) {
   }
   return (
     [ CMB9 => $scope, $type, make_List($method_String) ],
-    cons_List(
-      [ CONS => $scope => $self ],
-      [ CMB9 => $scope => $BIND_METHOD ],
-      $kstack
-    )
+    [ CONS => $scope => $self ],
+    [ CMB9 => $scope => $BIND_METHOD ],
+    $kstack
   );
 };
 
 method 'invoke-method' => \&invoke_method;
 
-sub invoke_method ($scope, $self, $args, $kstack) {
+sub invoke_method ($scope, $cmb, $self, $args, $kstack) {
   my ($method_String, $method_args) = uncons $args;
   my $method_name = raw($method_String);
   my $type = type($self);
@@ -50,10 +48,8 @@ sub invoke_method ($scope, $self, $args, $kstack) {
   }
   return (
     [ CMB9 => $scope, $type, make_List($method_String) ],
-    cons_List(
-      [ CMB6 => $scope, cons_List($self, $method_args) ],
-      $kstack
-    )
+    [ CMB6 => $scope, cons_List($self, $method_args) ],
+    $kstack
   );
 };
 

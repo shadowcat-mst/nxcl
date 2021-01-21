@@ -26,7 +26,8 @@ sub take_step_EVAL ($scope, $value, $kstack) {
   }
   return (
     [ CMB9 => $scope, $type, make_List(make_String('evaluate')) ],
-    cons_List([ CMB6 => $scope, make_List($value) ], $kstack)
+    [ CMB6 => $scope, make_List($value) ],
+    $kstack
   );
 }
 
@@ -49,14 +50,16 @@ sub take_step_CMB9 ($scope, $combiner, $args, $kstack) {
   }
   return (
     [ CMB9 => $scope, $type, make_List(String 'combine') ],
-    cons_List([ CMB6 => $scope, cons_List($combiner, $args) ], $kstack)
+    [ CMB6 => $scope, cons_List($combiner, $args) ],
+    $kstack
   );
 }
 
 sub take_step_ECDR ($scope, $cdr, $car, $kstack) {
   return (
     [ EVAL => $scope => $cdr ],
-    cons_List([ CONS => $car ], $kstack)
+    [ CONS => $car ],
+    $kstack
   );
 }
 
@@ -123,8 +126,8 @@ sub take_step ($prog, $kstack) {
 }
 
 sub run_til_done ($prog, $kstack) {
-  while ($kstack) {
-    ($prog, $kstack) = take_step($prog, $kstack);
+  while ((($prog, @stack) = take_step($prog, $kstack)) >= 2) {
+    $kstack = cons_List(@stack);
   }
   return $prog;
 }

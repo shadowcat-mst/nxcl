@@ -7,15 +7,13 @@ use NXCL::01::TypeExporter;
 
 export make => sub ($opv) { _make ValR ,=> $opv };
 
-method combine => sub ($scope, $apv, $argsp, $kstack) {
-  my ($obj, $args) = uncons($argsp);
+method combine => sub ($scope, $cmb, $self, $args, $kstack) {
+  my ($inv, $method_args) = uncons($argsp);
   return (
-    [ EVAL => $scope => $args ],
-    cons_List(
-      [ CONS => $obj ],
-      [ CMB9 => $scope => raw($apv) ],
-      $kstack
-    )
+    [ EVAL => $scope => $method_args ],
+    [ CONS => $inv ],
+    [ CMB9 => $scope => $self ],
+    $kstack
   );
 };
 

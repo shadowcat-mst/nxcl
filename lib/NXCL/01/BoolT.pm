@@ -1,6 +1,6 @@
 package NXCL::01::BoolT;
 
-use NXCL::01::Utils qw(type panic raw flatten make_const_combiner);
+use NXCL::01::Utils qw(type panic raw flatten make_const_method);
 use NXCL::01::ReprTypes qw(BoolR);
 use NXCL::01::TypeFunctions qw(BoolT);
 use NXCL::01::TypeExporter;
@@ -16,17 +16,20 @@ wrap method eq => sub ($scope, $args) {
   return make(raw($l) == raw($r));
 }
 
-method ifelse => sub ($scope, $args, $, $kstack) {
-  panic 'Wrong arg count' unless 3 ==
-    my ($bool, $then, $else) = flatten $args;
+method ifelse => sub ($scope, $cmb, $self, $args, $kstack) {
+  panic 'Wrong arg count' unless 2 ==
+    my ($then, $else) = flatten $args;
   return (
     [ EVAL => $scope => raw($bool) ? $then : $else ],
     $kstack,
   );
 }
 
-static true => make_const_combiner(my $true = make(1));
-static false => make_const_combiner(my $false = make(0));
+my $true = make(1);
+my $false = make(0);
+
+static true => sub { return ([ JUST => $true ], $_[-1]) };
+static false => sub { return ([ JUST => $false ], $_[-1]) };
 
 export true => sub { $true };
 export false => sub { $false };

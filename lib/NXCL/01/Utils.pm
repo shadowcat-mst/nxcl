@@ -8,8 +8,6 @@ use NXCL::01::TypeFunctions qw(empty_List);
 our @EXPORT_OK = qw(
   panic
   not_combinable
-  make_const_combiner
-  make_string_combiner
   $NIL
   mkv
   type rtype
@@ -24,19 +22,6 @@ require NXCL::01::ListT;
 our $NIL = $NXCL::01::ListT::NIL;
 
 sub panic { die $_[0]//'PANIC' }
-
-sub make_const_combiner ($constant) {
-  my ($hex) = $constant =~ m/\(0x(\w+)\)/;
-  return set_subname 'const_'.$hex =>
-    sub ($, $, $, $kstack) {
-      return ([ JUST => $constant ], $kstack);
-    };
-}
-
-sub make_string_combiner ($string) {
-  return set_subname 'const_string_'.$string =>
-    make_constant_combiner(make_String($string));
-}
 
 ## raw value utils
 

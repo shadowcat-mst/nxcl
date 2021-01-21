@@ -6,7 +6,7 @@ use NXCL::01::TypeExporter;
 
 export make => sub ($val) { _make ValR ,=> $val };
 
-method combine => sub ($scope, $args, $self, $kstack) {
+method combine => sub ($scope, $cmb, $self, $args, $kstack) {
   panic unless rnilp $args;
   return ([ JUST => raw($self) ], $kstack);
 };

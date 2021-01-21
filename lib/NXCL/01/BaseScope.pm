@@ -9,14 +9,14 @@ use NXCL::01::Types
     Object OpDict RawNative Scope String Val
   );
 
-our %NATIVES =
+our %N =
   map +($_ => make_RawNative(__PACKAGE__->can($_))),
     qw(dot_lookup dot_curryable dot_curried fdot dot);
 
-$_ = make_Apv($_) for $NATIVES{dot_curried};
+$_ = make_Apv($_) for $N{dot_curried};
 
 our $Store = make_OpDict +{
-  dot => make_Val($NATIVES{dot}),
+  dot => make_Val($N{dot}),
   map +($_ => Val($Types{$_})),
     @BASE_TYPES
 };
@@ -35,14 +35,14 @@ sub dot_lookup ($scope, $, $args, $kstack) {
 
 sub dot_curryable ($scope, $, $args, $kstack) {
   return (
-    [ JUST => make_Curry($NATIVES{dot_curried}, $args) ],
+    [ JUST => make_Curry($N{dot_curried}, $args) ],
     $kstack
   );
 }
 
 sub dot_curried ($scope, $, $args, $kstack) {
   return (
-    [ JUST => make_Curry($NATIVES{dot_curried_invoke}, make_List($args)) ],
+    [ JUST => make_Curry($N{dot_curried_invoke}, make_List($args)) ],
     $kstack
   );
 }
@@ -68,7 +68,7 @@ sub fdot ($scope, $, $args, $kstack) {
     }
 
     return (
-      [ JUST => make_Curry($NATIVES{dot_curryable}, $method) ],
+      [ JUST => make_Curry($N{dot_curryable}, $method) ],
       $kstack
     );
   }
@@ -83,7 +83,7 @@ sub fdot ($scope, $, $args, $kstack) {
   }
 
   return (
-    [ JUST => make_Curry($NATIVES{dot_lookup}, make_List $callp) ],
+    [ JUST => make_Curry($N{dot_lookup}, make_List $callp) ],
     $kstack
   );
 }
@@ -100,19 +100,15 @@ sub dot ($scope, $, $args, $kstack) {
 
     return (
       [ EVAL => $scope => make_List($args[0]) ],
-      cons_List(
-        [ CONS => $scope => $args[-1] ],
-        [ CMB9 => $scope => $NATIVES{fdot} ],
-        $kstack
-      );
+      [ CONS => $scope => $args[-1] ],
+      [ CMB9 => $scope => $N{fdot} ],
+      $kstack
     );
   }
   return (
     [ EVAL => $scope, $args ],
-    cons_List(
-      [ CMB9 => $scope => $NATIVES{fdot} ],
-      $kstack
-    )
+    [ CMB9 => $scope => $N{fdot} ],
+    $kstack
   );
 }
 

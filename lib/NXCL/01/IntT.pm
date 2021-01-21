@@ -47,7 +47,7 @@ wrap method minus => sub ($scope, $args) {
 
 wrap method times => sub ($scope, $args) {
   my @ints = flatten $args;
-  panic 'Must be ints' for grep type($_) ne IntT, $l, $r;
+  panic 'Must be ints' for grep type($_) ne IntT, @ints;
   return make reduce { $a * $b }, 1, map raw($_), @ints;
 };
 

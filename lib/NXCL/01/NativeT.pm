@@ -6,11 +6,10 @@ use NXCL::01::TypeExporter;
 
 export make => sub ($sub) { _make NativeR ,=> $sub };
 
-method combine => sub ($scope, $args, $value, $kstack) {
-  my ($kar, $kdr) = uncons $kstack;
+method combine => sub ($scope, $cmb, $self, $args, $kstack) {
   return (
-    [ @$kar, raw($value)->($scope, $args) ].
-    $kdr
+    [ JUST => raw($self)->($scope, $args) ].
+    $kstack
   );
 }
 
