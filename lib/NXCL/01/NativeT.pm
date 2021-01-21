@@ -6,8 +6,8 @@ use NXCL::01::TypeExporter;
 
 sub make ($sub) { _make NativeR ,=> $sub }
 
-method combine => sub ($scope, $cmb, $self, $args, $kstack) {
-  raw($self)->($scope, $self, $args, $kstack);
+method combine => sub ($scope, $cmb, $self, $args) {
+  raw($self)->($scope, $self, $args);
 };
 
 1;

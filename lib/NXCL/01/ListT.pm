@@ -23,27 +23,26 @@ sub cons (@members) {
 static empty => make_const_combiner($NIL);
 export empty => sub { $NIL };
 
-method first => sub ($scope, $cmb, $self, $args, $kstack) {
+method first => sub ($scope, $cmb, $self, $args) {
   panic unless rconsp $self;
   my ($first) = uncons $self;
-  return ([ JUST => $first ], $kstack);
+  return ([ JUST => $first ]);
 };
 
-method rest => sub ($scope, $cmb, $self, $args, $kstack) {
+method rest => sub ($scope, $cmb, $self, $args) {
   panic unless rconsp $self;
   my (undef, $rest) = uncons $self;
-  return ([ JUST => $rest ], $kstack);
+  return ([ JUST => $rest ]);
 };
 
-method evaluate => sub ($scope, $cmb, $self, $args, $kstack) {
+method evaluate => sub ($scope, $cmb, $self, $args) {
   if (rnilp $self) {
-    return ([ JUST => $self ], $kstack);
+    return ([ JUST => $self ]);
   }
   my ($car, $cdr) = uncons $self;
   return (
     [ EVAL => $scope => $car ],
     [ ECDR => $scope => $cdr ],
-    $kstack
   );
 };
 

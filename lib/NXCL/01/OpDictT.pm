@@ -6,11 +6,11 @@ use NXCL::01::TypeExporter;
 
 export make => sub ($hash) { _make DictR ,=> $hash };
 
-method combine => sub ($scope, $cmb, $self, $args, $kstack) {
+method combine => sub ($scope, $cmb, $self, $args) {
   my $key = raw(uncons($args)[0]);
   my $value = raw($self)->{$key};
   panic unless $value;
-  return ([ JUST => $value ], $kstack);
+  return ([ JUST => $value ]);
 };
 
 1;

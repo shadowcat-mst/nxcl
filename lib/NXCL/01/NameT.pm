@@ -9,7 +9,7 @@ use NXCL::01::TypeExporter;
 
 sub make ($name) { _make CharsR ,=> $name }
 
-method evaluate => sub ($scope, $cmb, $self, $args, $kstack) {
+method evaluate => sub ($scope, $cmb, $self, $args) {
   my $store = raw $scope;
   my $store_type = type($store);
   if ($store_type == OpDictT()) {
@@ -18,18 +18,15 @@ method evaluate => sub ($scope, $cmb, $self, $args, $kstack) {
     if (type($cell) == ValT or type($cell) == VarT) {
       return (
         [ JUST => raw($cell) ],
-        $kstack
       );
     }
     return (
       [ CMB9 => $scope => $cell => $NIL ],
-      $kstack
     );
   }
   return (
     [ CMB9 => $scope => $store => make_List(make_String(raw($self))) ],
     [ CMB6 => $scope => $NIL ],
-    $kstack
   );
 };
 
