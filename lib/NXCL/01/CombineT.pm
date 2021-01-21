@@ -11,7 +11,6 @@ method evaluate => sub ($scope, $cmb, $self, $args) {
   return (
     [ EVAL => $scope => $call ],
     [ CMB6 => $call_args ],
-    $kstack,
   );
 };
 

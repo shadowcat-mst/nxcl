@@ -23,7 +23,6 @@ method ifelse => sub ($scope, $cmb, $self, $args) {
     my ($then, $else) = flatten $args;
   return (
     [ EVAL => $scope => raw($bool) ? $then : $else ],
-    $kstack,
   );
 }
 
