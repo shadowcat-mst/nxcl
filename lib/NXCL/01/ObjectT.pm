@@ -2,18 +2,18 @@ package NXCL::01::ObjectT;
 
 use NXCL::01::Utils qw(uncons raw type $NIL);
 use NXCL::01::TypeFunctions qw(
-  make_RawNative make_Curry make_List cons_List OpDictT
+  make_Native make_Curry make_List cons_List OpDictT
 );
 use NXCL::01::TypeExporter;
 
 # no sub make, I don't think creating anything of this type makes sense
 
-sub bind_method ($scope, $, $args, $kstack) {
+sub bind_method ($scope, $cmb, $args, $kstack) {
   my ($obj, $method) = uncons $args;
   return ([ JUST => make_Curry($method, make_List($obj)) ], $kstack);
 }
 
-our $BIND_METHOD = make_RawNative(\&bind_method);
+our $BIND_METHOD = make_Native(\&bind_method);
 
 method 'invoker-for' => \&invoker_for;
 

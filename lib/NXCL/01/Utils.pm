@@ -7,7 +7,6 @@ use NXCL::01::TypeFunctions qw(empty_List);
 
 our @EXPORT_OK = qw(
   panic
-  not_combinable
   $NIL
   mkv
   type rtype

@@ -8,7 +8,10 @@ use NXCL::01::Utils qw(
   uncons
   raw
 );
-use NXCL::01::Types qw(OpDict String List);
+use NXCL::01::TypeFunctions qw(
+  OpDictT NativeT
+  make_List cons_List make_String
+);
 
 our @EXPORT_OK = qw(run_til_done);
 
@@ -16,7 +19,7 @@ sub take_step_EVAL ($scope, $value, $kstack) {
   my $type = type($value);
   if (type($type) == OpDictT) {
     my $handler = raw($type)->{'evaluate'};
-    if (type($handler) == RawNativeT) {
+    if (type($handler) == NativeT) {
       return raw($handler)->($scope, $handler, make_List($value), $kstack);
     }
     return (
@@ -33,12 +36,12 @@ sub take_step_EVAL ($scope, $value, $kstack) {
 
 sub take_step_CMB9 ($scope, $combiner, $args, $kstack) {
   my $type = type($combiner);
-  if ($type == RawNativeT) {
+  if ($type == NativeT) {
     return raw($combiner)->($scope, $combiner, $args, $kstack);
   }
   if (type($type) == OpDictT) {
     my $handler = raw($type)->{'combine'};
-    if (type($handler) == RawNativeT) {
+    if (type($handler) == NativeT) {
       return raw($handler)->(
         $scope, $handler, cons_List($combiner, $args), $kstack
       );

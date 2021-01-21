@@ -9,52 +9,78 @@ export make => \&make;
 
 sub make ($int) { _make IntR, => $int }
 
-wrap method eq => sub ($scope, $args) {
-  my ($l, $r, @too_many) = flatten $args;
+wrap method eq => sub ($scope, $cmb, $self, $args, $kstack) {
+  my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
-  panic 'Must be ints' for grep type($_) ne IntT, $l, $r;
-  return make_Bool(raw($l) == raw($r));
+  my $type = type($_);
+  panic 'Must be ints' unless type($r) == $type;
+  return (
+    [ JUST => make_Bool(raw($self) == raw($r)) ],
+    $kstack
+  );
 };
 
-wrap method gt => sub ($scope, $args) {
-  my ($l, $r, @too_many) = flatten $args;
+wrap method gt => sub ($scope, $cmb, $self, $args, $kstack) {
+  my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
-  panic 'Must be ints' for grep type($_) ne IntT, $l, $r;
-  return make_Bool(raw($l) > raw($r));
+  my $type = type($_);
+  panic 'Must be ints' unless type($r) == $type;
+  return (
+    [ JUST => make_Bool(raw($self) > raw($r)) ],
+    $kstack
 };
 
-wrap method div => sub ($scope, $args) {
-  my ($l, $r, @too_many) = flatten $args;
+wrap method div => sub ($scope, $cmb, $self, $args, $kstack) {
+  my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
-  panic 'Must be ints' for grep type($_) ne IntT, $l, $r;
-  return make int(raw($l) / raw($r));
+  my $type = type($_);
+  panic 'Must be ints' unless type($r) == $type;
+  return (
+    [ JUST => make int(raw($self) / raw($r)) ],
+    $kstack
+  );
 };
 
-wrap method mod => sub ($scope, $args) {
-  my ($l, $r, @too_many) = flatten $args;
+wrap method mod => sub ($scope, $cmb, $self, $args, $kstack) {
+  my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
-  panic 'Must be ints' for grep type($_) ne IntT, $l, $r;
-  return make(raw($l) % raw($r));
+  my $type = type($_);
+  panic 'Must be ints' unless type($r) == $type;
+  return (
+    [ JUST => make(raw($self) % raw($r)) ],
+    $kstack
+  );
 };
 
-wrap method minus => sub ($scope, $args) {
-  my ($l, $r, @too_many) = flatten $args;
+wrap method minus => sub ($scope, $cmb, $self, $args, $kstack) {
+  my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
-  panic 'Must be ints' for grep type($_) ne IntT, $l, $r;
-  return make(raw($l) - raw($r)) if defined($r);
-  return make(-raw($l));
+  unless ($r) {
+    return (
+      [ JUST => make(-raw($self)) ],
+      $kstack
+    );
+  }
+  my $type = type($_);
+  panic 'Must be ints' unless type($r) == $type;
+  return (
+    [ JUST => make(raw($self) - raw($r)) ],
+    $kstack
+  );
 };
 
-wrap method times => sub ($scope, $args) {
+wrap method times => sub ($scope, $cmb, $self, $args, $kstack) {
   my @ints = flatten $args;
-  panic 'Must be ints' for grep type($_) ne IntT, @ints;
-  return make reduce { $a * $b }, 1, map raw($_), @ints;
+  my $type = type($_);
+  panic 'Must be ints' for grep type($_) != $type, @ints;
+  return make reduce { $a * $b } map raw($_), $self, @ints;
 };
 
-wrap method plus => sub ($scope, $args) {
+wrap method times => sub ($scope, $cmb, $self, $args, $kstack) {
   my @ints = flatten $args;
-  panic 'Must be ints' for grep type($_) ne IntT, $l, $r;
-  return make reduce { $a + $b }, 0, map raw($_), @ints;
+  my $type = type($_);
+  panic 'Must be ints' for grep type($_) != $type, @ints;
+  return make reduce { $a + $b } map raw($_), $self, @ints;
 };
 
 1;

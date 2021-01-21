@@ -6,7 +6,7 @@ use experimental 'signatures';
 use Scalar::Util qw(weaken);
 use NXCL::01::TypeExporter ();
 use NXCL::01::Utils qw(make_string_combiner panic mkv);
-use NXCL::01::ReprTypes;
+use NXCL::01::ReprTypes qw(DictR);
 
 sub import ($, @args) {
   my $caller = caller;
@@ -26,58 +26,44 @@ sub load_type ($name) {
   }
 }
 
-sub make_type_object ($type) {
-  my ($name, $statics, $methods) = @{$type}{qw(short_name statics methods)};
-  my $meta_type = mkv OpDictT ,=> DictR ,=> _expand_methods($statics);
-  return mkv($meta_type, mkv OpDictT ,=> DictR ,=> {
-    evaluate => \&evaluate_to_value,
-    combine => \&not_combinable,
-    'type-shortname' => make_string_combiner($name),
-    %{_expand_methods($methods)},
-  });
-}
-
-# let _expand_methods (Dict d) {
-#   d.map(
-#     ((name, (code, attrs))) => {
-#       :($name) $(
-#         { ?: attrs,'wrap' make_ApMeth(this) this }
-#         [ [ ?: attrs.'raw' make_RawNative make_Native ] code ]
-#       )
-#     }
-#   )
-# }
-
-sub _expand_methods ($hash) {
-  return +{
-    map {
-      my ($name, $code, $attrs) = ($_, @{$hash->{$_}});
-      ($name =>
-        ($attrs->{wrap}
-          ? make_ApMeth(make_Native $code)
-          : make_RawNative($code))
-      )
-    } keys %$hash
-  };
-}
-
 sub _load_type ($name) {
   my $type_file = "NXCL/01/${name}T.pm";
   require $type_file;
   my $pkg = "NXCL::01::${name}T";
-  my %type = (
-    short_name => $name,
-    maker => $pkg->can('make'),
-    %{$NXCL::01::TypeExporter::Type_Info{$pkg}},
-  );
-  return make_type_object(\%type);
+  my $type_info = $NXCL::01::TypeExporter::Type_Info{$pkg};
+  return make_type_object($name => $type_info);
 }
 
-sub export_type_into ($into, $type) {
-  my $type_name = $type->{name};
-  {
+sub _method_dict ($src) {
+  my %real;
+  foreach $name (keys %$src) {
+    my $info = $src->{$name};
+    my $orig_code = $info->[0];
+    my $code = sub ($scope, $cmb, $args, $kstack) {
+      # should test type of first of $args
+      $orig_code->($scope, $cmb, uncons($args), $kstack);
+    };
+    my $native = make_Native($code);
+    $real{$name} = $info->[1]{wrap}
+      ? make_ApMeth($native)
+      : $native;
+  }
+  reture \%real;
+}
+
+sub make_type_object ($name, $info) {
+  my $meta_type_hr = _method_dict($info->{static});
+  my $type_hr = _method_dict($info->{method});
+  my $meta_type = make_OpDict($meta_type_hr);
+  my $type = mkv($meta_type, DictR ,=> $type_hr);
+  return $type;
+}
+
+sub export_type_into ($into, $type_name) {
+  my %exports = %{$NXCL::01::TypeExporter{$type_name}{export}};
+  foreach my $name (sort keys %exports) {
     no strict 'refs';
-    *{"${into}::${type_name}"} = $type->{maker};
+    *{"${into}::${name}"} = $exports{$name};
   }
 }
 

@@ -2,31 +2,43 @@ package NXCL::01::StringT;
 
 use NXCL::01::Utils qw(panic flatten);
 use NXCL::01::ReprTypes qw(CharsR);
-use NXCL::01::TypeFunctions qw(StringT make_Bool);
+use NXCL::01::TypeFunctions qw(make_Bool);
 use NXCL::01::TypeExporter;
 
 export make => \&make;
 
 sub make ($string) { _make CharsR, => $string }
 
-wrap method eq => sub ($scope, $args) {
-  my ($l, $r, @too_many) = flatten $args;
+wrap method eq => sub ($scope, $cmb, $self, $args, $kstack) {
+  my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
-  panic 'Must be strings' for grep type($_) ne StringT, $l, $r;
-  make_Bool(raw($l) eq raw($r));
+  my $type = type($self);
+  panic 'Must be strings' unless type($r) == $type;
+  return (
+    make_Bool(raw($self) eq raw($r)),
+    $kstack
+  );
 };
 
-wrap method gt => sub ($scope, $args) {
-  my ($l, $r, @too_many) = flatten $args;
+wrap method gt => sub ($scope, $cmb, $self, $args, $kstack) {
+  my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
-  panic 'Must be strings' for grep type($_) ne StringT, $l, $r;
-  make_Bool(raw($l) gt raw($r));
+  my $type = type($self);
+  panic 'Must be strings' unless type($r) == $type;
+  return (
+    make_Bool(raw($self) gt raw($r)),
+    $kstack
+  );
 };
 
-wrap method concat => sub ($scope, $args) {
+wrap method concat => sub ($scope, $cmb, $self, $args, $kstack) {
   my @string = flatten $args;
-  panic 'Must be strings' for grep type($_) ne StringT, @string;
-  make(join '', map raw($_). @string);
+  my $type = type($self);
+  panic 'Must be strings' for grep type($_) != $type, @string;
+  return (
+    make(join '', map raw($_). $self, @string),
+    $kstack
+  );
 };
 
 1;

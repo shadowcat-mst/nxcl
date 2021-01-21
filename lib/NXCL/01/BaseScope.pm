@@ -6,18 +6,18 @@ use vars qw(@BASE_TYPES);
 use NXCL::01::Types
   @BASE_TYPES = qw(
     Apv Bool Combine Curry Int List Name Native
-    Object OpDict RawNative Scope String Val
+    Object OpDict Native Scope String Val
   );
 
 our %N =
-  map +($_ => make_RawNative(__PACKAGE__->can($_))),
+  map +($_ => make_Native(__PACKAGE__->can($_))),
     qw(dot_lookup dot_curryable dot_curried fdot dot);
 
 $_ = make_Apv($_) for $N{dot_curried};
 
 our $Store = make_OpDict +{
   dot => make_Val($N{dot}),
-  map +($_ => Val($Types{$_})),
+  map +($_ => make_Val($Types{$_})),
     @BASE_TYPES
 };
 
@@ -88,19 +88,19 @@ sub fdot ($scope, $, $args, $kstack) {
   );
 }
 
-sub dot ($scope, $, $args, $kstack) {
+sub dot ($scope, $cmb, $args, $kstack) {
   my @args = flatten $args;
   panic unless @args == 1 or @args == 2;
   my $rtype = type($args[-1]);
   if ($rtype == NameT or $rtype == IntT or $rtype == StringT) {
 
     unless (@args == 2) {
-      return fdot($scope, $, $args, $kstack);
+      return fdot($scope, undef, $args, $kstack);
     }
 
     return (
       [ EVAL => $scope => make_List($args[0]) ],
-      [ CONS => $scope => $args[-1] ],
+      [ CONS => $args[-1] ],
       [ CMB9 => $scope => $N{fdot} ],
       $kstack
     );
