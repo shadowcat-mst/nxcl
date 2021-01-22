@@ -41,7 +41,7 @@ sub _method_dict ($src) {
     my $orig_code = $info->[0];
     my $code = sub ($scope, $cmb, $args, $kstack) {
       # should test type of first of $args
-      $orig_code->($scope, $cmb, uncons($args), $kstack);
+      $orig_code->($scope, $cmb, uncons($args)), $kstack;
     };
     my $native = make_Native($code);
     $real{$name} = $info->[1]{wrap}
