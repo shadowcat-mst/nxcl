@@ -2,11 +2,12 @@ package NXCL::01::BaseScope;
 
 use NXCL::Package;
 use NXCL::01::Utils qw($NIL panic flatten);
+use NXCL::01::MethodUtils;
 use vars qw(@BASE_TYPES);
 use NXCL::01::Types
   @BASE_TYPES = qw(
     Apv Bool Combine Curry Int List Name Native
-    Object OpDict Native Scope String Val
+    OpDict Native Scope String Val
   );
 
 our %N =
@@ -52,7 +53,7 @@ sub dot_curried_invoke ($scope, $, $argsp, $kstack) {
   my ($method, $curried_args) = uncons $curry;
   my ($obj, $extra_args) = uncons $call_args;
   my $args = cons_List(flatten($curried_args), $extra_args);
-  NXCL::01::ObjectT::invoke_method($scope, $obj, $args, $kstack);
+  call_method($scope, $obj, $method, $args, $kstack);
 }
 
 sub fdot ($scope, $, $args, $kstack) {
@@ -62,9 +63,7 @@ sub fdot ($scope, $, $args, $kstack) {
     my $method = make_String raw($callp);
 
     if ($obj) {
-      return NXCL::01::ObjectT::invoker_for(
-        $scope, $obj, make_List($method), $kstack
-      );
+      return lookup_method($scope, $obj, $method, $kstack);
     }
 
     return (

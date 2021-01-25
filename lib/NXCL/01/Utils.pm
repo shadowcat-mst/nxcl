@@ -3,7 +3,6 @@ package NXCL::01::Utils;
 use NXCL::Exporter;
 use Sub::Util qw(set_subname);
 use NXCL::01::ReprTypes qw(ConsR);
-use NXCL::01::TypeFunctions qw(empty_List);
 
 our @EXPORT_OK = qw(
   panic
