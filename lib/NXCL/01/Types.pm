@@ -1,42 +1,40 @@
 package NXCL::01::Types;
 
-use strict;
-use warnings;
-use experimental 'signatures';
 use Scalar::Util qw(weaken);
 use NXCL::01::TypeExporter ();
-use NXCL::01::Utils qw(make_string_combiner panic mkv);
+use NXCL::01::Utils qw(panic mkv);
 use NXCL::01::ReprTypes qw(DictR);
+use NXCL::01::TypeFunctions qw(make_OpDict make_ApMeth make_Native);
+use NXCL::Package;
 
 sub import ($, @args) {
   my $caller = caller;
   foreach my $type_name (@args) {
-    export_type_into($caller, load_type($type_name));
+    load_type($type_name);
+    export_type_into($caller, $type_name);
   }
   return
 }
 
 our %Types;
 
-sub OpDictT { $Types{OpDict} }
-
-sub load_type ($name) {
-  return $Types{$name} //= do {
-    _load_type($name);
+sub load_type ($type_name) {
+  return $Types{$type_name} //= do {
+    _load_type($type_name);
   }
 }
 
-sub _load_type ($name) {
-  my $type_file = "NXCL/01/${name}T.pm";
+sub _load_type ($type_name) {
+  my $type_file = "NXCL/01/${type_name}T.pm";
   require $type_file;
-  my $pkg = "NXCL::01::${name}T";
+  my $pkg = "NXCL::01::${type_name}T";
   my $type_info = $NXCL::01::TypeExporter::Type_Info{$pkg};
-  return make_type_object($name => $type_info);
+  return make_type_object($type_name => $type_info);
 }
 
 sub _method_dict ($src) {
   my %real;
-  foreach $name (keys %$src) {
+  foreach my $name (keys %$src) {
     my $info = $src->{$name};
     my $orig_code = $info->[0];
     my $code = sub ($scope, $cmb, $args, $kstack) {
@@ -48,7 +46,7 @@ sub _method_dict ($src) {
       ? make_ApMeth($native)
       : $native;
   }
-  reture \%real;
+  return \%real;
 }
 
 sub make_type_object ($name, $info) {
@@ -56,20 +54,30 @@ sub make_type_object ($name, $info) {
   my $type_hr = _method_dict($info->{method});
   my $meta_type = make_OpDict($meta_type_hr);
   my $type = mkv($meta_type, DictR ,=> $type_hr);
+  $info->{type} = $type;
   return $type;
 }
 
 sub export_type_into ($into, $type_name) {
-  my %exports = %{$NXCL::01::TypeExporter{$type_name}{export}};
+  my $pkg = "NXCL::01::${type_name}T";
+  my $type_info = $NXCL::01::TypeExporter::Type_Info{$pkg};
+  my %exports = %{$type_info->{exports}||{}};
+  my $type = $type_info->{type};
+  no strict 'refs';
   foreach my $name (sort keys %exports) {
-    no strict 'refs';
-    *{"${into}::${name}"} = $exports{$name};
+    *{"${into}::${name}_${type_name}"} = $exports{$name}[0];
   }
+  *{"${into}::${type_name}T"} = sub () { $type };
 }
 
-for my $type (load_type('OpDict')) {
-  weaken(my $weak = $type);
-  $type->[0] = $weak;
+{
+  my @opdict;
+  no warnings 'redefine';
+  local *make_OpDict = sub ($hash) {
+    push @opdict, mkv(undef, DictR, $hash);
+  };
+  my $opdict_t = load_type('OpDict');
+  $_->[0] = $opdict_t for @opdict;
 }
 
 1;

@@ -34,7 +34,7 @@ wrap method concat => sub ($scope, $cmb, $self, $args) {
   my $type = type($self);
   panic 'Must be strings' for grep type($_) != $type, @string;
   return (
-    make(join '', map raw($_). $self, @string),
+    _make(join '', map raw($_). $self, @string),
   );
 };
 

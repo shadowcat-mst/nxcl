@@ -1,13 +1,13 @@
 package NXCL::01::BaseScope;
 
 use NXCL::Package;
-use NXCL::01::Utils qw($NIL panic flatten);
+use NXCL::01::Utils qw(panic flatten);
 use NXCL::01::MethodUtils;
 use vars qw(@BASE_TYPES);
 use NXCL::01::Types
   @BASE_TYPES = qw(
     Apv Bool Combine Curry Int List Name Native
-    OpDict Native Scope String Val
+    OpDict Scope String Val
   );
 
 our %N =
@@ -18,7 +18,7 @@ $_ = make_Apv($_) for $N{dot_curried};
 
 our $Store = make_OpDict +{
   dot => make_Val($N{dot}),
-  map +($_ => make_Val($Types{$_})),
+  map +($_ => make_Val($NXCL::01::Types::Types{$_})),
     @BASE_TYPES
 };
 

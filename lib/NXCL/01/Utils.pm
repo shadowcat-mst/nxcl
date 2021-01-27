@@ -6,18 +6,11 @@ use NXCL::01::ReprTypes qw(ConsR);
 
 our @EXPORT_OK = qw(
   panic
-  $NIL
   mkv
   type rtype
   rconsp rnilp rcharsp rnativep rvalp rvarp
   raw uncons flatten
 );
-
-# This happens after compile time of 'sub name {' and definition of
-# @EXPORT_OK so our import() should still run fine when ListT.pm calls it
-
-require NXCL::01::ListT;
-our $NIL = $NXCL::01::ListT::NIL;
 
 sub panic { die $_[0]//'PANIC' }
 

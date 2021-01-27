@@ -4,6 +4,8 @@ use NXCL::01::Utils qw(raw);
 use NXCL::01::ReprTypes qw(NativeR);
 use NXCL::01::TypeExporter;
 
+export make => \&make;
+
 sub make ($sub) { _make NativeR ,=> $sub }
 
 method combine => sub ($scope, $cmb, $self, $args) {

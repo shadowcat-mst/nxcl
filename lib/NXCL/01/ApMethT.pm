@@ -8,7 +8,7 @@ use NXCL::01::TypeExporter;
 export make => sub ($opv) { _make ValR ,=> $opv };
 
 method combine => sub ($scope, $cmb, $self, $args) {
-  my ($inv, $method_args) = uncons($argsp);
+  my ($inv, $method_args) = uncons($args);
   return (
     [ EVAL => $scope => $method_args ],
     [ CONS => $inv ],

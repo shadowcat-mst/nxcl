@@ -1,7 +1,11 @@
 package NXCL::01::TypeExporter;
 
-use NXCL::01::Utils qw(mkv);
-use NXCL::Exporter;
+use NXCL::Package;
+
+sub import {
+  NXCL::Package->import;
+  goto &Exporter::import;
+}
 
 our %Type_Info;
 
@@ -10,7 +14,8 @@ our @EXPORT = qw(wrap method static export _make);
 sub _make {
   my $targ = caller;
   die unless my $type = $Type_Info{$targ}{type};
-  mkv($type, @_);
+  require NXCL::01::Utils;
+  NXCL::01::Utils::mkv($type, @_);
 }
 
 sub export ($name, $code) {

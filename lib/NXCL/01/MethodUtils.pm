@@ -1,6 +1,7 @@
 package NXCL::01::CallMethod;
 
 use NXCL::Exporter;
+use NXCL::01::Utils qw(panic);
 use NXCL::01::TypeFunctions qw(
   OpDictT NativeT
   make_List make_String
@@ -8,7 +9,7 @@ use NXCL::01::TypeFunctions qw(
 
 our @EXPORT = qw(call_method lookup_method);
 
-sub call_method ($scope, $self, $methodp, $args. $kstack) {
+sub call_method ($scope, $self, $methodp, $args, $kstack) {
   my ($method_name, $method_String) = (
     ref($methodp)
       ? (raw($methodp), $methodp)
@@ -49,8 +50,8 @@ sub lookup_method ($scope, $self, $methodp, $kstack) {
   return (
     [ CMB9 => $scope, $type, make_List($method_String) ],
     [ CMB9 => $scope => make_Native(sub ($scope, $cmb, $args, $kstack) {
-        make_Curry(uncons($args)[0], make_List($self))
-    } ],
+        make_Curry((uncons($args))[0], make_List($self))
+    }) ],
     $kstack
   );
 }

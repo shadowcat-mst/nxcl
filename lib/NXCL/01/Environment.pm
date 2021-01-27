@@ -27,7 +27,7 @@ sub _run ($self, $value, $kstack) {
 sub eval_string ($self, $string) {
   my $parse = $self->reader->parse($string);
   my $script = $self->expander->expand($parse);
-  $self->_run([ EVAL => $self->scope, $script ], $NIL);
+  $self->_run([ EVAL => $self->scope, $script ], make_List());
 }
 
 sub resume ($self, $value, $kstack) {

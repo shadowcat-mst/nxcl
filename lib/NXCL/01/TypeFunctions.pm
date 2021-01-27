@@ -2,8 +2,7 @@ package NXCL::01::TypeFunctions;
 
 use Sub::Defer qw(defer_sub);
 use Import::Into;
-use NXCL::01::Types ();
-use NXCL::Exporter;
+use NXCL::Package;
 
 our %Have_Imported;
 
@@ -18,13 +17,19 @@ sub import ($class, @args) {
       next;
     }
     defer_sub "${targ}::${export}", sub {
-      $Have_Imported{$type} ||= do { NXCL::01::Types->import($type); 1 };
+      $Have_Imported{$type} ||= do {
+        require NXCL::01::Types;
+        NXCL::01::Types->import($type);
+        1;
+      };
       $class->can($export)
         or die "Didn't receive export ${export} from type ${type}";
     };
   }
-  local @EXPORT_OK = @plain;
-  Exporter->import::into(1, @plain);
+  local our @EXPORT_OK = @plain;
+  no warnings 'redefine';
+  local *import = \&Exporter::import;
+  $class->import::into(1, @plain);
 }
 
 1;

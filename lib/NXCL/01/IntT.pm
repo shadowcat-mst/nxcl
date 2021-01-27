@@ -26,6 +26,7 @@ wrap method gt => sub ($scope, $cmb, $self, $args) {
   panic 'Must be ints' unless type($r) == $type;
   return (
     [ JUST => make_Bool(raw($self) > raw($r)) ],
+  );
 };
 
 wrap method div => sub ($scope, $cmb, $self, $args) {

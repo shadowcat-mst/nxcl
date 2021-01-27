@@ -1,14 +1,12 @@
 package NXCL::01::ListT;
 
 use NXCL::01::Utils qw(
-  uncons flatten rconsp panic make_const_combiner
+  uncons flatten rconsp panic
 );
 use NXCL::01::ReprTypes qw(ConsR NilR);
 use NXCL::01::TypeExporter;
 
-our $NIL = _make NilR;
-
-export make => sub (@members) { cons(@members, $NIL) };
+export make => sub (@members) { cons(@members, _make(NilR)) };
 
 export cons => \&cons;
 
@@ -20,8 +18,8 @@ sub cons (@members) {
   return $ret;
 }
 
-static empty => make_const_combiner($NIL);
-export empty => sub { $NIL };
+static empty => sub { [ JUST => _make(NilR) ] };
+export empty => sub { _make(NilR) };
 
 method first => sub ($scope, $cmb, $self, $args) {
   panic unless rconsp $self;
