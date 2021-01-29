@@ -13,10 +13,17 @@ sub import ($, @args) {
     load_type($type_name);
     export_type_into($caller, $type_name);
   }
-  return
+  no warnings 'redefine';
+  no strict 'refs';
+  *{"${caller}::type_object"} = \&type_object;
+  *{"${caller}::type_name_of"} = \&type_name_of;
 }
 
 our %Types;
+
+sub type_object ($name) { $Types{$name} }
+
+sub type_name_of ($type) { +{ reverse %Types }->{$type} }
 
 sub load_type ($type_name) {
   return $Types{$type_name} //= do {
@@ -74,7 +81,8 @@ sub export_type_into ($into, $type_name) {
   my @opdict;
   no warnings 'redefine';
   local *make_OpDict = sub ($hash) {
-    push @opdict, mkv(undef, DictR, $hash);
+    push @opdict, my $v = mkv(undef, DictR, $hash);
+    $v;
   };
   my $opdict_t = load_type('OpDict');
   $_->[0] = $opdict_t for @opdict;
