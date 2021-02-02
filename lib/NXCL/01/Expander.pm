@@ -11,7 +11,7 @@ sub expand ($self, $v) {
 }
 
 sub make ($self, $type, @v) {
-  $self->makers->{$type}->(@v);
+  ($self->makers->{$type}||die"No maker for ${type}")->(@v);
 }
 
 sub expand_word ($self, $name) {
