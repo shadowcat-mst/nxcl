@@ -18,7 +18,7 @@ $_ = make_Apv($_) for $N{dot_curried};
 
 our $Store = make_OpDict +{
   dot => make_Val($N{dot}),
-  map +($_ => make_Val($NXCL::01::Types::Types{$_})),
+  map +($_ => make_Val(type_object($_))),
     @BASE_TYPES
 };
 
