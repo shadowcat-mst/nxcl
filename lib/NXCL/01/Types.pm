@@ -23,7 +23,11 @@ our %Types;
 
 sub type_object ($name) { $Types{$name} }
 
-sub type_name_of ($type) { +{ reverse %Types }->{$type} }
+sub type_name_of ($type) {
+  return 'UNDEF' unless defined($type);
+  +{ reverse %Types }->{$type}
+    || sprintf("Type(%x)", $type);
+}
 
 sub load_type ($type_name) {
   return $Types{$type_name} //= do {
@@ -85,6 +89,7 @@ sub export_type_into ($into, $type_name) {
     $v;
   };
   my $opdict_t = load_type('OpDict');
+  weaken($opdict_t->[0] = $opdict_t);
   $_->[0] = $opdict_t for @opdict;
 }
 
