@@ -13,6 +13,8 @@ use NXCL::01::TypeFunctions qw(
   OpDictT NativeT
   make_List cons_List make_String
 );
+use NXCL::01::Types;
+use NXCL::01::ToJSON;
 
 our @EXPORT_OK = qw(run_til_done);
 
@@ -22,14 +24,18 @@ sub take_step_EVAL ($scope, $value, $kstack) {
   );
 }
 
-sub take_step_CMB9 ($scope, $combiner, $args, $kstack) {
-  my $type = type($combiner);
+sub take_step_CMB9 ($scope, $cmb, $args, $kstack) {
+  my $type = type($cmb);
   if ($type == NativeT) {
-    return raw($combiner)->($scope, $combiner, $args, $kstack);
+    return raw($cmb)->($scope, $cmb, $args, $kstack);
   }
   return call_method(
-    $scope, $combiner, 'combine', make_Cons($combiner, $args), $kstack
+    $scope, $cmb, 'combine', cons_List($cmb, $args), $kstack
   );
+}
+
+sub take_step_CMB6 ($scope, $args, $cmb, $kstack) {
+  return take_step_CMB9($scope, $cmb, $args, $kstack);
 }
 
 sub take_step_ECDR ($scope, $cdr, $car, $kstack) {
@@ -64,6 +70,10 @@ sub take_step_JUST ($val, $kstack) {
   );
 }
 
+sub take_step_DROP ($val, $kstack) {
+  return $kstack;
+}
+
 sub take_step_MARK ($, $val, $kstack) {
   my ($kar, $kdr) = uncons $kstack;
   return (
@@ -72,29 +82,14 @@ sub take_step_MARK ($, $val, $kstack) {
   );
 }
 
+my %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
+  qw(EVAL CMB9 CMB6 ECDR CONS JUMP JUST DROP MARK);
+
 sub take_step ($prog, $kstack) {
   my ($op, @v) = @$prog;
-  if ($op eq 'EVAL') {
-    return take_step_EVAL(@v, $kstack);
-  }
-  if ($op eq 'CMB9') {
-    return take_step_CMB9(@v, $kstack);
-  }
-  if ($op eq 'CMB6') {
-    my ($scope, $args, $cmb) = @v;
-    return take_step_CMB9($scope, $cmb, $args, $kstack);
-  }
-  if ($op eq 'ECDR') {
-    return take_step_ECDR(@v, $kstack);
-  }
-  if ($op eq 'CONS') {
-    return take_step_CONS(@v, $kstack);
-  }
-  if ($op eq 'JUMP') {
-    return take_step_JUMP(@v, $kstack);
-  }
-  if ($op eq 'MARK') {
-    return take_step_MARK(@v, $kstack);
+  warn "$op: ".join(', ', map type_name_of($_->[0]), @v);
+  if (my $step_func = $step_func{$op}) {
+    return $step_func->(@v, $kstack);
   }
   if ($op eq 'HOST') {
     return [ $v[0], $kstack ];
