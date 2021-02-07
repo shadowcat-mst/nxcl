@@ -19,6 +19,8 @@ sub call_method ($scope, $self, $methodp, $args, $kstack) {
   my $type = type($self);
   if (type($type) == OpDictT) {
     panic "No handler for ${method_name} on ".type_name_of($type)
+      ." (OpDict Type has methods: "
+      .(join(', ', sort keys %{raw($type)})||'(none)').")"
       unless my $handler = raw($type)->{$method_name};
     if (type($handler) == NativeT) {
       return raw($handler)->($scope, $handler, $args, $kstack);
