@@ -1,6 +1,7 @@
 package NXCL::01::Utils;
 
 use NXCL::Exporter;
+use Carp qw(croak);
 use Sub::Util qw(set_subname);
 use NXCL::01::ReprTypes qw(ConsR);
 
@@ -12,7 +13,7 @@ our @EXPORT_OK = qw(
   raw uncons flatten
 );
 
-sub panic { die $_[0]//'PANIC' }
+sub panic { croak $_[0]//'PANIC' }
 
 ## raw value utils
 
