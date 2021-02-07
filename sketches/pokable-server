@@ -1,0 +1,20 @@
+## Server:
+
+let socket = Socket.listen ...;
+
+let acceptor = start {
+  socket.connections().each start client;
+}
+
+## Debug:
+
+$ strands
+< main
+<   acceptor
+<     client1
+<     client2
+$ let old = strands.'main'.'acceptor';
+< acceptor
+$ inscope 'main' { let acceptor = <setup new socket> }
+$ old.kill();
+

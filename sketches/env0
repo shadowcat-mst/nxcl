@@ -1,0 +1,10 @@
+use NXCL::01::Environment;
+use NXCL::Package;
+use NXCL::01::ToJSON;
+use JSON::Dumper::Compact qw(jdc);
+
+my $emt = NXCL::01::Environment->new;
+
+my $res = $emt->eval_string('[ dot 1 plus ] 3');
+
+::Dwarn($res);

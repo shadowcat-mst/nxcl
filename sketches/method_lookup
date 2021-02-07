@@ -1,0 +1,18 @@
+sub method_of ($scope, $self, $method_name, $args. $kstack) {
+  my $type = type($self);
+  if (type($type) == OpDictT) {
+    my $handler = raw($type)->{$method_name};
+    if (type($handler) == NativeT) {
+      return raw($handler)->($scope, $handler, $args, $kstack);
+    }
+    return (
+      [ CMB9 => $scope, $handler, $args ],
+      $kstack
+    );
+  }
+  return (
+    [ CMB9 => $scope, $type, make_List(make_String($method_name)) ],
+    [ CMB6 => $scope, $args ],
+    $kstack
+  );
+}
