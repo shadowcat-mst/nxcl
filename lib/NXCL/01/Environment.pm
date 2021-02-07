@@ -11,14 +11,17 @@ use NXCL::01::TypeFunctions
 lazy scope => sub {
    require NXCL::01::BaseScope; NXCL::01::BaseScope::scope()
 };
+
 lazy reader => sub {
   require NXCL::01::Reader; NXCL::01::Reader->new
 };
+
 lazy makers => sub {
   +{
     map +($_ => __PACKAGE__->can("make_${_}")), @EXPAND_TYPES
   }
 };
+
 lazy expander => sub ($self) {
   require NXCL::01::Expander;
   NXCL::01::Expander->new(makers => $self->makers);
