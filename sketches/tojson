@@ -1,0 +1,46 @@
+package NXCL::01::ToJSON;
+
+use JSON::PP ();
+use Sub::Util qw(subname);
+use NXCL::01::Utils qw(type rtype raw uncons);
+use NXCL::01::Types;
+use NXCL::01::ReprTypes;
+use NXCL::Exporter;
+
+our @EXPORT = qw(value_to_json);
+
+sub value_to_json ($value) {
+  return 'null' unless defined($value);
+  my $type = type($value);
+  my $type_name = type_name_of($type);
+  my $rtype = rtype($value);
+  unless (defined($rtype)) {
+    require Data::Dumper;
+    die Data::Dumper::Dumper($value);
+  }
+  my @repr = do {
+    if ($rtype eq BoolR) {
+      raw($value) ? $JSON::PP::true : $JSON::PP::false
+    } elsif ($rtype eq CharsR or $rtype eq BytesR) {
+      ''.raw($value)
+    } elsif ($rtype eq NilR) {
+      ()
+    } elsif ($type eq IntR) {
+      0+raw($value)
+    } elsif ($rtype eq ValR or $rtype eq VarR) {
+      value_to_json(raw($value))
+    } elsif ($rtype eq ConsR) {
+      map value_to_json($_), uncons($value)
+    } elsif ($rtype eq DictR) {
+      my %r = %{raw($value)};
+      +{ map ($_ => value_to_json($r{$_})), keys %r }
+    } elsif ($rtype eq NativeR) {
+      subname(raw($value))
+    } else {
+      die "Unknown repr $$rtype";
+    }
+  };
+  return [ $type_name, [ $$rtype, @repr ] ];
+}
+
+1;
