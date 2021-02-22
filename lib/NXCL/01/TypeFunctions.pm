@@ -4,21 +4,16 @@ use Sub::Defer qw(defer_sub);
 use Import::Into;
 use NXCL::Package;
 
-our %Have_Imported;
+my $type_info = \%NXCL::01::TypeInfo::Registry;
 
 sub import ($class, @args) {
   my $targ = caller;
   foreach my $export (@args) {
-    my ($type) = grep defined, $export =~ /^(?:\w+_(\w+)|(\w+)T)$/;
-    die "Can't parse ${export}" unless $type;
+    my ($type_name) = grep defined, $export =~ /^(?:\w+_(\w+)|(\w+)_Inst)$/;
+    die "Can't parse ${export}" unless $type_name;
     defer_sub "${targ}::${export}", sub {
-      $Have_Imported{$type} ||= do {
-        require NXCL::01::Types;
-        NXCL::01::Types->import($type);
-        1;
-      };
-      $class->can($export)
-        or die "Didn't receive export ${export} from type ${type}";
+      require "NXCL/01/${type_name}T";
+      $type_info->{$type_name}->export_for($export)
     };
   }
 }

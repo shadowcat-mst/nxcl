@@ -3,7 +3,7 @@ package NXCL::01::IntT;
 use NXCL::01::Utils qw(flatten raw panic);
 use NXCL::01::ReprTypes qw(IntR);
 use NXCL::01::TypeFunctions qw(IntT make_Bool);
-use NXCL::01::TypeExporter;
+use NXCL::01::TypePackage;
 
 export make => \&make;
 

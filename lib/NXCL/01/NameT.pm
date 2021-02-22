@@ -1,12 +1,12 @@
 package NXCL::01::NameT;
 
-use NXCL::01::Utils qw(type raw panic);
+use NXCL::01::Utils qw(mset raw panic);
 use NXCL::01::ReprTypes qw(CharsR);
 use NXCL::01::TypeFunctions qw(
-  OpDictT ValT VarT make_String
-  cons_List make_List empty_List
+  OpDict_Inst Val_Inst Var_Inst
+  make_String make_List empty_List
 );
-use NXCL::01::TypeExporter;
+use NXCL::01::TypePackage;
 
 export make => \&make;
 
@@ -14,11 +14,11 @@ sub make ($name) { _make CharsR ,=> $name }
 
 method evaluate => sub ($scope, $cmb, $self, $args) {
   my $store = raw $scope;
-  my $store_type = type($store);
-  if ($store_type == OpDictT()) {
+  my $store_mset = mset($store);
+  if ($store_mset == OpDict_Inst) {
     my $cell = raw($store)->{raw($self)};
     panic unless $cell;
-    if (type($cell) == ValT or type($cell) == VarT) {
+    if (mset($cell) == Val_Inst or mset($cell) == Var_Inst) {
       return (
         [ JUST => raw($cell) ],
       );

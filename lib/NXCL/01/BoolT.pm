@@ -1,8 +1,8 @@
 package NXCL::01::BoolT;
 
-use NXCL::01::Utils qw(type panic raw flatten);
+use NXCL::01::Utils qw(mset panic raw flatten);
 use NXCL::01::ReprTypes qw(BoolR);
-use NXCL::01::TypeExporter;
+use NXCL::01::TypePackage;
 
 export make => \&make;
 
@@ -11,8 +11,8 @@ sub make ($val) { _make BoolR ,=> 0+!!$val };
 wrap method eq => sub ($scope, $cmb, $self, $args) {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
-  my $type = type($self);
-  panic 'Must be bools' unless type($r) == $type;
+  my $mset = mset($self);
+  panic 'Must be bools' unless mset($r) == $mset;
   return (
     [ JUST => make(raw($self) == raw($r)) ],
   );

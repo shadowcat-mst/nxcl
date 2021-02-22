@@ -3,7 +3,7 @@ package NXCL::01::StringT;
 use NXCL::01::Utils qw(panic flatten);
 use NXCL::01::ReprTypes qw(CharsR);
 use NXCL::01::TypeFunctions qw(make_Bool);
-use NXCL::01::TypeExporter;
+use NXCL::01::TypePackage;
 
 export make => \&make;
 

@@ -1,20 +1,9 @@
 package NXCL::01::Runtime;
 
 use NXCL::Exporter;
-use Scalar::Util qw(weaken);
-use List::Util qw(reduce);
-use NXCL::01::Utils qw(
-  type
-  uncons
-  raw
-);
+use NXCL::01::Utils qw(mset uncons raw);
 use NXCL::01::MethodUtils;
-use NXCL::01::TypeFunctions qw(
-  OpDictT NativeT
-  make_List cons_List make_String
-);
-use NXCL::01::Types;
-use NXCL::01::ToJSON;
+use NXCL::01::TypeFunctions qw(Native_Inst make_List cons_List);
 
 our @EXPORT_OK = qw(run_til_done);
 
@@ -25,8 +14,7 @@ sub take_step_EVAL ($scope, $value, $kstack) {
 }
 
 sub take_step_CMB9 ($scope, $cmb, $args, $kstack) {
-  my $type = type($cmb);
-  if ($type == NativeT) {
+  if (mset($cmb) == Native_Inst) {
     return raw($cmb)->($scope, $cmb, $args, $kstack);
   }
   return call_method(
@@ -87,7 +75,6 @@ my %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
 
 sub take_step ($prog, $kstack) {
   my ($op, @v) = @$prog;
-  warn "$op: ".join(', ', map type_name_of($_->[0]), @v);
   if (my $step_func = $step_func{$op}) {
     return $step_func->(@v, $kstack);
   }

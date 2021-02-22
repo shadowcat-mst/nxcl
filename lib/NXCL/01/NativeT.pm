@@ -2,7 +2,7 @@ package NXCL::01::NativeT;
 
 use NXCL::01::Utils qw(raw);
 use NXCL::01::ReprTypes qw(NativeR);
-use NXCL::01::TypeExporter;
+use NXCL::01::TypePackage;
 
 export make => \&make;
 

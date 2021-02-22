@@ -1,11 +1,10 @@
 package NXCL::01::MethodUtils;
 
 use NXCL::Exporter;
-use NXCL::01::Utils qw(panic type raw);
-use NXCL::01::Types;
+use NXCL::01::Utils qw(panic mset raw);
 use NXCL::01::TypeFunctions qw(
-  OpDictT NativeT
-  make_List make_String
+  OpDict_Inst Native_Inst
+  make_List make_String make_Curry make_Native
 );
 
 our @EXPORT = qw(call_method lookup_method);
@@ -16,13 +15,13 @@ sub call_method ($scope, $self, $methodp, $args, $kstack) {
       ? (raw($methodp), $methodp)
       : ($methodp, make_String($methodp))
   );
-  my $type = type($self);
-  if (type($type) == OpDictT) {
-    panic "No handler for ${method_name} on ".type_name_of($type)
+  my $mset = mset($self);
+  if (mset($mset) == OpDict_Inst) {
+    panic "No handler for ${method_name} on ".mset($type)
       ." (OpDict Type has methods: "
       .(join(', ', sort keys %{raw($type)})||'(none)').")"
       unless my $handler = raw($type)->{$method_name};
-    if (type($handler) == NativeT) {
+    if (mset($handler) == Native_Inst) {
       return raw($handler)->($scope, $handler, $args, $kstack);
     }
     return (
@@ -43,8 +42,8 @@ sub lookup_method ($scope, $self, $methodp, $kstack) {
       ? (raw($methodp), $methodp)
       : ($methodp, make_String($methodp))
   );
-  my $type = type($self);
-  if (type($type) == OpDictT) {
+  my $mset = mset($self);
+  if (mset($mset) == OpDict_Inst) {
     panic unless my $handler = raw($type)->{$method_name};
     return (
       [ JUST => make_Curry($handler, make_List($self)) ],

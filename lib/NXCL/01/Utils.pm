@@ -8,7 +8,7 @@ use NXCL::01::ReprTypes qw(ConsR);
 our @EXPORT_OK = qw(
   panic
   mkv
-  type rtype
+  mset rtype
   rconsp rnilp rcharsp rnativep rvalp rvarp
   raw uncons flatten
 );
@@ -17,9 +17,10 @@ sub panic { croak $_[0]//'PANIC' }
 
 ## raw value utils
 
-sub mkv ($type, $repr, @v) { [ $type => [ $repr => @v ] ] }
+sub mkv ($mset, $rtype, @v) { [ $mset => [ $rtype => @v ] ] }
 
-sub type ($v) { $v->[0] }
+sub mset ($v) { $v->[0] }
+
 sub rtype ($v) { $v->[1][0] }
 
 sub rconsp ($v) { rtype($v) eq 'cons' }

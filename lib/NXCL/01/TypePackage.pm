@@ -1,38 +1,25 @@
-package NXCL::01::TypeExporter;
+package NXCL::01::TypePackage;
 
+use NXCL::01::TypeInfo;
 use NXCL::Package;
+use curry;
+
+my $type_info = \%NXCL::01::TypeInfo::Registry;
 
 sub import {
   NXCL::Package->import;
-  goto &Exporter::import;
-}
-
-our %Type_Info;
-
-our @EXPORT = qw(wrap method static export _make);
-
-sub _make {
   my $targ = caller;
-  die unless my $type = $Type_Info{$targ}{type};
-  require NXCL::01::Utils;
-  NXCL::01::Utils::mkv($type, @_);
+  my ($name) = $targ = m/^NXCL::01::(\w+)T$/
+    or die "Couldn't extract type name from target package ${targ}";
+  die "Double import of ".__PACKAGE__." into ${targ}" if $type_info->{$name};
+  my $info = $type_info->{$name}
+    = NXCL::01::TypeInfo->new(package => $targ, name => $name);
+  no strict 'refs';
+  *{"${targ}::_make"} = $info->curry::make;
+  *{"${targ}::export"} = $info->curry::add_export;
+  *{"${targ}::method"} = $info->curry::add_method;
+  *{"${targ}::static"} = $info->curry::add_static;
+  *{"${targ}::wrap"} = $info->curry::mark_wrapped;
 }
-
-sub export ($name, $code) {
-  my $targ = caller;
-  $Type_Info{$targ}{exports}{$name} = [ $code ];
-}
-
-sub method ($name, $code) {
-  my $targ = caller;
-  $Type_Info{$targ}{methods}{$name} = [ $code ];
-}
-
-sub static ($name, $code) {
-  my $targ = caller;
-  $Type_Info{$targ}{statics}{$name} = [ $code ];
-}
-
-sub wrap ($info) { $info->[1]{wrap} = 1 }
 
 1;

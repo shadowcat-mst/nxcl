@@ -2,7 +2,7 @@ package NXCL::01::OpDictT;
 
 use NXCL::01::Utils qw(panic raw uncons);
 use NXCL::01::ReprTypes qw(DictR);
-use NXCL::01::TypeExporter;
+use NXCL::01::TypePackage;
 
 export make => sub ($hash) { _make DictR ,=> $hash };
 

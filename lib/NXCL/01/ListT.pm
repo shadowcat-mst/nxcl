@@ -4,7 +4,7 @@ use NXCL::01::Utils qw(
   uncons flatten rconsp panic
 );
 use NXCL::01::ReprTypes qw(ConsR NilR);
-use NXCL::01::TypeExporter;
+use NXCL::01::TypePackage;
 
 export make => sub (@members) { cons(@members, _make(NilR)) };
 
