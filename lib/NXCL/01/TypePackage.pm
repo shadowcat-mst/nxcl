@@ -4,7 +4,7 @@ use NXCL::01::TypeInfo;
 use NXCL::Package;
 use curry;
 
-my $type_info = \%NXCL::01::TypeInfo::Registry;
+my $type_info = NXCL::01::TypeInfo->registry;
 
 sub import {
   NXCL::Package->import;

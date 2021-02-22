@@ -1,10 +1,10 @@
 package NXCL::01::TypeFunctions;
 
+use NXCL::01::TypeInfo;
 use Sub::Defer qw(defer_sub);
-use Import::Into;
 use NXCL::Package;
 
-my $type_info = \%NXCL::01::TypeInfo::Registry;
+my $type_info = NXCL::01::TypeInfo->registry;
 
 sub import ($class, @args) {
   my $targ = caller;

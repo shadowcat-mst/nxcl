@@ -6,6 +6,8 @@ use NXCL::01::ReprTypes qw(ValR);
 
 our %Registry;
 
+sub registry { \%Registry }
+
 ro 'package';
 
 ro 'name';
