@@ -3,10 +3,8 @@ package NXCL::01::TypeInfo;
 use NXCL::Class;
 use NXCL::01::Utils qw(mkv);
 use NXCL::01::ReprTypes qw(ValR);
-
-our %Registry;
-
-sub registry { \%Registry }
+use NXCL::01::TypeFunctions qw(make_OpDict make_ApMeth make_Native);
+use curry;
 
 ro 'package';
 
@@ -15,7 +13,7 @@ ro 'name';
 lazy exports => sub { {} };
 
 sub add_export ($self, $name, $code) {
-  $self->exports->{"${$name}_${\$self->name}"} = $code;
+  $self->exports->{"${name}_${\$self->name}"} = $code;
 }
 
 lazy methods => sub { {} };
@@ -41,7 +39,7 @@ sub make ($self, @v) { mkv($self->inst_mset, @v) }
 lazy type => sub ($self) { mkv($self->type_mset, ValR ,=> $self->inst_mset) };
 
 sub _mset_of ($self, $proto) {
-  my %real;
+  my %mset;
   foreach my $name (keys %$proto) {
     my $info = $proto->{$name};
     my $orig_code = $info->[0];
@@ -50,15 +48,18 @@ sub _mset_of ($self, $proto) {
       $orig_code->($scope, $cmb, uncons($args)), $kstack;
     };
     my $native = make_Native($code);
-    $real{$name} = $info->[1]{wrap}
+    $mset{$name} = $info->[1]{wrap}
       ? make_ApMeth($native)
       : $native;
   }
-  return make_OpDict(\%real);
+  return make_OpDict(\%mset);
 }
 
 sub export_for ($self, $name) {
   my $my_name = $self->name;
+  if ($name eq $my_name) {
+    return $self->curry::type;
+  }
   if ($name eq "${my_name}_Inst") {
     my $inst_mset = $self->inst_mset;
     return sub () { $inst_mset };

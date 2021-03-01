@@ -4,10 +4,15 @@ use NXCL::Package;
 use NXCL::01::Utils qw(panic flatten);
 use NXCL::01::MethodUtils;
 use vars qw(@BASE_TYPES);
-use NXCL::01::Types
-  @BASE_TYPES = qw(
+use NXCL::01::TypeFunctions
+  (@BASE_TYPES = qw(
     Apv Bool Combine Curry Int List Name Native
     OpDict Scope String Val
+  )),
+  qw(
+    Name_Inst String_Inst Int_Inst
+    make_Apv make_Val make_OpDict make_List make_Native make_Curry
+    make_String cons_List make_Scope
   );
 
 our %N =
@@ -18,7 +23,7 @@ $_ = make_Apv($_) for $N{dot_curried};
 
 our $Store = make_OpDict +{
   dot => make_Val($N{dot}),
-  map +($_ => make_Val(type_object($_))),
+  map +($_ => make_Val(__PACKAGE__->can($_)->())),
     @BASE_TYPES
 };
 
@@ -58,8 +63,8 @@ sub dot_curried_invoke ($scope, $, $argsp, $kstack) {
 
 sub fdot ($scope, $, $args, $kstack) {
   my ($callp, $obj) = flatten $args;
-  my $ctype = type($callp);
-  if ($ctype == NameT) {
+  my $ctype = mset($callp);
+  if ($ctype == Name_Inst) {
     my $method = make_String raw($callp);
 
     if ($obj) {
@@ -72,7 +77,7 @@ sub fdot ($scope, $, $args, $kstack) {
     );
   }
 
-  panic unless $ctype == StringT or $ctype == IntT;
+  panic unless $ctype == String_Inst or $ctype == Int_Inst;
 
   if ($obj) {
     return (
@@ -91,7 +96,7 @@ sub dot ($scope, $cmb, $args, $kstack) {
   my @args = flatten $args;
   panic unless @args == 1 or @args == 2;
   my $rtype = type($args[-1]);
-  if ($rtype == NameT or $rtype == IntT or $rtype == StringT) {
+  if ($rtype == Name_Inst or $rtype == Int_Inst or $rtype == String_Inst) {
 
     unless (@args == 2) {
       return fdot($scope, undef, $args, $kstack);

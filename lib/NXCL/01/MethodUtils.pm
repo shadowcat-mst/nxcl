@@ -17,10 +17,10 @@ sub call_method ($scope, $self, $methodp, $args, $kstack) {
   );
   my $mset = mset($self);
   if (mset($mset) == OpDict_Inst) {
-    panic "No handler for ${method_name} on ".mset($type)
+    panic "No handler for ${method_name} on ".$mset
       ." (OpDict Type has methods: "
-      .(join(', ', sort keys %{raw($type)})||'(none)').")"
-      unless my $handler = raw($type)->{$method_name};
+      .(join(', ', sort keys %{raw($mset)})||'(none)').")"
+      unless my $handler = raw($mset)->{$method_name};
     if (mset($handler) == Native_Inst) {
       return raw($handler)->($scope, $handler, $args, $kstack);
     }
@@ -30,7 +30,7 @@ sub call_method ($scope, $self, $methodp, $args, $kstack) {
     );
   }
   return (
-    [ CMB9 => $scope, $type, make_List($method_String) ],
+    [ CMB9 => $scope, $mset, make_List($method_String) ],
     [ CMB6 => $scope, $args ],
     $kstack
   );
@@ -44,14 +44,14 @@ sub lookup_method ($scope, $self, $methodp, $kstack) {
   );
   my $mset = mset($self);
   if (mset($mset) == OpDict_Inst) {
-    panic unless my $handler = raw($type)->{$method_name};
+    panic unless my $handler = raw($mset)->{$method_name};
     return (
       [ JUST => make_Curry($handler, make_List($self)) ],
       $kstack
     );
   }
   return (
-    [ CMB9 => $scope, $type, make_List($method_String) ],
+    [ CMB9 => $scope, $mset, make_List($method_String) ],
     [ CMB9 => $scope => make_Native(sub ($scope, $cmb, $args, $kstack) {
         make_Curry((uncons($args))[0], make_List($self))
     }) ],
