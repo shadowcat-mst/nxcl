@@ -4,13 +4,12 @@ use NXCL::01::TypeInfo;
 use NXCL::Package;
 use curry;
 
-my $type_info = \%NXCL::01::TypeRegistry::Registry;
-
 sub import {
   NXCL::Package->import;
   my $targ = caller;
   my ($name) = $targ =~ m/^NXCL::01::(\w+)T$/
     or die "Couldn't extract type name from target package ${targ}";
+  my $type_info = \%NXCL::01::TypeRegistry::Registry;
   die "Double import of ".__PACKAGE__." into ${targ}" if $type_info->{$name};
   my $info = $type_info->{$name}
     = NXCL::01::TypeInfo->new(package => $targ, name => $name);
