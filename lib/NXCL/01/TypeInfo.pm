@@ -3,6 +3,7 @@ package NXCL::01::TypeInfo;
 use NXCL::Class;
 use NXCL::01::Utils qw(mkv);
 use NXCL::01::ReprTypes qw(ValR);
+use Sub::Util qw(set_subname);
 use NXCL::01::TypeFunctions qw(make_OpDict make_ApMeth make_Native);
 use curry;
 
@@ -30,15 +31,15 @@ sub add_static ($self, $name, $code) {
 
 sub mark_wrapped ($self, $info) { $info->[1]{wrap} = 1; $info }
 
-lazy inst_mset => sub ($self) { $self->_mset_of($self->methods) };
+lazy inst_mset => sub ($self) { $self->_mset_of(Inst => $self->methods) };
 
-lazy type_mset => sub ($self) { $self->_mset_of($self->statics) };
+lazy type_mset => sub ($self) { $self->_mset_of(Type => $self->statics) };
 
 sub make ($self, @v) { mkv($self->inst_mset, @v) }
 
 lazy type => sub ($self) { mkv($self->type_mset, ValR ,=> $self->inst_mset) };
 
-sub _mset_of ($self, $proto) {
+sub _mset_of ($self, $mset_type, $proto) {
   my %mset;
   foreach my $name (keys %$proto) {
     my $info = $proto->{$name};
@@ -47,12 +48,15 @@ sub _mset_of ($self, $proto) {
       # should test type of first of $args
       $orig_code->($scope, $cmb, uncons($args)), $kstack;
     };
-    my $native = make_Native($code);
+    my $subname = join('::', $self->package, "${mset_type}_${name}");
+    my $native = make_Native(set_subname $subname => $code);
     $mset{$name} = $info->[1]{wrap}
       ? make_ApMeth($native)
       : $native;
   }
-  return make_OpDict(\%mset);
+  my $mset_v = make_OpDict(\%mset);
+  $NXCL::01::TypeRegistry::Mset{$mset_v} = join('_', $self->name, $mset_type);
+  return $mset_v;
 }
 
 sub export_for ($self, $name) {

@@ -12,7 +12,7 @@ sub import ($class, @args) {
     defer_sub "${targ}::${export}", sub {
       require NXCL::01::TypeRegistry;
       require "NXCL/01/${type_name}T.pm";
-      $NXCL::01::TypeRegistry::Registry{$type_name}->export_for($export)
+      $NXCL::01::TypeRegistry::TypeInfo{$type_name}->export_for($export)
     };
   }
 }
