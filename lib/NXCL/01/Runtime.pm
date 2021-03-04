@@ -62,16 +62,8 @@ sub take_step_DROP ($val, $kstack) {
   return $kstack;
 }
 
-sub take_step_MARK ($, $val, $kstack) {
-  my ($kar, $kdr) = uncons $kstack;
-  return (
-    [ @$kar, $val ],
-    $kdr
-  );
-}
-
 my %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
-  qw(EVAL CMB9 CMB6 ECDR CONS JUMP JUST DROP MARK);
+  qw(EVAL CMB9 CMB6 ECDR CONS JUMP JUST DROP);
 
 sub take_step ($prog, $kstack) {
   my ($op, @v) = @$prog;
