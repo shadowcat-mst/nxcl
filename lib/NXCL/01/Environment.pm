@@ -34,7 +34,11 @@ sub _run ($self, $value, $kstack) {
 sub eval_string ($self, $string) {
   my $parse = $self->reader->from_string($string);
   my $script = $self->expander->expand($parse);
-  $self->_run([ EVAL => $self->scope, $script ], make_List([ 'HOST' ]));
+  $self->eval($script);
+}
+
+sub eval ($self, $value) {
+  $self->_run([ EVAL => $self->scope, $value ], make_List([ 'HOST' ]));
 }
 
 sub resume ($self, $value, $kstack) {

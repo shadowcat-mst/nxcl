@@ -1,7 +1,7 @@
 package NXCL::01::TypeInfo;
 
 use NXCL::Class;
-use NXCL::01::Utils qw(mkv);
+use NXCL::01::Utils qw(mkv uncons);
 use NXCL::01::ReprTypes qw(ValR);
 use Sub::Util qw(set_subname);
 use NXCL::01::TypeFunctions qw(make_OpDict make_ApMeth make_Native);
@@ -54,6 +54,13 @@ sub _mset_of ($self, $mset_type, $proto) {
       ? make_ApMeth($native)
       : $native;
   }
+  $mset{evaluate} ||= do {
+    state $id = make_Native(
+      set_subname identity => sub ($scope, $cmb, $args, $kstack) {
+        return ([ JUST => (uncons $args)[0] ], $kstack);
+      }
+    );
+  };
   my $mset_v = make_OpDict(\%mset);
   $NXCL::01::TypeRegistry::Mset{$mset_v} = join('_', $self->name, $mset_type);
   return $mset_v;
