@@ -3,13 +3,13 @@ package NXCL::01::Utils;
 use NXCL::Exporter;
 use Carp qw(croak);
 use Sub::Util qw(set_subname);
-use NXCL::01::ReprTypes qw(ConsR);
+use NXCL::01::ReprTypes;
 
 our @EXPORT_OK = qw(
   panic
   mkv
   mset rtype
-  rconsp rnilp rcharsp rnativep rvalp rvarp
+  rboolp rcharsp rbytesp rnilp rintp rvalp rvarp rconsp rdictp rnativep
   raw uncons flatten
 );
 
@@ -23,13 +23,16 @@ sub mset ($v) { $v->[0] }
 
 sub rtype ($v) { $v->[1][0] }
 
-sub rconsp ($v) { rtype($v) eq 'cons' }
-sub rnilp ($v) { rtype($v) eq 'nil' }
-sub rcharsp ($v) { rtype($v) eq 'chars' }
-sub rboolp ($v) { rtype($v) eq 'bool' }
-sub rnativep ($v) { rtype($v) eq 'native' }
-sub rvalp ($v) { rtype($v) eq 'val' }
-sub rvarp ($v) { rtype($v) eq 'var' }
+sub rboolp ($v) { rtype($v) eq BoolR }
+sub rcharsp ($v) { rtype($v) eq CharsR }
+sub rbytesp ($v) { rtype($v) eq BytesR }
+sub rnilp ($v) { rtype($v) eq NilR }
+sub rintp ($v) { rtype($v) eq IntR }
+sub rvalp ($v) { rtype($v) eq ValR }
+sub rvarp ($v) { rtype($v) eq VarR }
+sub rconsp ($v) { rtype($v) eq ConsR }
+sub rdictp ($v) { rtype($v) eq DictR }
+sub rnativep ($v) { rtype($v) eq NativeR }
 
 sub raw ($v) { $v->[1][1] }
 

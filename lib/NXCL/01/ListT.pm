@@ -1,7 +1,7 @@
 package NXCL::01::ListT;
 
 use NXCL::01::Utils qw(
-  uncons flatten rconsp panic
+  uncons flatten rconsp rnilp panic rtype
 );
 use NXCL::01::ReprTypes qw(ConsR NilR);
 use NXCL::01::TypePackage;
