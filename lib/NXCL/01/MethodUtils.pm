@@ -18,7 +18,7 @@ sub call_method ($scope, $self, $methodp, $args, $kstack) {
   my $mset = mset($self);
   if (mset($mset) == OpDict_Inst) {
     panic "No handler for ${method_name} on ".$mset
-      ." (OpDict Type has methods: "
+      ." (mset has methods: "
       .(join(', ', sort keys %{raw($mset)})||'(none)').")"
       unless my $handler = raw($mset)->{$method_name};
     if (mset($handler) == Native_Inst) {
@@ -44,7 +44,10 @@ sub lookup_method ($scope, $self, $methodp, $kstack) {
   );
   my $mset = mset($self);
   if (mset($mset) == OpDict_Inst) {
-    panic unless my $handler = raw($mset)->{$method_name};
+    panic "No handler for ${method_name} on ".$mset
+      ." (mset has methods: "
+      .(join(', ', sort keys %{raw($mset)})||'(none)').")"
+      unless my $handler = raw($mset)->{$method_name};
     return (
       [ JUST => make_Curry($handler, make_List($self)) ],
       $kstack
