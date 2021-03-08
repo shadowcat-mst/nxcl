@@ -1,7 +1,7 @@
 package NXCL::01::BaseScope;
 
 use NXCL::Package;
-use NXCL::01::Utils qw(panic flatten);
+use NXCL::01::Utils qw(panic flatten mset raw);
 use NXCL::01::MethodUtils;
 use vars qw(@BASE_TYPES);
 use NXCL::01::TypeFunctions
@@ -95,8 +95,8 @@ sub fdot ($scope, $, $args, $kstack) {
 sub dot ($scope, $cmb, $args, $kstack) {
   my @args = flatten $args;
   panic unless @args == 1 or @args == 2;
-  my $rtype = type($args[-1]);
-  if ($rtype == Name_Inst or $rtype == Int_Inst or $rtype == String_Inst) {
+  my $mset = mset($args[-1]);
+  if ($mset == Name_Inst or $mset == Int_Inst or $mset == String_Inst) {
 
     unless (@args == 2) {
       return fdot($scope, undef, $args, $kstack);

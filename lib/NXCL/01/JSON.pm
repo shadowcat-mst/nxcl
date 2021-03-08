@@ -27,7 +27,7 @@ sub repr2json ($t, $r) {
   return $r if $t == CharsR or $t == BytesR or $t == IntR;
   return nxcl2json($r) if $t == ValR or $t == VarR;
   return +{ map +($_ => nxcl2json($r->{$_})), sort keys %$r } if $t == DictR;
-  return subname($r) if $t == NativeR;
+  return subname(\&$r) if $t == NativeR;
   die "Unserializable repr type $t";
 }
 

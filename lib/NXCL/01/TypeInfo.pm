@@ -3,8 +3,9 @@ package NXCL::01::TypeInfo;
 use NXCL::Class;
 use NXCL::01::Utils qw(mkv uncons);
 use NXCL::01::ReprTypes qw(ValR);
-use Sub::Util qw(set_subname);
+use Sub::Util qw(subname set_subname);
 use NXCL::01::TypeFunctions qw(make_OpDict make_ApMeth make_Native);
+use NXCL::01::TypeMethod;
 use curry;
 
 ro 'package';
@@ -43,13 +44,10 @@ sub _mset_of ($self, $mset_type, $proto) {
   my %mset;
   foreach my $name (keys %$proto) {
     my $info = $proto->{$name};
-    my $orig_code = $info->[0];
-    my $code = sub ($scope, $cmb, $args, $kstack) {
-      # should test type of first of $args
-      $orig_code->($scope, $cmb, uncons($args)), $kstack;
-    };
-    my $subname = join('::', $self->package, "${mset_type}_${name}");
-    my $native = make_Native(set_subname $subname => $code);
+    set_subname
+      +(subname($info->[0]) =~ s/::__ANON__$/::Inst_${name}/r),
+      $info->[0];
+    my $native = make_Native(NXCL::01::TypeMethod->new(code => $info->[0]));
     $mset{$name} = $info->[1]{wrap}
       ? make_ApMeth($native)
       : $native;
