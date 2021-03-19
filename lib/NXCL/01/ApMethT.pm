@@ -12,7 +12,7 @@ method combine => sub ($scope, $cmb, $self, $args) {
   return (
     [ EVAL => $scope => $method_args ],
     [ CONS => $inv ],
-    [ CMB9 => $scope => $self ],
+    [ CMB9 => $scope => raw($self) ],
   );
 };
 

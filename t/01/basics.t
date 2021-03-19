@@ -1,9 +1,9 @@
 use NXCL::Test;
+use NXCL::01::Utils qw(uncons raw);
 use NXCL::01::Environment;
 use NXCL::01::TypeFunctions qw(
   make_Int make_String make_Native make_Combine make_List make_Name
 );
-use NXCL::01::Utils qw(uncons raw);
 use NXCL::01::JSON;
 use JSON::Dumper::Compact qw(jdc);
 
@@ -34,6 +34,20 @@ foreach my $expect_ident (
   my ($ret) = $env->eval(make_Combine($func, make_List(make_Int 2)));
 
   isv($ret, make_Int(3));
+}
+
+{
+  my $seven = make_Int(7);
+  my ($ret) = $env->eval(
+    make_Combine(
+      make_Combine(
+        make_Name( 'dot' ),
+        make_List( $seven, make_Name('minus') ),
+      ),
+      make_List( make_Int(3) )
+    )
+  );
+  isv($ret, make_Int(4));
 }
 
 done_testing;
