@@ -4,6 +4,7 @@ use NXCL::Exporter;
 use NXCL::01::Utils qw(mset uncons raw);
 use NXCL::01::MethodUtils;
 use NXCL::01::TypeFunctions qw(Native_Inst make_List cons_List);
+use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 
 our @EXPORT_OK = qw(run_til_done);
 
@@ -62,10 +63,11 @@ sub take_step_DROP ($val, $kstack) {
   return $kstack;
 }
 
-my %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
+our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
   qw(EVAL CMB9 CMB6 ECDR CONS JUMP JUST DROP);
 
 sub take_step ($prog, $kstack) {
+  DEBUG and DEBUG_WARN($prog, $kstack);
   my ($op, @v) = @$prog;
   if (my $step_func = $step_func{$op}) {
     return $step_func->(@v, $kstack);

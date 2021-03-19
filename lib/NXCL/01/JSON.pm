@@ -13,7 +13,7 @@ sub json2nxcl { die "NYI" }
 
 sub nxcl2json ($v) {
   my $mset = mset($v);
-  die "Anonymous msets NYI" unless my $mset_name = $Mset{$mset};
+  my $mset_name = $Mset{$mset} || 'ANON_'.$mset;
   my $rtype = rtype($v);
   return [ $mset_name, [ 'nil' ] ] if $rtype == NilR;
   return [ $mset_name, [ cons => map nxcl2json($_), uncons($v) ] ]
