@@ -1,7 +1,9 @@
 package NXCL::01::RunTrace;
 
 use NXCL::Package;
-use JSON::Dumper::Compact qw(jdc);
+use JSON::Dumper::Compact;
+
+our $jdc = JSON::Dumper::Compact->new; # (max_width => 160);
 
 our $Count = 0;
 our $Max;
@@ -29,7 +31,7 @@ sub NXCL::01::Runtime::DEBUG_WARN ($prog, $kstack) {
   #  ($prog, $kstack) = uncons($kstack);
   #}
   #warn jdc(\@state);
-  warn jdc($state[0]);
+  warn $jdc->dump($state[0]);
   if (defined $Max) {
     $Count++;
     exit if $Count >= $Max;
