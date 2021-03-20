@@ -36,18 +36,13 @@ foreach my $expect_ident (
   isv($ret, make_Int(3));
 }
 
+use NXCL::01::ValueBuilders;
+
 {
-  my $seven = make_Int(7);
   my ($ret) = $env->eval(
-    make_Combine(
-      make_Combine(
-        make_Name( 'dot' ),
-        make_List( $seven, make_Name('minus') ),
-      ),
-      make_List( make_Int(3) )
-    )
+    Cmb( Cmb( N"dot", I(7), N"minus" ), I(3) )
   );
-  isv($ret, make_Int(4));
+  isv($ret, I(4));
 }
 
 done_testing;
