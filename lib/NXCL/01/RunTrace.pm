@@ -16,7 +16,7 @@ use NXCL::01::JSON;
 
 sub jsonify ($v) {
   if (mset($v) == Scope_Inst) {
-    return [ Scope => 0+raw($v) ];
+    return [ Scope => sprintf("%x", 0+raw($v)) ];
   }
   return nxcl2json($v);
 }
