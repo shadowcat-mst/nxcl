@@ -3,7 +3,7 @@ package NXCL::01::TypeRegistry;
 use Scalar::Util qw(weaken);
 use NXCL::Exporter;
 
-our @EXPORT = qw(%TypeInfo %Mset);
+our @EXPORT = qw(%TypeInfo %Mset mset_name);
 
 our %TypeInfo;
 our %Mset;
@@ -31,5 +31,7 @@ unless (our $Loading) {
 
   weaken($_->[0]) for values %{$native_info->inst_mset->[1][1]};
 }
+
+sub mset_name ($mset) { $Mset{$mset}||'ANON_'.$mset }
 
 1;

@@ -6,6 +6,7 @@ use NXCL::01::TypeFunctions qw(
   OpDict_Inst Native_Inst
   make_List make_String make_Curry make_Native
 );
+use NXCL::01::TypeRegistry;
 
 our @EXPORT = qw(call_method lookup_method);
 
@@ -17,7 +18,7 @@ sub call_method ($scope, $self, $methodp, $args, $kstack) {
   );
   my $mset = mset($self);
   if (mset($mset) == OpDict_Inst) {
-    panic "No handler for ${method_name} on ".$mset
+    panic "No handler for ${method_name} on ".mset_name($mset)
       ." (mset has methods: "
       .(join(', ', sort keys %{raw($mset)})||'(none)').")"
       unless my $handler = raw($mset)->{$method_name};
@@ -44,7 +45,7 @@ sub lookup_method ($scope, $self, $methodp, $kstack) {
   );
   my $mset = mset($self);
   if (mset($mset) == OpDict_Inst) {
-    panic "No handler for ${method_name} on ".$mset
+    panic "No handler for ${method_name} on ".mset_name($mset)
       ." (mset has methods: "
       .(join(', ', sort keys %{raw($mset)})||'(none)').")"
       unless my $handler = raw($mset)->{$method_name};

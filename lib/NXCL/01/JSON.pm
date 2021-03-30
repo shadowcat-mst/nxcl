@@ -2,7 +2,7 @@ package NXCL::01::JSON;
 
 use JSON::PP ();
 use NXCL::01::Utils qw(mset rtype raw uncons);
-use NXCL::01::TypeRegistry qw(%Mset);
+use NXCL::01::TypeRegistry;
 use NXCL::01::ReprTypes;
 use Sub::Util qw(subname);
 use NXCL::Exporter;
@@ -12,8 +12,8 @@ our @EXPORT = qw(nxcl2json json2nxcl);
 sub json2nxcl { die "NYI" }
 
 sub nxcl2json ($v) {
-  my $mset = mset($v);
-  my $mset_name = $Mset{$mset} || 'ANON_'.$mset;
+  return undef unless defined $v;
+  my $mset_name = mset_name mset $v;
   my $rtype = rtype($v);
   return [ $mset_name, [ 'nil' ] ] if $rtype == NilR;
   return [ $mset_name, [ cons => map nxcl2json($_), uncons($v) ] ]
