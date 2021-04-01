@@ -9,7 +9,7 @@ export make => sub ($opv) { _make ValR ,=> $opv };
 method combine => sub ($scope, $cmb, $self, $args) {
   return (
     [ EVAL => $scope => $args ],
-    [ CMB6 => $scope => raw($self) ],
+    [ CMB9 => $scope => raw($self) ],
   );
 };
 
