@@ -1,7 +1,7 @@
 package NXCL::01::BaseScope;
 
 use NXCL::Package;
-use NXCL::01::Utils qw(panic flatten mset raw);
+use NXCL::01::Utils qw(panic flatten mset raw uncons);
 use NXCL::01::MethodUtils;
 use vars qw(@BASE_TYPES);
 use NXCL::01::TypeFunctions
@@ -46,18 +46,9 @@ sub dot_curryable ($scope, $, $args, $kstack) {
   );
 }
 
-sub dot_curried ($scope, $, $args, $kstack) {
-  return (
-    [ JUST => make_Curry($N{dot_curried_invoke}, make_List($args)) ],
-    $kstack
-  );
-}
-
-sub dot_curried_invoke ($scope, $, $argsp, $kstack) {
-  my ($curry, $call_args) = uncons $argsp;
-  my ($method, $curried_args) = uncons $curry;
-  my ($obj, $extra_args) = uncons $call_args;
-  my $args = cons_List(flatten($curried_args), $extra_args);
+sub dot_curried ($scope, $, $argsp, $kstack) {
+  my ($method, $args) = uncons $argsp;
+  my ($obj) = uncons $args;
   call_method($scope, $obj, $method, $args, $kstack);
 }
 
@@ -72,7 +63,7 @@ sub fdot ($scope, $, $args, $kstack) {
     }
 
     return (
-      [ JUST => make_Curry($N{dot_curryable}, $method) ],
+      [ JUST => make_Curry($N{dot_curryable}, make_List $method) ],
       $kstack
     );
   }
