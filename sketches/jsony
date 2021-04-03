@@ -1,0 +1,41 @@
+#{{{
+  my $seven = make_Int(7);
+  my ($ret) = $env->eval(
+    make_Combine(
+      make_Combine(
+        make_Name( 'dot' ),
+        make_List( $seven, make_Name('minus') ),
+      ),
+      make_List( make_Int(3) )
+    )
+  );
+  isv($ret, make_Int(4));
+}
+}}}#
+
+[ Combine_Inst [ cons [
+  [ Combine_inst [ cons [
+    [ Name_Inst [ chars dot ] ]
+    [ List_Inst [ cons [
+      [ Int_Inst [ int 7 ] ]
+      [ List_Inst [ cons [
+        [ Name_Inst [ chars minus ] ]
+        [ List_Inst [ nil ] ]
+      ] ] ]
+    ] ] ]
+  ] ] ]
+] ] ]
+
+[ [ dot 7 minus ] 3 ]
+
+Combine(
+  Combine(Name('dot'),Int(7),Name('minus')),
+  Int(3)
+)
+
+Cmb(
+  Cmb(N'dot',7,N'minus'),
+  3
+)'
+
+
