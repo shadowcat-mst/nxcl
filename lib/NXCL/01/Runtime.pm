@@ -44,11 +44,7 @@ sub take_step_CONS ($car, $cdr, $kstack) {
 }
 
 sub take_step_JUMP ($to, $arg, $kstack) {
-  my ($kar, $kdr) = uncons $to;
-  return (
-    (defined($arg) ? [ @$kar, $arg ] : $kar),
-    $kdr
-  );
+  raw($arg) ? $to : $kstack;
 }
 
 sub take_step_JUST ($val, $kstack) {
