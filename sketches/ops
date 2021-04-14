@@ -1,0 +1,28 @@
+  x + y
+
+  .plus() x y
+
+  foo 1 + bar 2
+
+  .plus() [foo 1] [bar 2]
+
+
+  x => { ... }
+
+  Fun.make x { ... }
+
+  foo x + y
+
+  .plus() [ foo x ] y
+
+  foo x => { ... }
+
+  foo [ Fun.make x { ... } ]
+
+  foo [ [ dot Fun make ] x { ... } ]
+
+  x.y(z)
+
+  [ dot x y ] z
+
+  
