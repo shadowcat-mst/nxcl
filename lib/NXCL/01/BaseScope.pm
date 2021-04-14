@@ -7,7 +7,7 @@ use vars qw(@BASE_TYPES);
 use NXCL::01::TypeFunctions
   (@BASE_TYPES = qw(
     Apv Bool Combine Curry Int List Name Native
-    OpDict Scope String Val
+    OpDict Scope String Val Compound
   )),
   qw(
     Name_Inst String_Inst Int_Inst

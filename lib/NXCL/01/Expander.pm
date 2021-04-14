@@ -1,6 +1,5 @@
 package NXCL::01::Expander;
 
-use List::Util qw(reduce);
 use NXCL::Class;
 
 ro 'makers';
@@ -32,12 +31,7 @@ sub expand_string ($self, $v) {
 
 sub expand_compound ($self, $v) {
   return $self->expand($v->[0]) unless @$v > 1;
-  my ($firstp, @restp) = @$v;
-  die "Nope" if $firstp->[0] eq 'list';
-  reduce { $self->make(Combine => $a, $b) }
-    $self->expand($firstp),
-    map $self->expand($_->[0] eq 'list' ? $_ : [ list => [ $_ ] ]),
-      @restp;
+  $self->make(Compound => map $self->expand($_), @$v;
 }
 
 sub expand_list ($self, $v) {

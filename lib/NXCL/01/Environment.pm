@@ -5,7 +5,7 @@ use NXCL::01::Runtime qw(run_til_done);
 use vars qw(@EXPAND_TYPES);
 use NXCL::01::TypeFunctions
   map "make_${_}", @EXPAND_TYPES = qw(
-    Name Int String Combine List BlockProto Call
+    Name Int String Combine List BlockProto Call Compound
   );
 
 lazy scope => sub {

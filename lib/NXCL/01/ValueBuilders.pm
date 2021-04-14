@@ -3,6 +3,7 @@ package NXCL::01::ValueBuilders;
 use NXCL::Exporter;
 use NXCL::01::TypeFunctions qw(
   make_Combine
+  make_Compound
   make_Name
   make_Int
   make_List
@@ -18,6 +19,8 @@ our @EXPORT = qw(
 );
 
 sub Cmb ($c, @args) { make_Combine($c, make_List(@args)) }
+
+sub Cmp (@args) { make_Compound(@args) }
 
 sub N :prototype($) ($v) { make_Name($v) }
 
