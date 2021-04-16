@@ -55,4 +55,10 @@ wv(
   'x.y(3).z(27) => [ [ . [ [ . x y ] 3 ] z ] 27 ]',
 );
 
+wv(
+  Cmb(N 'x', N '.', Cmp(N 'y', L(I 3)), N '.', Cmp(N 'z', L(I 27))),
+  Cmb(Cmb(N '.', $xy3, N 'z'), I 27),
+  'x . y(3) . z(27) => [ [ . [ [ . x y ] 3 ] z ] 27 ]',
+);
+
 done_testing;
