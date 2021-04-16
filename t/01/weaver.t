@@ -37,4 +37,10 @@ wv(
   'x.y => [ . x y ]',
 );
 
+wv(
+  Cmb(N 'x', N '.', Cmp(N 'y', I 3)),
+  Cmb(Cmb(N '.', N 'x', N 'y'), I 3),
+  'x.y(3) => [ [ . x y ] 3 ]',
+);
+
 done_testing;
