@@ -39,7 +39,7 @@ wv(
 
 wv(
   Cmp(N 'x', N '.', N 'y', L(I 3)),
-  Cmb(Cmb(N '.', N 'x', N 'y'), I 3),
+  my $xy3 = Cmb(Cmb(N '.', N 'x', N 'y'), I 3),
   'x.y(3) => [ [ . x y ] 3 ]',
 );
 
@@ -47,6 +47,12 @@ wv(
   Cmb(N 'x', N '.', Cmp(N 'y', I 3)),
   Cmb(Cmb(N '.', N 'x', N 'y'), I 3),
   'x . y(3) => [ [ . x y ] 3 ]',
+);
+
+wv(
+  Cmp(N 'x', N '.', N 'y', L(I 3), N '.', N 'z', L(I 27)),
+  Cmb(Cmb(N '.', $xy3, N 'z'), I 27),
+  'x.y(3).z(27) => [ [ . [ [ . x y ] 3 ] z ] 27 ]',
 );
 
 done_testing;
