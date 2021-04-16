@@ -31,4 +31,10 @@ wv(
   'Combine 3 + 4 == 7 => [ = [ + 3 4 ] 7 ]',
 );
 
+wv(
+  Cmp(N 'x', N '.', N 'y'),
+  Cmb(N '.', N 'x', N 'y'),
+  'x.y => [ . x y ]',
+);
+
 done_testing;
