@@ -1,12 +1,10 @@
 use NXCL::Test;
 use NXCL::01::Utils qw(uncons raw);
 use NXCL::01::Environment;
-use NXCL::01::TypeFunctions qw(
-  make_Int make_String make_Native make_Combine make_List make_Name
-  make_Curry
-);
 use NXCL::01::JSON;
+use NXCL::01::TypeFunctions qw(make_Native);
 use JSON::Dumper::Compact jdc => { max_width => 76 };
+use NXCL::01::ValueBuilders;
 
 my $env = NXCL::01::Environment->new;
 
@@ -27,10 +25,8 @@ sub isv ($code, $val, $msg = undef) {
 }
 
 my $func = make_Native(sub ($scope, $cmb, $args, $kstack) {
-  return ([ JUST => make_Int(raw((uncons($args))[0])+1) ], $kstack);
+  return ([ JUST => I(raw((uncons($args))[0])+1) ], $kstack);
 });
-
-use NXCL::01::ValueBuilders;
 
 foreach my $ident (
   S"foo",
