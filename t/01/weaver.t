@@ -16,16 +16,19 @@ sub wv ($code, $val, $msg = undef) {
 wv(
   Cmb(I 3, N '+', I 4),
   Cmb(N '+', I 3, I 4),
+  'Combine 3 + 4 => [ + 3 4 ]',
 );
 
 wv(
   Cmp(I 3, N '+', I 4),
   Cmb(N '+', I 3, I 4),
+  'Compound 3+4 => [ + 3 4 ]',
 );
 
 wv(
   Cmb(I 3, N '+', I 4, N '--', I 7),
   Cmb(N '==', Cmb(N '+', I 3, I 4), I 7),
+  'Combine 3 + 4 == 7 => [ = [ + 3 4 ] 7 ]',
 );
 
 done_testing;
