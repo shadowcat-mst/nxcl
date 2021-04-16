@@ -12,6 +12,7 @@ use NXCL::01::TypeFunctions qw(
 
 our @EXPORT = qw(
   Cmb
+  Cmp
   N
   I
   L
