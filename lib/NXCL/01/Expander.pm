@@ -31,7 +31,7 @@ sub expand_string ($self, $v) {
 
 sub expand_compound ($self, $v) {
   return $self->expand($v->[0]) unless @$v > 1;
-  $self->make(Compound => map $self->expand($_), @$v;
+  $self->make(Compound => map $self->expand($_)), @$v;
 }
 
 sub expand_list ($self, $v) {
