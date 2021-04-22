@@ -10,10 +10,10 @@ export make => sub ($call, $first, @rest) {
 };
 
 method evaluate => sub ($scope, $cmb, $self, $args) {
-  my ($first, $second, @rest) = flatten $self;
+  my ($first, @rest) = flatten $self;
   return (
-    [ CMB9 => $first, $second ],
-    map [ CMB6 => (mset($_) == List_Inst ? $_ : make_List($_)) ], @rest
+    [ EVAL => $scope, $first ],
+    map [ CMB6 => $scope, (mset($_) == List_Inst ? $_ : make_List($_)) ], @rest
   );
 };
 
