@@ -17,7 +17,7 @@ method evaluate => sub ($scope, $cmb, $self, $args) {
   my $store_mset = mset($store);
   if ($store_mset == OpDict_Inst) {
     my $cell = raw($store)->{raw($self)};
-    panic unless $cell;
+    panic "No value for ${\raw($self)} in current scope" unless $cell;
     if (mset($cell) == Val_Inst or mset($cell) == Var_Inst) {
       return (
         [ JUST => raw($cell) ],
