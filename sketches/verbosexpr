@@ -1,0 +1,38 @@
+use NXCL::Package;
+
+use NXCL::01::RunTrace;
+use JSON::Dumper::Compact qw(jdc);
+use NXCL::01::Environment;
+use NXCL::01::Weaver;
+use NXCL::01::JSON;
+
+my $env = NXCL::01::Environment->new;
+my $reader = $env->reader;
+my $expander = $env->expander;
+my $weaver = NXCL::01::Weaver->new;
+
+my ($code) = @ARGV;
+
+die "No code supplied" unless $code;
+
+warn "\n## CODE\n\n${code}\n\n";
+
+my $read = $reader->from_string($code);
+
+warn "\n## READ\n\n".jdc($read);
+
+my $expanded = $expander->expand($read);
+
+warn "\n## EXPN\n\n".jdc(nxcl2json($expanded));
+
+my $woven = $weaver->weave($expanded);
+
+warn "\n## WOVE\n\n".jdc(nxcl2json($woven));
+
+warn "\n## EVAL\n\n";
+
+my ($ret) = $env->eval($woven);
+
+print jdc(nxcl2json($ret));
+
+1;
