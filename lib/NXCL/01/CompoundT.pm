@@ -5,7 +5,7 @@ use NXCL::01::TypeFunctions qw(List_Inst make_List);
 use NXCL::01::ReprTypes qw(ConsR);
 use NXCL::01::TypePackage;
 
-export make => sub ($call, $first, @rest) {
+export make => sub ($first, @rest) {
   _make ConsR ,=> $first, make_List(@rest);
 };
 
