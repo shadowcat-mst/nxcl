@@ -1,7 +1,12 @@
 use NXCL::Package;
 
 use NXCL::01::RunTrace;
-use JSON::Dumper::Compact qw(jdc);
+use YAML::XS;
+sub jdc ($v) { Dump($v) =~ s/^[- ] (\s*(?:- )*)/' ' x length($1)/mreg }
+BEGIN {
+  no warnings 'redefine';
+  sub JSON::Dumper::Compact::dump { jdc($_[1]) }
+}
 use NXCL::01::Environment;
 use NXCL::01::Weaver;
 use NXCL::01::JSON;
