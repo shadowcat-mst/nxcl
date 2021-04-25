@@ -24,6 +24,7 @@ sub nxcl2json ($v) {
   return [ $type, map nxcl2json($_), uncons($v) ]
     if $rtype == ConsR;
   my $rval = repr2json($rtype, raw($v));
+  return [ join ' ', $type, $rval ] unless ref $rval;
   return [ $type, $rval ];
 }
 

@@ -27,7 +27,7 @@ use NXCL::01::JSON;
 
 sub jsonify ($v) {
   if (mset($v) == Scope_Inst) {
-    return [ Scope => 'SCOPE_'.$scopes{$v} ];
+    return [ "Scope (dict) SCOPE_".$scopes{$v} ];
   }
   return nxcl2json($v);
 }
