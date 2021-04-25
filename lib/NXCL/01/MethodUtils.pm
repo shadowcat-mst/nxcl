@@ -14,7 +14,7 @@ our $ndot = make_Native \&dot;
 
 our %N =
   map +($_ => make_Native(__PACKAGE__->can($_))),
-    qw(dot_lookup dot_curryable dot_curried fdot);
+    qw(dot_lookup dot_curryable dot_curried dot_f);
 
 $_ = make_Apv($_) for $N{dot_curried};
 
@@ -92,7 +92,7 @@ sub dot_curried ($scope, $, $argsp, $kstack) {
   call_method($scope, $obj, $method, $args, $kstack);
 }
 
-sub fdot ($scope, $, $args, $kstack) {
+sub dot_f ($scope, $, $args, $kstack) {
   my ($callp, $obj) = flatten $args;
   my $ctype = mset($callp);
   if ($ctype == Name_Inst) {
@@ -130,19 +130,19 @@ sub dot ($scope, $cmb, $args, $kstack) {
   if ($mset == Name_Inst or $mset == Int_Inst or $mset == String_Inst) {
 
     unless (@args == 2) {
-      return fdot($scope, undef, $args, $kstack);
+      return dot_f($scope, undef, $args, $kstack);
     }
 
     return (
       [ EVAL => $scope => make_List($args[0]) ],
       [ CONS => $args[-1] ],
-      [ CMB9 => $scope => $N{fdot} ],
+      [ CMB9 => $scope => $N{dot_f} ],
       $kstack
     );
   }
   return (
     [ EVAL => $scope, $args ],
-    [ CMB9 => $scope => $N{fdot} ],
+    [ CMB9 => $scope => $N{dot_f} ],
     $kstack
   );
 }
