@@ -60,7 +60,8 @@ sub _mset_of ($self, $mset_type, $proto) {
     );
   };
   my $mset_v = make_OpDict(\%mset);
-  $NXCL::01::TypeRegistry::Mset{$mset_v} = join('_', $self->name, $mset_type);
+  my $mset_name = $self->name.($mset_type eq 'Type' ? 'T' : '');
+  $NXCL::01::TypeRegistry::Mset{$mset_v} = $mset_name;
   return $mset_v;
 }
 

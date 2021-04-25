@@ -24,7 +24,7 @@ unless (our $Loading) {
       $bs->_build_inst_mset;
     };
     @{$bs->{inst_mset}} = @$inst_mset;
-    $Mset{$bs->inst_mset} = join('_', $bs->name, 'Inst');
+    $Mset{$bs->inst_mset} = $bs->name;
   }
 
   weaken($opdict_info->inst_mset->[0]);
