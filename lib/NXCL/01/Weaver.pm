@@ -77,7 +77,7 @@ sub _weave_type_Compound ($self, $v) { $self->_op_weave(\&make_Compound, $v) }
 
 sub _op_weave ($self, $make, $v) {
   my @parts = flatten $v;
-  return $v unless @parts > 2;
+  return $self->_flat_weave($make, $v) unless @parts > 2;
   my %binops = %{$self->binops};
   my @op_cand = map {
     my $p = $parts[$_];
@@ -87,7 +87,7 @@ sub _op_weave ($self, $make, $v) {
       ()
     }
   } 1..$#parts-1;
-  return $v unless @op_cand; # no ops, skip
+  return $self->_flat_weave($make, $v) unless @op_cand; # no ops, skip
   my $op_spec = max_by { $_->[2] } @op_cand;
   my ($op_idx, $op_type) = @$op_spec;
   my @pre = @parts[0..$op_idx-1];
@@ -134,7 +134,8 @@ sub _weave_op_dot ($self, $make, $op, $pre, $post) {
       make_Combine($op, pop(@pre), shift(@post));
     }
   };
-  return $self->weave($make->(@pre, $op, @post));
+  return $dot unless @pre or @post;
+  return $self->weave($make->(@pre, $dot, @post));
 }
 
 1;
