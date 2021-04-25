@@ -19,7 +19,7 @@ our @EXPORT = qw(
   S
 );
 
-sub Cmb ($c, @args) { make_Combine($c, make_List(@args)) }
+sub Cmb (@args) { make_Combine(@args) }
 
 sub Cmp (@args) { make_Compound(@args) }
 

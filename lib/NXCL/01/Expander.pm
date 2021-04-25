@@ -46,10 +46,7 @@ sub expand_call ($self, $v) {
   # handle the [x] case
   if (@$v == 1 and @{$v->[0][1]} == 1) { # guaranteed to be an expr node
     return $self->make(Call => [
-      $self->make(Combine =>
-        $self->expand($v->[0][1][0]),
-        $self->make(List =>),
-      ),
+      $self->make(Combine => $self->expand($v->[0][1][0])),
     ]);
   }
   $self->make(Call => map $self->expand($_), @$v);
@@ -64,7 +61,7 @@ sub expand_expr ($self, $v) {
   my ($firstp, @restp) = @$v;
   $self->make(Combine =>
     $self->expand($firstp),
-    $self->make(List => map $self->expand($_), @restp)
+    map $self->expand($_), @restp
   );
 }
 
