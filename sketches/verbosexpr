@@ -38,6 +38,8 @@ warn "\n## EVAL\n\n";
 
 my ($ret) = $env->eval($woven);
 
+warn "\n## HOST\n\n";
+
 print jdc(nxcl2json($ret));
 
 1;
