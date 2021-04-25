@@ -1,5 +1,6 @@
 package NXCL::01::IntT;
 
+use List::Util qw(reduce);
 use NXCL::01::Utils qw(flatten raw panic mset);
 use NXCL::01::ReprTypes qw(IntR);
 use NXCL::01::TypeFunctions qw(make_Bool);
@@ -68,14 +69,14 @@ wrap method times => sub ($scope, $cmb, $self, $args) {
   my @ints = flatten $args;
   my $mset = mset($self);
   panic 'Must be ints' for grep mset($_) != $mset, @ints;
-  return make reduce { $a * $b } map raw($_), $self, @ints;
+  return [ JUST => make reduce { $a * $b } map raw($_), $self, @ints ];
 };
 
-wrap method times => sub ($scope, $cmb, $self, $args) {
+wrap method plus => sub ($scope, $cmb, $self, $args) {
   my @ints = flatten $args;
   my $mset = mset($self);
   panic 'Must be ints' for grep mset($_) != $mset, @ints;
-  return make reduce { $a + $b } map raw($_), $self, @ints;
+  return [ JUST => make reduce { $a + $b } map raw($_), $self, @ints ];
 };
 
 1;
