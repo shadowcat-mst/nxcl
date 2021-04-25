@@ -11,11 +11,9 @@ use NXCL::01::TypeFunctions (
   qw(make_Val make_Scope make_Native make_OpDict),
 );
 
-my $val_dot = make_Val make_Native \&dot;
-
 our $Store = make_OpDict +{
-  dot => make_Val($ndot),
-  '.' => make_Val($ndot),
+  dot => make_Val($DOT),
+  '.' => make_Val($DOT),
   map +($_ => make_Val(__PACKAGE__->can($_)->())),
     @BASE_TYPES
 };

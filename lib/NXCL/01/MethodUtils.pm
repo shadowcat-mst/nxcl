@@ -8,9 +8,9 @@ use NXCL::01::TypeFunctions qw(
 );
 use NXCL::01::TypeRegistry;
 
-our @EXPORT = qw(call_method lookup_method $ndot);
+our @EXPORT = qw(call_method lookup_method $DOT);
 
-our $ndot = make_Native \&dot;
+our $DOT = make_Native \&dot;
 
 our %N =
   map +($_ => make_Native(__PACKAGE__->can($_))),
