@@ -1,8 +1,9 @@
 package NXCL::01::JSON;
 
 use JSON::PP ();
-use NXCL::01::Utils qw(mset rtype raw uncons);
+use NXCL::01::Utils qw(mset rtype raw uncons flatten);
 use NXCL::01::TypeRegistry;
+use NXCL::01::TypeFunctions qw(List_Inst);
 use NXCL::01::ReprTypes;
 use Sub::Util qw(subname);
 use NXCL::Exporter;
@@ -15,11 +16,15 @@ sub nxcl2json ($v) {
   return undef unless defined $v;
   my $mset_name = mset_name mset $v;
   my $rtype = rtype($v);
-  return [ $mset_name, [ 'nil' ] ] if $rtype == NilR;
-  return [ $mset_name, [ cons => map nxcl2json($_), uncons($v) ] ]
+  my $type = "${mset_name} (${$rtype})";
+  return [ $type ] if $rtype == NilR;
+  return [ "${mset_name} (flattened)", map nxcl2json($_), flatten($v) ]
+    if mset($v) == List_Inst
+      or ($rtype == ConsR and List_Inst == mset +(uncons $v)[1]);
+  return [ $type, map nxcl2json($_), uncons($v) ]
     if $rtype == ConsR;
   my $rval = repr2json($rtype, raw($v));
-  return [ $mset_name, [ $$rtype, $rval ] ];
+  return [ $type, $rval ];
 }
 
 sub repr2json ($t, $r) {
