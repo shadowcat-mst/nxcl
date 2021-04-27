@@ -4,7 +4,7 @@ use NXCL::Exporter;
 use NXCL::01::Utils qw(panic mset raw flatten uncons);
 use NXCL::01::TypeFunctions qw(
   OpDict_Inst Native_Inst Name_Inst String_Inst Int_Inst
-  make_List make_String make_Curry make_Native make_Apv
+  make_List make_String cons_Curry make_Curry make_Native make_Apv
 );
 use NXCL::01::TypeRegistry;
 
@@ -58,14 +58,14 @@ sub lookup_method ($scope, $self, $methodp, $kstack) {
       .(join(', ', sort keys %{raw($mset)})||'(none)').")"
       unless my $handler = raw($mset)->{$method_name};
     return (
-      [ JUST => make_Curry($handler, make_List($self)) ],
+      [ JUST => make_Curry($handler, $self) ],
       $kstack
     );
   }
   return (
     [ CMB9 => $scope, $mset, make_List($method_String) ],
     [ CMB9 => $scope => make_Native(sub ($scope, $cmb, $args, $kstack) {
-        make_Curry((uncons($args))[0], make_List($self))
+        make_Curry((uncons($args))[0], $self)
     }) ],
     $kstack
   );
@@ -81,7 +81,7 @@ sub dot_lookup ($scope, $, $args, $kstack) {
 
 sub dot_curryable ($scope, $, $args, $kstack) {
   return (
-    [ JUST => make_Curry($N{dot_curried}, $args) ],
+    [ JUST => cons_Curry($N{dot_curried}, $args) ],
     $kstack
   );
 }
@@ -103,7 +103,7 @@ sub dot_f ($scope, $, $args, $kstack) {
     }
 
     return (
-      [ JUST => make_Curry($N{dot_curryable}, make_List $method) ],
+      [ JUST => make_Curry($N{dot_curryable}, $method) ],
       $kstack
     );
   }
@@ -118,7 +118,7 @@ sub dot_f ($scope, $, $args, $kstack) {
   }
 
   return (
-    [ JUST => make_Curry($N{dot_lookup}, make_List $callp) ],
+    [ JUST => make_Curry($N{dot_lookup}, $callp) ],
     $kstack
   );
 }
