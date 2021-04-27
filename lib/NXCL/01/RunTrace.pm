@@ -21,7 +21,7 @@ BEGIN {
     $_ = do { my $v = $_; sub { my $s = &$v; $scopes{$s} = ++$idx; $s } }
   }
 }
-use NXCL::01::Utils qw(uncons mset raw);
+use NXCL::01::Utils qw(uncons mset raw flatten);
 use NXCL::01::TypeFunctions qw(Scope_Inst);
 use NXCL::01::JSON;
 
@@ -33,14 +33,11 @@ sub jsonify ($v) {
 }
 
 sub NXCL::01::Runtime::DEBUG_WARN ($prog, $kstack) {
-  my @state;
-  #while ($prog) {
-    my ($op, @v) = @$prog;
-    push @state, [ $op => map jsonify($_), @v ];
-  #  ($prog, $kstack) = uncons($kstack);
-  #}
-  #warn jdc(\@state);
-  warn $jdc->dump($state[0]);
+  my @state = map {
+    my ($op, @v) = @$_;
+    [ $op => map jsonify($_), @v ];
+  } ($prog, flatten($kstack));
+  warn $jdc->dump(\@state);
   if (defined $Max) {
     $Count++;
     exit if $Count >= $Max;
