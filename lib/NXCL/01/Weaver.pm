@@ -99,7 +99,7 @@ sub _op_weave ($self, $make, $v) {
 sub _weave_op_basic ($self, $make, $op, $pre, $post) {
   make_Combine(
     $op,
-    map { @$_ > 1 ? $self->weave($make->(@$_)) : $_ } $pre, $post
+    @$pre, @$post
   );
 }
 
