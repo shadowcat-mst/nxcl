@@ -3,6 +3,7 @@ package NXCL::01::BaseScope;
 use NXCL::Package;
 use NXCL::01::Utils qw(uncons);
 use NXCL::01::MethodUtils;
+use Sub::Util qw(set_subname);
 use vars qw(@BASE_TYPES);
 use NXCL::01::TypeFunctions (
   (@BASE_TYPES = qw(
@@ -14,10 +15,11 @@ use NXCL::01::TypeFunctions (
 
 my %opmeth = map {
   my ($opname, $opmeth) = @$_;
-  ($opname => make_Val make_Native sub ($scope, $, $args, $kstack) {
-    my ($obj) = uncons $args;
-    call_method($scope, $obj, $opmeth, $args, $kstack);
-  })
+  ($opname => make_Val make_Native set_subname "dot_${opmeth}" =>
+    sub ($scope, $, $args, $kstack) {
+      my ($obj) = uncons $args;
+      call_method($scope, $obj, $opmeth, $args, $kstack);
+    })
 } (
   [ '+', 'plus' ],
   [ '-', 'minus' ],
