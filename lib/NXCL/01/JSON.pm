@@ -16,6 +16,7 @@ sub nxcl2json ($v) {
   return undef unless defined $v;
   my $mset_name = mset_name mset $v;
   my $rtype = rtype($v);
+  return [ "${mset_name} (UNDEF)" ] unless defined($rtype);
   my $type = "${mset_name} (${$rtype})";
   return [ $type ] if $rtype == NilR;
   return [ "${mset_name} (flattened)", map nxcl2json($_), flatten($v) ]
