@@ -12,17 +12,17 @@ use NXCL::01::TypeFunctions (
   )),
   qw(make_Val make_Scope make_Native make_OpDict),
 );
+use NXCL::01::BaseOps qw(%OP_MAP);
 
 my %opmeth = map {
-  my ($opname, $opmeth) = @$_;
+  my ($opname, $opmeth) = ($_, $OP_MAP{$_});
   ($opname => make_Val make_Native set_subname "dot_${opmeth}" =>
     sub ($scope, $, $args, $kstack) {
       my ($obj) = uncons $args;
       call_method($scope, $obj, $opmeth, $args, $kstack);
     })
 } (
-  [ '+', 'plus' ],
-  [ '-', 'minus' ],
+  sort keys %OP_MAP
 );
 
 our $Store = make_OpDict +{

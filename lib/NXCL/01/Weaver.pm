@@ -12,34 +12,11 @@ use NXCL::01::TypeFunctions qw(
   Combine_Inst
   Compound_Inst
 );
+use NXCL::01::BaseOps qw(@WEAVE_OPS);
 use List::UtilsBy qw(max_by);
 use NXCL::Class;
 
-our @BASIC_BINOPS = do {
-  my $basic = '
-    + -
-    * /
-    < > <= >=
-    == !=
-    ++
-    //
-    &&
-    ||
-    ..
-    |
-    =
-    and
-    or
-  ';
-  map [ map [ basic => $_ ], /(\S+)/g ], grep /\S/, split "\n", $basic
-};
-
-our @DEFAULT_BINOPS = (
-  [ [ dot => '.' ] ],
-  [ [ tight => '=>' ] ],
-  @BASIC_BINOPS,
-  [ [ flip => 'if' ], [ flip => 'unless' ] ],
-);
+lazy binops => sub ($self) { $self->expand_binop_list(@WEAVE_OPS) };
 
 sub expand_binop_list ($self, @op_list) {
   my %binops;
@@ -51,8 +28,6 @@ sub expand_binop_list ($self, @op_list) {
   }
   return \%binops;
 }
-
-lazy binops => sub ($self) { $self->expand_binop_list(@DEFAULT_BINOPS) };
 
 sub weave ($self, $v) {
   my $mset_name = mset_name mset $v;
