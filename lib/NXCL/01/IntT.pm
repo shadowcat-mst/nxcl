@@ -30,7 +30,7 @@ wrap method gt => sub ($scope, $cmb, $self, $args) {
   );
 };
 
-wrap method div => sub ($scope, $cmb, $self, $args) {
+wrap method quotient => sub ($scope, $cmb, $self, $args) {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
@@ -40,7 +40,7 @@ wrap method div => sub ($scope, $cmb, $self, $args) {
   );
 };
 
-wrap method mod => sub ($scope, $cmb, $self, $args) {
+wrap method remainder => sub ($scope, $cmb, $self, $args) {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
