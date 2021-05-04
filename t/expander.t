@@ -1,12 +1,12 @@
 use NXCL::Test;
 use NXCL::DataTest;
-use NXCL::01::Reader;
-use NXCL::01::Expander;
+use NXCL::Reader;
+use NXCL::Expander;
 use JSON::Dumper::Compact jdc => { max_width => 76 };
 
-my $r = NXCL::01::Reader->new;
+my $r = NXCL::Reader->new;
 
-my $e = NXCL::01::Expander->new(
+my $e = NXCL::Expander->new(
   makers => { map {
     my $type = $_;
     ($type => sub { [ $type, @_ ] })

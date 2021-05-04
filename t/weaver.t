@@ -1,11 +1,11 @@
 use NXCL::Test;
-use NXCL::01::Utils qw(uncons raw);
-use NXCL::01::Weaver;
-use NXCL::01::JSON;
+use NXCL::Utils qw(uncons raw);
+use NXCL::Weaver;
+use NXCL::JSON;
 use JSON::Dumper::Compact jdc => { max_width => 76 };
-use NXCL::01::ValueBuilders;
+use NXCL::ValueBuilders;
 
-my $weaver = NXCL::01::Weaver->new;
+my $weaver = NXCL::Weaver->new;
 
 sub wv ($code, $val, $msg = undef) {
   my ($ret) = $weaver->weave($val);

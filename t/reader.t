@@ -1,9 +1,9 @@
 use NXCL::Test;
 use NXCL::DataTest;
-use NXCL::01::Reader;
+use NXCL::Reader;
 use JSON::Dumper::Compact qw(jdc);
 
-my $r = NXCL::01::Reader->new;
+my $r = NXCL::Reader->new;
 
 data_test \*DATA, sub ($v) {
   (jdc $r->from_string($v)) =~ s/\n\z//r;

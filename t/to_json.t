@@ -1,6 +1,6 @@
 use NXCL::Test;
-use NXCL::01::TypeFunctions qw(OpDict Native make_List make_String);
-use NXCL::01::JSON;
+use NXCL::TypeFunctions qw(OpDict Native make_List make_String);
+use NXCL::JSON;
 use JSON::Dumper::Compact qw(jdc);
 
 warn jdc(nxcl2json(OpDict));

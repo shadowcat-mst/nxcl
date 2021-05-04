@@ -1,12 +1,12 @@
 use NXCL::Test;
-use NXCL::01::Utils qw(uncons raw);
-use NXCL::01::Environment;
-use NXCL::01::JSON;
-use NXCL::01::TypeFunctions qw(make_Native);
+use NXCL::Utils qw(uncons raw);
+use NXCL::Environment;
+use NXCL::JSON;
+use NXCL::TypeFunctions qw(make_Native);
 use JSON::Dumper::Compact jdc => { max_width => 76 };
-use NXCL::01::ValueBuilders;
+use NXCL::ValueBuilders;
 
-my $env = NXCL::01::Environment->new;
+my $env = NXCL::Environment->new;
 
 sub Dv ($tag, $v) {
   warn "$tag: ".jdc(nxcl2json($v));
