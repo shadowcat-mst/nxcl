@@ -1,20 +1,20 @@
 use NXCL::Package;
 
-use NXCL::01::RunTrace;
+use NXCL::RunTrace;
 use YAML::XS;
 sub jdc ($v) { Dump($v) =~ s/^[- ] (\s*(?:- )*)/' ' x length($1)/mreg }
 BEGIN {
   no warnings 'redefine';
   sub JSON::Dumper::Compact::dump { jdc($_[1]) }
 }
-use NXCL::01::Environment;
-use NXCL::01::Weaver;
-use NXCL::01::JSON;
+use NXCL::Environment;
+use NXCL::Weaver;
+use NXCL::JSON;
 
-my $env = NXCL::01::Environment->new;
+my $env = NXCL::Environment->new;
 my $reader = $env->reader;
 my $expander = $env->expander;
-my $weaver = NXCL::01::Weaver->new;
+my $weaver = NXCL::Weaver->new;
 
 my ($code) = @ARGV;
 
