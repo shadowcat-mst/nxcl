@@ -14,10 +14,7 @@ sub nxcl_require {
 
 sub nxcl_require_and_call {
   my ($pkg, $call, @args) = @_;
-  sub {
-    nxcl_require($pkg);
-    $pkg->$call(@args);
-  };
+  sub { nxcl_require($pkg)->$call(@args) };
 }
 
 1;
