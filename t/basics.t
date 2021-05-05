@@ -42,6 +42,6 @@ isv(Cmb($func, I 2), I 3);
 
 isv(Cmb( Cmb( N"dot", I 7, N"minus" ), I 3 ), I 4);
 
-isv(Cmb( Cmb( Cmb( N"dot", N"minus" ) ), I 7, I 3), I 4);
+isv(Cmb( Cmb( Call( dot => N"minus" ) ), I 7, I 3), I 4);
 
 done_testing;
