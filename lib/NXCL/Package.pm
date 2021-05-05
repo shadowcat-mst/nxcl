@@ -11,6 +11,7 @@ sub import {
   experimental->import::into(1, 'signatures');
   warnings->import::into(1, FATAL => 'uninitialized');
   warnings->unimport::out_of(1, 'once');
+  NXCL::Require->import::into(1);
 }
 
 1;

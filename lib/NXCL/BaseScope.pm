@@ -35,6 +35,6 @@ our $Store = make_OpDict +{
 
 our $Scope = make_Scope $Store;
 
-sub scope () { $Scope }
+sub scope ($class = undef) { $Scope }
 
 1;

@@ -8,13 +8,9 @@ use NXCL::TypeFunctions
     Name Int String Combine List BlockProto Call Compound
   );
 
-lazy scope => sub {
-   require NXCL::BaseScope; NXCL::BaseScope::scope()
-};
+lazy scope => nxcl_require_and_call('NXCL::BaseScope', 'scope');
 
-lazy reader => sub {
-  require NXCL::Reader; NXCL::Reader->new
-};
+lazy reader => nxcl_require_and_call('NXCL::Reader', 'new');
 
 lazy makers => sub {
   +{
@@ -23,9 +19,10 @@ lazy makers => sub {
 };
 
 lazy expander => sub ($self) {
-  require NXCL::Expander;
-  NXCL::Expander->new(makers => $self->makers);
+  nxcl_require('NXCL::Expander')->new(makers => $self->makers);
 };
+
+lazy weaver => nxcl_require_and_call('NXCL::Weaver', 'new');
 
 sub _run ($self, $value, $kstack) {
   @{ run_til_done($value, $kstack) };
@@ -33,7 +30,8 @@ sub _run ($self, $value, $kstack) {
 
 sub eval_string ($self, $string) {
   my $parse = $self->reader->from_string($string);
-  my $script = $self->expander->expand($parse);
+  my $exp = $self->expander->expand($parse);
+  my $script = $self->weaver->weave($exp);
   $self->eval($script);
 }
 
