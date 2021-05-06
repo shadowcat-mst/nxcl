@@ -15,7 +15,7 @@ our @EXPORT_OK = qw(
 sub panic {
   my $err = $_[0]//'PANIC';
   my ($package, $filename, $line) = caller;
-  die "${err} (${package})\n";
+  die "${err} (${package} ${filename} ${line})\n";
 }
 
 ## raw value utils
