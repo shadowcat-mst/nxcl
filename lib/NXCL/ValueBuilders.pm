@@ -32,6 +32,6 @@ sub S :prototype($) ($v) { make_String($v) }
 
 sub L (@v) { make_List(@v) }
 
-sub Call ($name, @rest) { Cmb(N"$name", @rest) }
+sub Call ($name, @rest) { Cmb( Cmb(N('dot'), N($name)), @rest) }
 
 1;

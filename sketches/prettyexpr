@@ -1,0 +1,30 @@
+use NXCL::Package;
+
+use YAML::XS;
+sub ydc ($v) { Dump($v) =~ s/^[- ] (\s*(?:- )*)/' ' x length($1)/mreg }
+use NXCL::Environment;
+use NXCL::JSON;
+use NXCL::ValueBuilders;
+use NXCL::Utils qw(mset raw);
+use NXCL::TypeFunctions qw(String_Inst);
+
+my $env = NXCL::Environment->new;
+
+my ($code) = @ARGV;
+
+my ($ret) = $env->eval_string($code);
+
+#warn "PRETTY";
+
+if (my ($pretty) = eval { $env->eval(Cmb(Call(prettify =>), $ret)) }) {
+  if (mset($pretty) == String_Inst) {
+    print raw($pretty)."\n";
+    exit 0;
+  }
+  print ydc(nxcl2json($pretty));
+  exit 0;
+}
+my $err = $@;
+print ydc({ error => $err, value => nxcl2json($ret) });
+
+1;

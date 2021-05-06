@@ -3,12 +3,16 @@ package NXCL::IntT;
 use List::Util qw(reduce);
 use NXCL::Utils qw(flatten raw panic mset);
 use NXCL::ReprTypes qw(IntR);
-use NXCL::TypeFunctions qw(make_Bool);
+use NXCL::TypeFunctions qw(make_Bool make_String);
 use NXCL::TypePackage;
 
 export make => \&make;
 
 sub make ($int) { _make IntR, => $int }
+
+method prettify => sub ($scope, $cmb, $self, $) {
+  return ([ JUST => make_String(''.raw($self)) ]);
+};
 
 wrap method eq => sub ($scope, $cmb, $self, $args) {
   my ($r, @too_many) = flatten $args;
