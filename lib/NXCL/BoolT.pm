@@ -2,11 +2,16 @@ package NXCL::BoolT;
 
 use NXCL::Utils qw(mset panic raw flatten);
 use NXCL::ReprTypes qw(BoolR);
+use NXCL::TypeFunctions qw(make_String);
 use NXCL::TypePackage;
 
 export make => \&make;
 
 sub make ($val) { _make BoolR ,=> 0+!!$val };
+
+method to_xcl_string => sub ($scope, $cmb, $self, $) {
+  return ([ JUST => make_String(!!(raw($self)) ? 'true' : 'false') ]);
+};
 
 wrap method eq => sub ($scope, $cmb, $self, $args) {
   my ($r, @too_many) = flatten $args;

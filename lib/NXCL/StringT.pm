@@ -1,6 +1,6 @@
 package NXCL::StringT;
 
-use NXCL::Utils qw(panic flatten);
+use NXCL::Utils qw(panic flatten raw);
 use NXCL::ReprTypes qw(CharsR);
 use NXCL::TypeFunctions qw(make_Bool);
 use NXCL::TypePackage;
@@ -8,6 +8,11 @@ use NXCL::TypePackage;
 export make => \&make;
 
 sub make ($string) { _make CharsR, => $string }
+
+method to_xcl_string => sub ($scope, $cmb, $self, $) {
+  # this is wrong
+  return ([ JUST => make("'".raw($self)."'") ]);
+};
 
 wrap method eq => sub ($scope, $cmb, $self, $args) {
   my ($r, @too_many) = flatten $args;

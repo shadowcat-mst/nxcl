@@ -10,7 +10,7 @@ export make => \&make;
 
 sub make ($int) { _make IntR, => $int }
 
-method prettify => sub ($scope, $cmb, $self, $) {
+method to_xcl_string => sub ($scope, $cmb, $self, $) {
   return ([ JUST => make_String(''.raw($self)) ]);
 };
 

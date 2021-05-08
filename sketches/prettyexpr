@@ -16,7 +16,7 @@ my ($ret) = $env->eval_string($code);
 
 #warn "PRETTY";
 
-if (my ($pretty) = eval { $env->eval(Cmb(Call(prettify =>), $ret)) }) {
+if (my ($pretty) = eval { $env->eval(Cmb(Call(to_xcl_string =>), $ret)) }) {
   if (mset($pretty) == String_Inst) {
     print raw($pretty)."\n";
     exit 0;
