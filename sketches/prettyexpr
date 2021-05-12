@@ -10,7 +10,7 @@ use NXCL::TypeFunctions qw(String_Inst);
 
 my $env = NXCL::Environment->new;
 
-my ($code) = @ARGV;
+die "No code supplied" unless my ($code) = @ARGV;
 
 my ($ret) = $env->eval_string($code);
 
