@@ -14,6 +14,12 @@ sub take_step_EVAL ($scope, $value, $kstack) {
   );
 }
 
+sub take_step_CALL ($scope, $methodp, $args, $kstack) {
+  return call_method(
+    $scope, (uncons($args))[0], $methodp, $args, $kstack
+  );
+}
+
 sub take_step_CMB9 ($scope, $cmb, $args, $kstack) {
   if (mset($cmb) == Native_Inst) {
     return raw($cmb)->($scope, $cmb, $args, $kstack);
@@ -49,6 +55,10 @@ sub take_step_CONS ($car, $cdr, $kstack) {
   );
 }
 
+sub take_step_SNOC ($cdr, $car, $kstack) {
+  take_step_CONS($car, $cdr, $kstack);
+}
+
 sub take_step_JUMP ($to, $arg, $kstack) {
   raw($arg) ? $to : $kstack;
 }
@@ -66,7 +76,7 @@ sub take_step_DROP ($val, $kstack) {
 }
 
 our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
-  qw(EVAL CMB9 CMB6 ECDR CONS JUMP JUST DROP);
+  qw(EVAL CALL CMB9 CMB6 ECDR CONS SNOC JUMP JUST DROP);
 
 sub take_step ($prog, $kstack) {
   DEBUG and DEBUG_WARN($prog, $kstack);
