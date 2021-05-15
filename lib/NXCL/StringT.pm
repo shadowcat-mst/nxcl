@@ -11,7 +11,7 @@ sub make ($string) { _make CharsR, => $string }
 
 method to_xcl_string => sub ($scope, $cmb, $self, $) {
   # this is wrong
-  return ([ JUST => make("'".raw($self)."'") ]);
+  JUST make("'".raw($self)."'");
 };
 
 wrap method eq => sub ($scope, $cmb, $self, $args) {
@@ -19,9 +19,7 @@ wrap method eq => sub ($scope, $cmb, $self, $args) {
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be strings' unless mset($r) == $mset;
-  return (
-    [ JUST => make_Bool(raw($self) eq raw($r)) ],
-  );
+  JUST make_Bool(raw($self) eq raw($r));
 };
 
 wrap method gt => sub ($scope, $cmb, $self, $args) {
@@ -29,23 +27,19 @@ wrap method gt => sub ($scope, $cmb, $self, $args) {
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be strings' unless mset($r) == $mset;
-  return (
-    [ JUST => make_Bool(raw($self) gt raw($r)) ],
-  );
+  JUST make_Bool(raw($self) gt raw($r));
 };
 
 wrap method concat => sub ($scope, $cmb, $self, $args) {
   my @string = flatten $args;
   my $mset = mset($self);
   panic 'Must be strings' for grep mset($_) != $mset, @string;
-  return (
-    [ JUST => make(join '', map raw($_), $self, @string) ]
-  );
+  JUST make(join '', map raw($_), $self, @string);
 };
 
 wrap method sprintf => sub ($scope, $cmb, $self, $args) {
   # This should have some validation
-  [ JUST => make(sprintf(raw($self), map raw($_), flatten($args))) ]
+  JUST make(sprintf raw($self), map raw($_), flatten($args))
 };
 
 1;

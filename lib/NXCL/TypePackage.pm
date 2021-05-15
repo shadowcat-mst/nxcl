@@ -19,6 +19,7 @@ sub import {
   *{"${targ}::method"} = $info->curry::add_method;
   *{"${targ}::static"} = $info->curry::add_static;
   *{"${targ}::wrap"} = $info->curry::mark_wrapped;
+  *{"${targ}::JUST"} = sub ($v) { [ JUST => $v ] };
 }
 
 1;
