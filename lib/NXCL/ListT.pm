@@ -1,12 +1,15 @@
 package NXCL::ListT;
 
 use NXCL::Utils qw(
-  uncons flatten rconsp rnilp panic rtype
+  uncons flatten rconsp rnilp panic rtype raw
 );
 use NXCL::ReprTypes qw(ConsR NilR);
+use NXCL::TypeFunctions qw(make_String);
 use NXCL::TypePackage;
 
-export make => sub (@members) { cons(@members, _make(NilR)) };
+export make => \&make;
+
+sub make (@members) { cons(@members, _make(NilR)) };
 
 export cons => \&cons;
 
@@ -20,6 +23,25 @@ sub cons (@members) {
 
 static empty => sub { [ JUST => _make(NilR) ] };
 export empty => sub { _make(NilR) };
+
+method to_xcl_string => sub ($scope, $cmb, $self, $) {
+  return ([ CALL => $scope => '_to_xcl_string' => make($self) ]);
+};
+
+method _to_xcl_string => sub ($scope, $cmb, $self, $args) {
+  if (rnilp($self)) {
+    return ([ JUST => make_String(
+      '('.join(', ', map raw($_), reverse flatten $args).')'
+    )]);
+  }
+  my ($car, $cdr) = uncons($self);
+  return (
+    [ CALL => $scope => 'to_xcl_string' => make($car) ],
+    [ SNOC => $args ],
+    [ CONS => $cdr ],
+    [ CALL => $scope => '_to_xcl_string' ],
+  );
+};
 
 method first => sub ($scope, $cmb, $self, $args) {
   panic unless rconsp $self;
