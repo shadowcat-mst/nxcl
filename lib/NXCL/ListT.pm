@@ -66,4 +66,11 @@ method evaluate => sub ($scope, $cmb, $self, $args) {
   );
 };
 
+wrap method concat => sub ($scope, $cmb, $self, $args) {
+  my ($concat) = uncons($args);
+  return ([
+    JUST => cons(flatten($self), $concat)
+  ]);
+};
+
 1;
