@@ -43,4 +43,9 @@ wrap method concat => sub ($scope, $cmb, $self, $args) {
   );
 };
 
+wrap method sprintf => sub ($scope, $cmb, $self, $args) {
+  # This should have some validation
+  [ JUST => make(sprintf(raw($self), map raw($_), flatten($args))) ]
+};
+
 1;
