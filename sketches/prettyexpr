@@ -2,6 +2,10 @@ use NXCL::Package;
 
 use YAML::XS;
 sub ydc ($v) { Dump($v) =~ s/^[- ] (\s*(?:- )*)/' ' x length($1)/mreg }
+BEGIN {
+  no warnings 'redefine';
+  sub JSON::Dumper::Compact::dump { ydc($_[1]) }
+}
 use NXCL::Environment;
 use NXCL::JSON;
 use NXCL::ValueBuilders;
@@ -14,7 +18,7 @@ die "No code supplied" unless my ($code) = @ARGV;
 
 my ($ret) = $env->eval_string($code);
 
-#warn "PRETTY";
+warn "PRETTY";
 
 if (my ($pretty) = eval { $env->eval(Cmb(Call(to_xcl_string =>), $ret)) }) {
   if (mset($pretty) == String_Inst) {
