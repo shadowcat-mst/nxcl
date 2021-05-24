@@ -3,6 +3,7 @@ package NXCL::BaseScope;
 use NXCL::Package;
 use NXCL::Utils qw(uncons);
 use NXCL::MethodUtils;
+use NXCL::ExprUtils;
 use Sub::Util qw(set_subname);
 use vars qw(@BASE_TYPES);
 use NXCL::TypeFunctions (
@@ -28,6 +29,8 @@ my %opmeth = map {
 our $Store = make_OpDict +{
   dot => make_Val($DOT),
   '.' => make_Val($DOT),
+  escape => make_Val($ESCAPE),
+  "\\" => make_Val($ESCAPE),
   %opmeth,
   map +($_ => make_Val(__PACKAGE__->can($_)->())),
     @BASE_TYPES
