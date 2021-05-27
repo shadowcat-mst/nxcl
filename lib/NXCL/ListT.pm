@@ -30,7 +30,7 @@ method to_xcl_string => sub ($scope, $cmb, $self, $) {
 
 method _to_xcl_string => sub ($scope, $cmb, $self, $args) {
   if (rnilp($self)) {
-    return ([ JUST => make_String(
+    return ([ JUST make_String(
       '('.join(', ', map raw($_), reverse flatten $args).')'
     )]);
   }
