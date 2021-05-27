@@ -22,7 +22,7 @@ BEGIN {
   }
 }
 use NXCL::Utils qw(uncons mset raw flatten);
-use NXCL::TypeFunctions qw(Scope_Inst);
+use NXCL::TypeFunctions qw(Scope_Inst make_String);
 use NXCL::JSON;
 
 sub jsonify ($v) {
@@ -36,7 +36,7 @@ sub NXCL::Runtime::DEBUG_WARN ($prog, $kstack) {
   eval {
     my @state = map {
       my ($op, @v) = @$_;
-      [ $op => map jsonify($_), @v ];
+      [ $op => map jsonify(ref() ? $_ : make_String($_)), @v ];
     } ($prog, flatten($kstack));
     warn $jdc->dump(\@state);
     1;
