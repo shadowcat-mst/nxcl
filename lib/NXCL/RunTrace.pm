@@ -33,11 +33,16 @@ sub jsonify ($v) {
 }
 
 sub NXCL::Runtime::DEBUG_WARN ($prog, $kstack) {
-  my @state = map {
-    my ($op, @v) = @$_;
-    [ $op => map jsonify($_), @v ];
-  } ($prog, flatten($kstack));
-  warn $jdc->dump(\@state);
+  eval {
+    my @state = map {
+      my ($op, @v) = @$_;
+      [ $op => map jsonify($_), @v ];
+    } ($prog, flatten($kstack));
+    warn $jdc->dump(\@state);
+    1;
+  } or do {
+    warn $jdc->dump([ error => $@ ]); exit 255;
+  };
   if (defined $Max) {
     $Count++;
     exit if $Count >= $Max;
