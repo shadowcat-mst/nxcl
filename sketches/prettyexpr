@@ -18,7 +18,7 @@ die "No code supplied" unless my ($code) = @ARGV;
 
 my ($ret) = $env->eval_string($code);
 
-warn "PRETTY";
+warn "---\nPRETTY\n" if $INC{'NXCL/RunTrace.pm'};
 
 if (my ($pretty) = eval { $env->eval(Cmb(Call(to_xcl_string =>), $ret)) }) {
   if (mset($pretty) == String_Inst) {
