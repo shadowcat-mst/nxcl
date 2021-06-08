@@ -1,0 +1,64 @@
+borrowed from: https://github.com/tailscale/tailscale/blob/main/tstest/integration/vms/vms_test.go#L668-L700
+
+# before version: hugo style
+
+const userDataTemplate = `#cloud-config
+#vim:syntax=yaml
+cloud_config_modules:
+ - runcmd
+cloud_final_modules:
+ - [users-groups, always]
+ - [scripts-user, once-per-instance]
+users:
+ - name: root
+   ssh-authorized-keys:
+    - {{.SSHKey}}
+ - name: ts
+   plain_text_passwd: {{.Password}}
+   groups: [ wheel ]
+   sudo: [ "ALL=(ALL) NOPASSWD:ALL" ]
+   shell: /bin/sh
+   ssh-authorized-keys:
+    - {{.SSHKey}}
+write_files:
+  - path: /etc/cloud/cloud.cfg.d/80_disable_network_after_firstboot.cfg
+    content: |
+      # Disable network configuration after first boot
+      network:
+        config: disabled
+runcmd:
+{{.InstallPre}}
+ - [ curl, "{{.HostURL}}/myip/{{.Port}}", "-H", "User-Agent: {{.Hostname}}" ]
+`
+
+# after version: xcl style
+
+const userDataTemplate = `
+  cloud_config_modules (run_cmd),
+  cloud_final_modules (
+    (user-groups, always),
+    (scripts-user, once-per-instance)
+  ),
+  users (
+    { name root; ssh-authorized-keys $ssh_key },
+    {
+      name ts;
+      plain_text_passwd $password;
+      groups (wheel);
+      sudo ('ALL=(ALL) NOPASSWD:ALL');
+      shell '/bin/sh';
+      ssh-authorized-keys $ssh_key;
+    }
+  ),
+  write_files {
+    path '/etc/cloud/cloud.cfg.d/80_disable_network_after_firstboot.cfg';
+    content {
+      # Disable network configuration after first boot
+      network { config disabled }
+    }
+  },
+  runcmd (
+    @InstallPre,
+    (curl, "$(host_url)/myip/$(port)", "-H", "User-Agent: $(hostname)")
+  )
+`;

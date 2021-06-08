@@ -1,0 +1,25 @@
+sub parse_spacecall ($self, $ts) {
+  my @elements;
+  while (my $peeked = $ts->peek_type) {
+    if ($peeked->is_fluff) {
+      push @elements, $ts->next_element;
+    } elsif ($peeked->is_atomish) {
+      push @elements, $self->parse_compound($ts);
+    } else {
+      fail;
+    }
+  }
+  fail unless @elements;
+  return [ spacecall => @elements ];
+}
+
+collect expr =>
+  fluff => 'element',
+  atomish => 'compound',
+;
+
+collect compound =>
+  atomish => 'element',
+;
+
+

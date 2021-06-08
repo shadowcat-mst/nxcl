@@ -1,0 +1,21 @@
+token word => qr/[A-Za-z_][A-Za-z_0-9-]*/;
+
+token symbol => qr'[.!\$%&*+/:<=>@\\^|~?-]+';
+
+token uint => qr/[0-9]+/;
+
+token string => qr/'(.*?(?<=[^\\])(?:\\\\)*)'/, sub ($str) {
+  $str =~ s/\\(['\\])/$1/gr
+};
+
+rule compound => concatenation => 'atomish';
+
+rule atomish => any => qw(word symbol uint string call block list);
+
+rule list => delimited => '(', ',', 'expr', ')';
+
+rule call => delimited => '[',  ';', 'expr', ']';
+
+rule block => delimited => '{', ';', 'expr', '}';
+
+rule expr => sequence => 'compound';
