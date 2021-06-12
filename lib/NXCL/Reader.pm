@@ -6,7 +6,7 @@ our %START = (
   ' ' => 'ws',
   "\t" => 'ws',
   "\n" => 'ws',
-  (map +("$_" => 'uint'), 0..9),
+  (map +("$_" => 'natural'), 0..9),
   (map +($_ => 'word'), ('a' .. 'z'), ('A' .. 'Z'), '_'),
   (map +($_ => 'symbol'), split '', $SYMBOL_CHARS),
   "'" => 'qstring',
@@ -15,6 +15,9 @@ our %START = (
   '[' => 'call',
   '(' => 'list',
   '{' => 'block',
+  ']' => 'call_end',
+  ')' => 'list_end',
+  '}' => 'block_end',
   '#' => 'comment',
   # '"' => 'qqstring',
   # '`' => 'blockstring',
@@ -24,7 +27,7 @@ our %IS_FLUFF = (ws => 1, comment => 1);
 
 our %IS_ATOMSTART = (
   map +($_ => 1),
-    qw(qstring uint word symbol list block call)
+    qw(qstring natural word symbol list block call)
 );
 
 use NXCL::Class;
@@ -61,7 +64,7 @@ sub parse ($self, $type, $str) {
   $self->${\"parse_${type}"};
 }
 
-sub parse_script ($self, $str) {
+sub parse_script ($self) {
   [ script => $self->extract_expr_seq('semicolon') ];
 }
 
@@ -115,8 +118,8 @@ sub parse_symbol ($self) {
   [ symbol => $self->extract_re(qr"[${SYMBOL_CHARS}]+") ]
 }
 
-sub parse_uint ($self) {
-  [ uint => $self->extract_re(qr/[0-9]+/) ]
+sub parse_natural ($self) {
+  [ natural => $self->extract_re(qr/[0-9]+/) ]
 }
 
 sub parse_qstring ($self) {
@@ -144,7 +147,7 @@ sub parse_delimited_sequence ($self, $type, $enter, $leave, $sep) {
   
 sub peek_type ($self) {
   return unless length($self->str);
-  $START{substr($self->str,0,1)} // die "WHAT";
+  $START{substr($self->str,0,1)} // die "WHAT: ".$self->str;
 }
 
 1;
