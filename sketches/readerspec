@@ -1,0 +1,66 @@
+The top level of a "normal" reader result is always a script, so for example
+a single uint will result in a script containing an expr containing a compound
+
+    $ 123
+
+A word is a "normal" identifier, and therefore must start with [A-Za-z_] but
+can then include - and digits
+
+    $ foo
+
+    $ _foo-v-013
+
+A symbol is an identifier that starts with a non-word character and continues
+with non-alphanumeric characters
+
+    $ -/<=>
+
+A compound consists of a sequence of atomish elements with no whitespace
+between them - atomish will be defined later but includes words, symbols and
+uints
+
+    $ x+y+3
+
+Note: A uint token preserves initial zeroes since the expander will need them
+
+    $ -0.01
+
+An expr consists of a sequence of compounds separated by fluff (whitespace
+and/or comments)
+
+    $ foo x y
+
+    $ foo # fluff
+      x y
+
+A single quoted string (qstring) is delimited by '' and is literal except for
+\' and \\
+
+    $ 'foo'
+
+    $ 'foo \\ \'bar\''
+
+A list begins with ( and ends with ) and contains expressions separated by
+commas (,)
+
+    $ (123)
+
+    $ (foo x y, z)
+
+Lists can also be members of a compound
+
+    $ foo(x, y)
+
+A call begins with [ and ends with ] and contains expressions separated by
+semicolons (;)
+
+    $ [ foo x y ]
+
+    $ [ foo(1, 2); bar ]
+
+A block begins with { and ends with } and contains expressions separeted by
+semicolons (;)
+
+    $ { foo 'bar'; baz() }
+
+... qqstring, blockstring, blockcomment to come ...
