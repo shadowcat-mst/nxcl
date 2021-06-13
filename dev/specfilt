@@ -1,0 +1,18 @@
+use NXCL::Package;
+use NXCL::Reader;
+use NXCL::YDump;
+
+my $str = do { local $/; <STDIN> };
+
+my $reader = NXCL::Reader->new;
+
+sub parse_block ($block) {
+  my $code = $block =~ s/^    [$ ] //mgr;
+  #warn "--\n${block}";
+  my $read = $reader->parse(script => $code);
+  return ydump($read) =~ s/^/      /mgr =~ s/\A     /    </r;
+}
+
+$str =~ s/((?:^    .*\n)+)/$1.parse_block($1)/emg;
+
+print $str;

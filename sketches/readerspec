@@ -1,5 +1,6 @@
 The top level of a "normal" reader result is always a script, so for example
-a single uint will result in a script containing an expr containing a compound
+a single numeric will result in a script containing an expr containing a
+compound
 
     $ 123
 
@@ -17,11 +18,12 @@ with non-alphanumeric characters
 
 A compound consists of a sequence of atomish elements with no whitespace
 between them - atomish will be defined later but includes words, symbols and
-uints
+numerics
 
     $ x+y+3
 
-Note: A uint token preserves initial zeroes since the expander will need them
+Note: A numeric token preserves initial zeroes since the expander will need
+them
 
     $ -0.01
 
@@ -30,7 +32,7 @@ and/or comments)
 
     $ foo x y
 
-    $ foo # fluff
+    $ foo; # fluff
       x y
 
 A single quoted string (qstring) is delimited by '' and is literal except for

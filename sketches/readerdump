@@ -1,14 +1,9 @@
 use NXCL::Package;
-use YAML::XS qw(Dump);
 use NXCL::Reader;
+use NXCL::YDump;
 
 my $r = NXCL::Reader->new;
 
 my $struct = $r->parse(script => $ARGV[0]//die "No argument given");
 
-my $cooked = (sub ($type, @parts) {
-  my @cooked_parts = map { ref($_) ? __SUB__->(@$_) : $_ } @parts;
-  return { $type => (@cooked_parts > 1 ? \@cooked_parts : $cooked_parts[0]) };
-})->(@$struct);
-
-print Dump($cooked) =~ s/^---\n//r =~ s/^( *)-/$1 /mgr;
+print ydump($struct);

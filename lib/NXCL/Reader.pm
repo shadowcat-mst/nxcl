@@ -6,7 +6,7 @@ our %START = (
   ' ' => 'ws',
   "\t" => 'ws',
   "\n" => 'ws',
-  (map +("$_" => 'natural'), 0..9),
+  (map +("$_" => 'numeric'), 0..9),
   (map +($_ => 'word'), ('a' .. 'z'), ('A' .. 'Z'), '_'),
   (map +($_ => 'symbol'), split '', $SYMBOL_CHARS),
   "'" => 'qstring',
@@ -27,7 +27,7 @@ our %IS_FLUFF = (ws => 1, comment => 1);
 
 our %IS_ATOMSTART = (
   map +($_ => 1),
-    qw(qstring natural word symbol list block call)
+    qw(qstring numeric word symbol list block call)
 );
 
 use NXCL::Class;
@@ -118,8 +118,8 @@ sub parse_symbol ($self) {
   [ symbol => $self->extract_re(qr"[${SYMBOL_CHARS}]+") ]
 }
 
-sub parse_natural ($self) {
-  [ natural => $self->extract_re(qr/[0-9]+/) ]
+sub parse_numeric ($self) {
+  [ numeric => $self->extract_re(qr/[0-9]+/) ]
 }
 
 sub parse_qstring ($self) {
