@@ -119,7 +119,7 @@ sub parse_symbol ($self) {
 }
 
 sub parse_numeric ($self) {
-  [ numeric => $self->extract_re(qr/[0-9]+/) ]
+  [ numeric => $self->extract_re(qr/[0-9]+(?:\.[0-9]+)?/) ]
 }
 
 sub parse_qstring ($self) {
