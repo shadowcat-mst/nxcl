@@ -1,3 +1,6 @@
+---
+render-block: ydump(Read($code))
+---
 The top level of a "normal" reader result is always a script, so for example
 a single numeric will result in a script containing an expr containing a
 compound
@@ -22,10 +25,9 @@ numerics
 
     $ x+y+3
 
-Note: A numeric token preserves initial zeroes since the expander will need
-them
+Note: A numeric token preserves zeroes for the weaver to specialise from
 
-    $ -0.01
+    $ -00.010
 
 An expr consists of a sequence of compounds separated by fluff (whitespace
 and/or comments)

@@ -1,16 +1,19 @@
 use NXCL::Package;
-use NXCL::Reader;
-use NXCL::YDump;
+use NXCL::DocRender;
+use CPAN::Meta::YAML qw(Load);
 
 my $str = do { local $/; <STDIN> };
 
-my $reader = NXCL::Reader->new;
+die unless $str =~ s/\A---\n(.*?)---\n//s;
+
+my $meta = Load($1);
+
+my $render = $meta->{'render-block'};
 
 sub parse_block ($block) {
   my $code = $block =~ s/^    [$ ] //mgr;
-  #warn "--\n${block}";
-  my $read = $reader->parse(script => $code);
-  return ydump($read) =~ s/^/      /mgr =~ s/\A     /    </r;
+  my $y = render($render, $code);
+  return $y =~ s/^/      /mgr =~ s/\A     /    </r;
 }
 
 $str =~ s/((?:^    .*\n)+)/$1.parse_block($1)/emg;
