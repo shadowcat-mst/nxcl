@@ -21,8 +21,8 @@ sub expand_symbol ($self, $name) {
   $self->make(Name => $name);
 }
 
-sub expand_uint ($self, $v) {
-  $self->make(Int => 0+$v);
+sub expand_numeric ($self, $v) {
+  $self->make(Numeric => $v);
 }
 
 sub expand_string ($self, $v) {
