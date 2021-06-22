@@ -9,13 +9,16 @@ sub import ($class, @args) {
     my ($type_name) = grep defined,
       $export =~ /^(?:[a-z]+_(\w+)|(\w+?)(?:_Inst)?)$/;
     die "Can't parse ${export}" unless $type_name;
-    defer_sub "${targ}::${export}", sub {
-      require NXCL::TypeRegistry;
-      unless (eval { require "NXCL/${type_name}T.pm"; 1 }) {
-        die "Error: Can't load ${export} for ${targ}:\n$@";
-      }
-      $NXCL::TypeRegistry::TypeInfo{$type_name}->export_for($export)
-    };
+    # Only export if not already present
+    unless ($targ->can($export)) {
+      defer_sub "${targ}::${export}", sub {
+        require NXCL::TypeRegistry;
+        unless (eval { require "NXCL/${type_name}T.pm"; 1 }) {
+          die "Error: Can't load ${export} for ${targ}:\n$@";
+        }
+        $NXCL::TypeRegistry::TypeInfo{$type_name}->export_for($export)
+      };
+    }
   }
 }
 
