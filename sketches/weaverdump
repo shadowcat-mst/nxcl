@@ -1,0 +1,20 @@
+use NXCL::Package;
+use NXCL::Reader;
+use NXCL::Expander;
+use NXCL::Weaver;
+use NXCL::JSON;
+use NXCL::YDump;
+
+my $r = NXCL::Reader->new;
+
+my $e = NXCL::Expander->new;
+
+my $w = NXCL::Weaver->new;
+
+my $struct = $w->weave(
+  $e->expand(
+    $r->parse(script => $ARGV[0]//die "No argument given")
+  )
+);
+
+print ydump(nxcl2json($struct));
