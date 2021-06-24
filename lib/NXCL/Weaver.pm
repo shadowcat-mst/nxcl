@@ -2,6 +2,7 @@ package NXCL::Weaver;
 
 use NXCL::Utils qw(mset flatten raw);
 use NXCL::TypeRegistry qw(mset_name);
+use NXCL::TypeMaker;
 use NXCL::TypeFunctions qw(
   make_List
   make_Call
@@ -37,6 +38,11 @@ sub weave ($self, $v) {
   return $v;
 }
 
+sub _weave_type_Numeric ($self, $v) {
+  my $raw = raw($v);
+  make_value($raw =~ /\./ ? 'Float' : 'Int', $raw);
+}
+
 sub _weave_type_List ($self, $v) { $self->_flat_weave(\&make_List, $v) }
 sub _weave_type_Call ($self, $v) { $self->_flat_weave(\&make_Call, raw($v)) }
 sub _weave_type_BlockProto ($self, $v) {
@@ -65,9 +71,9 @@ sub _op_weave ($self, $make, $v) {
   return $self->_flat_weave($make, $v) unless @op_cand; # no ops, skip
   my $op_spec = max_by { $_->[2] } @op_cand;
   my ($op_idx, $op_type) = @$op_spec;
-  my @pre = @parts[0..$op_idx-1];
+  my @pre = map $self->weave($_), @parts[0..$op_idx-1];
   my $op = $parts[$op_idx];
-  my @post = @parts[$op_idx+1..$#parts];
+  my @post = map $self->weave($_), @parts[$op_idx+1..$#parts];
   return $self->${\"_weave_op_${op_type}"}($make, $op, \@pre, \@post);
 }
 
