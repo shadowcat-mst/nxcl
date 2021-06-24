@@ -7,14 +7,11 @@ use JSON::Dumper::Compact jdc => { max_width => 76 };
 my $r = NXCL::Reader->new;
 
 my $e = NXCL::Expander->new(
-  makers => { map {
-    my $type = $_;
-    ($type => sub { [ $type, @_ ] })
-  } qw(Name Int List String BlockProto Call Combine Compound) }
+  maker => sub { \@_ },
 );
 
 data_test \*DATA, sub ($v) {
-  (jdc $e->expand($r->from_string($v))) =~ s/\n\z//r;
+  (jdc $e->expand($r->parse(script => $v))) =~ s/\n\z//r;
 };
 
 done_testing;
