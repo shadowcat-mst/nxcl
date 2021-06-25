@@ -8,6 +8,7 @@ use NXCL::TypeFunctions qw(
   make_Call
   make_BlockProto
   make_Combine
+  cons_Combine
   make_Compound
   Name_Inst
   Combine_Inst
@@ -100,7 +101,7 @@ sub _weave_op_dot ($self, $make, $op, $pre, $post) {
   my @post = @$post;
   my $dot = do {
     if ($make == \&make_Compound and @post > 1) {
-      make_Combine(
+      cons_Combine(
         make_Combine($op, pop(@pre), shift(@post)),
         shift(@post)
       );
