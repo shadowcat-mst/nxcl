@@ -1,9 +1,7 @@
 package NXCL::RunTrace;
 
 use NXCL::Package;
-use JSON::Dumper::Compact;
-
-our $jdc = JSON::Dumper::Compact->new; # (max_width => 160);
+use NXCL::YDump;
 
 our $Count = 0;
 our $Max;
@@ -38,10 +36,10 @@ sub NXCL::Runtime::DEBUG_WARN ($prog, $kstack) {
       my ($op, @v) = @$_;
       [ $op => map jsonify(ref() ? $_ : make_String($_)), @v ];
     } ($prog, flatten($kstack));
-    warn $jdc->dump(\@state);
+    warn join('', map ydump($_), @state)."\n";
     1;
   } or do {
-    warn $jdc->dump([ error => $@ ]); exit 255;
+    warn ydump([ error => $@ ]); exit 255;
   };
   if (defined $Max) {
     $Count++;
