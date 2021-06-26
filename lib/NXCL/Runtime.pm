@@ -94,7 +94,7 @@ sub run_til_done ($prog, $kstack) {
   while ((($prog, my @stack) = take_step($prog, $kstack)) >= 2) {
     $kstack = cons_List(@stack);
   }
-  return $prog;
+  return @$prog;
 }
 
 1;

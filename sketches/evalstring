@@ -1,12 +1,11 @@
 use NXCL::Package;
-use NXCL::JSON;
-use NXCL::YDump;
+use NXCL::Utils qw(raw);
 use NXCL::Environment;
 
 my $env = NXCL::Environment->new;
 
 my $rv = $env->eval_string(
   $ARGV[0]//die "No argument given"
-);
+)->value->to_xcl_string;
 
-print ydump(nxcl2json($rv->raw_value));
+say raw($rv->raw_value);
