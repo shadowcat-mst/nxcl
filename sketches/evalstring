@@ -6,6 +6,6 @@ my $env = NXCL::Environment->new;
 
 my $rv = $env->eval_string(
   $ARGV[0]//die "No argument given"
-)->value->to_xcl_string;
+)->value_to_xcl_string;
 
 say raw($rv->raw_value);
