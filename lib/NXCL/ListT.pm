@@ -73,4 +73,13 @@ wrap method concat => sub ($scope, $cmb, $self, $args) {
   ]);
 };
 
+wrap method combine => sub ($scope, $cmb, $self, $args) {
+  my $idx = raw((uncons($args))[0]);
+  my $value = $self;
+  (undef, $value) = uncons($value) for 1..$idx;
+  my ($car) = uncons($value);
+  panic unless $car;
+  return ([ JUST => $car ]);
+};
+
 1;
