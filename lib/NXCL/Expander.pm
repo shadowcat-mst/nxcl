@@ -24,7 +24,10 @@ sub expand_symbol ($self, $name) { $self->make(Name => $name) }
 
 sub expand_numeric ($self, $v) { $self->make(Numeric => $v) }
 
-sub expand_string ($self, $v) { $self->make(String => $v) }
+sub expand_qstring ($self, $v) {
+  s/^'//, s/'$//, s/\\(['\\])/$1/g for $v;
+  $self->make(String => $v)
+}
 
 sub expand_compound ($self, @v) {
   return $self->expand($v[0]) unless @v > 1;
