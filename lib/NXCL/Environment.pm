@@ -12,15 +12,7 @@ lazy scope => nxcl_require_and_call('NXCL::BaseScope', 'scope');
 
 lazy reader => nxcl_require_and_call('NXCL::Reader', 'new');
 
-lazy makers => sub {
-  +{
-    map +($_ => __PACKAGE__->can("make_${_}")), @EXPAND_TYPES
-  }
-};
-
-lazy expander => sub ($self) {
-  nxcl_require('NXCL::Expander')->new(makers => $self->makers);
-};
+lazy expander => nxcl_require_and_call('NXCL::Expander', 'new');
 
 lazy weaver => nxcl_require_and_call('NXCL::Weaver', 'new');
 
@@ -29,7 +21,7 @@ sub _run ($self, $value, $kstack) {
 }
 
 sub eval_string ($self, $string) {
-  my $parse = $self->reader->from_string($string);
+  my $parse = $self->reader->parse(script => $string);
   my $exp = $self->expander->expand($parse);
   my $script = $self->weaver->weave($exp);
   $self->eval($script);
