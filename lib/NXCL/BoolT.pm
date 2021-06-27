@@ -31,8 +31,8 @@ method ifelse => sub ($scope, $cmb, $self, $args) {
   );
 };
 
-static true => sub { return ([ JUST => make(1) ], $_[-1]) };
-static false => sub { return ([ JUST => make(0) ], $_[-1]) };
+static true => sub { return ([ JUST => make(1) ]) };
+static false => sub { return ([ JUST => make(0) ]) };
 
 export true => sub { make(1) };
 export false => sub { make(0) };
