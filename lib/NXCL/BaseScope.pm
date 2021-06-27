@@ -8,8 +8,23 @@ use Sub::Util qw(set_subname);
 use vars qw(@BASE_TYPES);
 use NXCL::TypeFunctions (
   (@BASE_TYPES = qw(
-    Apv Bool Combine Curry Int List Name Native
-    OpDict Scope String Val Compound
+    ApMeth
+    Apv
+    Bool
+    Call
+    Combine
+    Compound
+    Curry
+    Dict
+    Int
+    List
+    Name
+    Native
+    Numeric
+    OpDict
+    Scope
+    String
+    Val
   )),
   qw(make_Val make_Scope make_Native make_OpDict),
 );
