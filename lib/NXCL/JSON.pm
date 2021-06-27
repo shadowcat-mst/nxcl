@@ -24,6 +24,12 @@ sub nxcl2json ($v) {
       or ($rtype == ConsR and List_Inst == mset +(uncons $v)[1]);
   return [ $type, map nxcl2json($_), uncons($v) ]
     if $rtype == ConsR;
+  return [ $type, do {
+    my %h = %{raw($v)};
+    +(map {
+      +{ $_ => nxcl2json($h{$_}) }
+    } sort keys %h );
+  } ] if $rtype == DictR;
   my $rval = repr2json($rtype, raw($v));
   return [ join ' ', $type, $rval ] unless ref $rval;
   return [ $type, $rval ];

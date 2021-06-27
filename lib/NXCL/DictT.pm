@@ -1,6 +1,6 @@
 package NXCL::DictT;
 
-use NXCL::Utils qw(panic raw uncons);
+use NXCL::Utils qw(panic raw uncons flatten);
 use NXCL::ReprTypes qw(DictR);
 use NXCL::TypePackage;
 

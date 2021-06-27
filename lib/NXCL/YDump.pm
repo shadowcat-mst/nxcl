@@ -8,11 +8,16 @@ our @EXPORT = qw(ydump);
 
 sub _cook ($type, @parts) {
   my @cooked_parts = map {
-    ref($_) eq 'ARRAY'
-      ? __SUB__->(@$_)
-      : $_->isa('JSON::PP::Boolean')
-        ? ($_ ? 'true' : 'false')
-        :  $_
+    if ($_->$_isa('JSON::PP::Boolean')) {
+      ($_ ? 'true' : 'false')
+    } elsif (ref($_) eq 'ARRAY') {
+      __SUB__->(@$_)
+    } elsif (ref($_) eq 'HASH') {
+      my %h = %{$_};
+      +{ map +($_ => __SUB__->(@{$h{$_}})), sort keys %h }
+    } else {
+      $_
+    }
   } @parts;
   return { $type => (@cooked_parts > 1 ? \@cooked_parts : $cooked_parts[0]) };
 }
