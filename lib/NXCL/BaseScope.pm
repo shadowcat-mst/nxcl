@@ -16,12 +16,14 @@ use NXCL::TypeFunctions (
     Compound
     Curry
     Dict
+    Key
     Int
     List
     Name
     Native
     Numeric
     OpDict
+    Pair
     Scope
     String
     Val

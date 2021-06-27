@@ -6,6 +6,17 @@ use NXCL::TypePackage;
 
 export make => sub ($hash) { _make DictR ,=> $hash };
 
+wrap static new => sub ($scope, $cmb, $self, $args) {
+  my @pairs = flatten $args;
+  my %setup;
+  foreach my $p (@pairs) {
+    my ($kp, $v) = uncons($p);
+    my $kstr = raw($kp);
+    $setup{$kstr} = $v;
+  }
+  return ([ JUST => _make DictR, => \%setup ]);
+};
+
 wrap method combine => sub ($scope, $cmb, $self, $args) {
   my $key = raw((uncons($args))[0]);
   my $value = raw($self)->{$key};
