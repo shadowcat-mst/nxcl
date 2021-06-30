@@ -1,0 +1,24 @@
+sub map_continue ($scope, $cmb, $args, $kstack) {
+  my ($func, $list, $val) = flatten($args);
+  return (
+    [ CALL => $scope => map => make($list, $func) ],
+    [ CONS => $val ],
+    $kstack
+  );
+}
+
+my $map_continue = make_Native \&map_continue;
+
+method map => sub ($scope, $cmb, $self, $args) {
+  if (rnilp($self) {
+    return [ JUST => $self ];
+  }
+  my ($car, $cdr) = uncons($self);
+  my ($func) = uncons($args);
+  return (
+    [ CMB9 => $scope => $func => make($car) ],
+    [ CONS => $cdr ],
+    [ CONS => $func ],
+    [ CMB9 => $scope => $map_continue ],
+  );
+};
