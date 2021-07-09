@@ -20,7 +20,23 @@ sub panic {
 
 ## raw value utils
 
-sub mkv ($mset, $rtype, @v) { [ $mset => [ $rtype => @v ] ] }
+#sub mkv ($mset, $rtype, @v) { [ $mset => [ $rtype => @v ] ] }
+
+sub mkv ($mset, $rtype, @v) {
+  if (1) { # should check a flag later
+    panic "mkv called with undefined mset" unless defined($mset);
+    panic "mkv called with undefined rtype" unless defined($rtype);
+    if (my @undef = grep !defined($v[$_]), 0..$#v) {
+      my $failed = (
+        @undef == 1
+          ? 'argument '.($undef[0]+1)
+          : 'arguments '.(join(', ', map $_+1, @undef))
+      );
+      panic "mkv called with undefined ${failed} of ".scalar(@v);
+    }
+  }
+  return [ $mset => [ $rtype => @v ] ]
+}
 
 sub mset ($v) { $v->[0] }
 
