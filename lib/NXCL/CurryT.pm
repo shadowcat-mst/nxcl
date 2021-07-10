@@ -10,6 +10,11 @@ export cons => \&cons;
 
 sub cons ($cmb, $i_args) { _make ConsR ,=> $cmb, $i_args }
 
+# Should be used as list_to_maybe_Curry($list) later
+#export list_to_maybe => sub ($cmb, $i_args) {
+#  rnilp($i_args) ? $cmb : cons($cmb, $i_args)
+#};
+
 method to_xcl_string => sub ($scope, $, $self, $) {
   state $fmt = make_String('Curry%s');
   return (
