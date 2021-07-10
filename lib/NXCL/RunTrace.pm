@@ -34,12 +34,14 @@ sub NXCL::Runtime::DEBUG_WARN ($prog, $kstack) {
   eval {
     my @state = map {
       my ($op, @v) = @$_;
-      [ $op => map jsonify(ref() ? $_ : make_String($_)), @v ];
+      [ $op => map jsonify(ref() ? $_ : make_String($_//'NULL')), @v ];
     } ($prog, flatten($kstack));
     warn join('', map ydump($_), @state)."\n";
     1;
   } or do {
-    warn ydump([ error => $@ ]); exit 255;
+    warn ydump([ debug_render_error => $@ ]);
+    warn "aborting from DEBUG_WARN\n";
+    exit 255;
   };
   if (defined $Max) {
     $Count++;
