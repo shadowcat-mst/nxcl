@@ -4,7 +4,7 @@ use NXCL::Utils qw(
   uncons flatten rconsp rnilp panic rtype raw
 );
 use NXCL::ReprTypes qw(ConsR NilR);
-use NXCL::TypeFunctions qw(make_String);
+use NXCL::TypeFunctions qw(make_String make_Native);
 use NXCL::TypePackage;
 
 export make => \&make;
@@ -80,6 +80,32 @@ wrap method combine => sub ($scope, $cmb, $self, $args) {
   my ($car) = uncons($value);
   panic unless $car;
   return ([ JUST => $car ]);
+};
+
+sub map_continue ($scope, $cmb, $args, $kstack) {
+  my ($func, $argcdr) = uncons($args);
+  my ($val, $rest) = uncons($argcdr);
+  return (
+    [ CALL => $scope => map => make($rest, $func) ],
+    [ CONS => $val ],
+    $kstack
+  );
+}
+
+my $map_continue = make_Native \&map_continue;
+
+wrap method map => sub ($scope, $cmb, $self, $args) {
+  if (rnilp($self)) {
+    return [ JUST => $self ];
+  }
+  my ($car, $cdr) = uncons($self);
+  my ($func) = uncons($args);
+  return (
+    [ CMB9 => $scope => $func => make($car) ],
+    [ SNOC => $cdr ],
+    [ CONS => $func ],
+    [ CMB9 => $scope => $map_continue ],
+  );
 };
 
 1;
