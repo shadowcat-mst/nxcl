@@ -19,13 +19,15 @@ our %N =
 $_ = make_Apv($_) for $N{dot_curried};
 
 sub call_method ($scope, $self, $methodp, $args, $kstack) {
+  panic "Undefined self" unless defined($self);
   my ($method_name, $method_String) = (
     ref($methodp)
       ? (raw($methodp), $methodp)
       : ($methodp, make_String($methodp))
   );
-  my $mset = mset($self);
-  if (mset($mset) == OpDict_Inst) {
+  my $mset = mset($self) // panic "Undefined mset for ${self}";
+  my $mmset = mset($mset) // panic "Undefined mset of mset for ${mset}";
+  if ($mmset == OpDict_Inst) {
     panic "No handler for ${method_name} on ".mset_name($mset)
       ." (mset has methods: "
       .(join(', ', sort keys %{raw($mset)})||'(none)').")"
