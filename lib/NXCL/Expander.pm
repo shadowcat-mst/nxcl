@@ -17,6 +17,8 @@ sub expand_comma { () }
 sub expand_semicolon { () }
 sub expand_enter_list { () }
 sub expand_leave_list { () }
+sub expand_enter_call { () }
+sub expand_leave_call { () }
 
 sub expand_word ($self, $name) { $self->make(Name => $name) }
 
