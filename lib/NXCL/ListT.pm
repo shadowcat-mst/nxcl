@@ -74,6 +74,7 @@ wrap method concat => sub ($scope, $cmb, $self, $args) {
 };
 
 wrap method combine => sub ($scope, $cmb, $self, $args) {
+  panic "List.combine called without an index" if rnilp($args);
   my $idx = raw((uncons($args))[0]);
   my $value = $self;
   (undef, $value) = uncons($value) for 1..$idx;
