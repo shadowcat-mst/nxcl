@@ -59,8 +59,10 @@ sub expand_script ($self, @v) {
 }
 
 sub expand_expr ($self, @v) {
-  return $self->expand($v[0]) unless @v > 1;
-  $self->make(Combine => map $self->expand($_), @v);
+  # Must expand first so fluff like whitespace disappears before the '> 1'
+  my @exp = map $self->expand($_), @v;
+  return $exp[0] unless @exp > 1;
+  $self->make(Combine => @exp);
 }
 
 1;
