@@ -83,19 +83,26 @@ wrap method combine => sub ($scope, $cmb, $self, $args) {
   return ([ JUST => $car ]);
 };
 
-sub map_continue ($scope, $cmb, $args, $kstack) {
+sub map_continue ($scope, $cmb, $args, $kstack, $flat = undef) {
   my ($func, $argcdr) = uncons($args);
   my ($val, $rest) = uncons($argcdr);
+  my ($mapname, @vals) = ($flat ? ('lmap', $flat->($val)) : ('map', $val));
   return (
-    [ CALL => $scope => map => make($rest, $func) ],
-    [ CONS => $val ],
+    [ CALL => $scope => $mapname => make($rest, $func) ],
+    (map [ CONS => $_ ], @vals),
     $kstack
   );
 }
 
 my $map_continue = make_Native \&map_continue;
+my $lmap_continue = make_Native sub {
+  map_continue(@_, sub ($v) {
+    panic "lmap_continue given non-list" unless rconsp($v);
+    return flatten($v);
+  });
+};
 
-wrap method map => sub ($scope, $cmb, $self, $args) {
+sub map_body ($scope, $cmb, $self, $args, $continue = $map_continue) {
   if (rnilp($self)) {
     return [ JUST => $self ];
   }
@@ -105,8 +112,12 @@ wrap method map => sub ($scope, $cmb, $self, $args) {
     [ CMB9 => $scope => $func => make($car) ],
     [ SNOC => $cdr ],
     [ CONS => $func ],
-    [ CMB9 => $scope => $map_continue ],
+    [ CMB9 => $scope => $continue ],
   );
 };
+
+wrap method map => \&map_body;
+
+wrap method lmap => sub { map_body(@_, $lmap_continue) };
 
 1;
