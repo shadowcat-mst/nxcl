@@ -1,0 +1,30 @@
+perl -E '
+  my ($n, $d) = split "d", $ARGV[0];
+  my @rolls = map { 1+ int rand $d } 1..$n;
+  while (my @line = splice(@rolls, 0, 10)) { say join "\t", @line }
+' 25d20
+
+alias dice='perl -E '"'"'my ($n, $d) = split "d", $ARGV[0]; my @res = map { 1+ int rand $d } 1..$n; while (my @line = splice(@res, 0, 10)) { say join "\t", @line }'"'"
+
+demeisen=; dice 25d20
+18      8       18      3       17      13      6       17      5       18
+7       7       6       20      16      17      8       2       18      2
+15      8       12      3       18
+
+xcl eval '
+  let (n, d) = process.argv().0.split "d"; 
+  let rolls = (1..n).map { this.rand() + 1 }
+  rolls.batches_of(10).each { say this.join("\t") }
+' 25d20
+
+xcl eval '
+  let (n, d) = process.argv().0.split "d"; 
+  let rolls = (1..n).map { $.rand() + 1 }
+  rolls.batches_of(10).each { say $.join("\t") }
+' 25d20
+
+xcl eval '
+  let (n, d) = process.argv().0.split "d";
+  let rolls = (1..n).map .rand().plus(1);
+  rolls.batches_of(10).each .join("\t").say()
+' 25d20
