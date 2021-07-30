@@ -1,0 +1,18 @@
+use strict;
+use warnings;
+use B ();
+
+my $addr;
+
+{
+  my $x = { foo => 27 };
+  $x->{bar} = $x;
+  $addr = 0+$x;
+  warn $addr; # 94907575693944 at sketches/vivify line 11.
+}
+
+my $reviv = bless(\$addr, 'B::SV');
+
+my $obj = $reviv->object_2svref;
+
+warn $obj->{foo}; # 27 at sketches/vivify line 18.
