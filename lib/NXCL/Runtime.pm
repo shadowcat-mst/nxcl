@@ -73,7 +73,7 @@ sub take_step_JUST ($val, $kstack) {
 }
 
 sub take_step_DROP ($val, $kstack) {
-  return $kstack;
+  return uncons($kstack);
 }
 
 our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
