@@ -9,12 +9,12 @@ export make => sub ($val) { _make ValR ,=> $val };
 
 wrap static new => sub ($scope, $cmb, $self, $args) {
   my ($key) = uncons($args);
-  return ([ JUST => _make ValR ,=> $key ]);
+  return JUST _make ValR ,=> $key;
 };
 
 wrap method combine => sub ($scope, $cmb, $self, $args) {
   my ($value) = uncons($args);
-  return ([ JUST => make_Pair(raw($self), $value) ]);
+  return JUST make_Pair(raw($self), $value);
 };
 
 1;

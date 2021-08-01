@@ -12,7 +12,7 @@ our $IDENTITY = make_Native \&identity;
 sub escape ($scope, $cmb, $args, $kstack) {
   my ($arg, $extra) = uncons($args);
   panic "One arg only" unless rnilp($extra);
-  return ([ JUST => $arg ], $kstack);
+  return (JUST($arg), $kstack);
 }
 
 sub identity { die }

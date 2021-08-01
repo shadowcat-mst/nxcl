@@ -11,7 +11,7 @@ sub make ($string) { _make CharsR, => $string }
 
 method to_xcl_string => sub ($scope, $cmb, $self, $) {
   # this is wrong
-  JUST make("N'".raw($self)."'");
+  return JUST make("N'".raw($self)."'");
 };
 
 1;

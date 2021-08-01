@@ -21,56 +21,54 @@ sub cons (@members) {
   return $ret;
 }
 
-static empty => sub { [ JUST => _make(NilR) ] };
+static empty => sub { return JUST _make(NilR) };
 export empty => sub { _make(NilR) };
 
 method to_xcl_string => sub ($scope, $cmb, $self, $) {
-  return ([ CALL => $scope => '_to_xcl_string' => make($self) ]);
+  return CALL $scope => '_to_xcl_string' => make($self);
 };
 
 method _to_xcl_string => sub ($scope, $cmb, $self, $args) {
   if (rnilp($self)) {
-    return ([ JUST => make_String(
+    return JUST make_String(
       '('.join(', ', map raw($_), reverse flatten $args).')'
-    )]);
+    );
   }
   my ($car, $cdr) = uncons($self);
   return (
-    [ CALL => $scope => 'to_xcl_string' => make($car) ],
-    [ SNOC => $args ],
-    [ CONS => $cdr ],
-    [ CALL => $scope => '_to_xcl_string' ],
+    CALL($scope => 'to_xcl_string' => make($car)),
+    SNOC($args),
+    CONS($cdr),
+    CALL($scope => '_to_xcl_string'),
   );
 };
 
 method first => sub ($scope, $cmb, $self, $args) {
   panic unless rconsp $self;
   my ($first) = uncons $self;
-  return ([ JUST => $first ]);
+  return JUST $first;
 };
 
 method rest => sub ($scope, $cmb, $self, $args) {
   panic unless rconsp $self;
   my (undef, $rest) = uncons $self;
-  return ([ JUST => $rest ]);
+  return JUST $rest;
 };
 
 method evaluate => sub ($scope, $cmb, $self, $args) {
   if (rnilp $self) {
-    return ([ JUST => $self ]);
+    return JUST $self;
   }
   my ($car, $cdr) = uncons $self;
   return (
-    [ EVAL => $scope => $car ],
-    [ ECDR => $scope => $cdr ],
+    EVAL($scope => $car),
+    ECDR($scope => $cdr),
   );
 };
 
 wrap method concat => sub ($scope, $cmb, $self, $args) {
   my ($concat) = uncons($args);
-  return ([
-    JUST => cons(flatten($self), $concat)
-  ]);
+  return JUST cons(flatten($self), $concat);
 };
 
 wrap method combine => sub ($scope, $cmb, $self, $args) {
@@ -80,7 +78,7 @@ wrap method combine => sub ($scope, $cmb, $self, $args) {
   (undef, $value) = uncons($value) for 1..$idx;
   my ($car) = uncons($value);
   panic unless $car;
-  return ([ JUST => $car ]);
+  return JUST $car;
 };
 
 sub map_continue ($scope, $cmb, $args, $kstack, $flat = undef) {
@@ -88,8 +86,8 @@ sub map_continue ($scope, $cmb, $args, $kstack, $flat = undef) {
   my ($val, $rest) = uncons($argcdr);
   my ($mapname, @vals) = ($flat ? $flat->($val) : (map => $val));
   return (
-    [ CALL => $scope => $mapname => make($rest, $func) ],
-    (map [ CONS => $_ ], @vals),
+    CALL($scope => $mapname => make($rest, $func)),
+    (map CONS($_), @vals),
     $kstack
   );
 }
@@ -104,15 +102,15 @@ my $lmap_continue = make_Native sub {
 
 sub map_body ($scope, $cmb, $self, $args, $continue = $map_continue) {
   if (rnilp($self)) {
-    return [ JUST => $self ];
+    return JUST $self;
   }
   my ($car, $cdr) = uncons($self);
   my ($func) = uncons($args);
   return (
-    [ CMB9 => $scope => $func => make($car) ],
-    [ SNOC => $cdr ],
-    [ CONS => $func ],
-    [ CMB9 => $scope => $continue ],
+    CMB9($scope => $func => make($car)),
+    SNOC($cdr),
+    CONS($func),
+    CMB9($scope => $continue),
   );
 };
 

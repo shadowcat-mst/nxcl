@@ -12,7 +12,7 @@ sub make ($sub) { _make NativeR ,=> $sub }
 
 method to_xcl_string => sub ($scope, $cmb, $self, $) {
   # should indirect via Combine maybe?
-  return ([ JUST => make_String("Native('".subname(\&{raw($self)})."')") ]);
+  return JUST make_String("Native('".subname(\&{raw($self)})."')");
 };
 
 method combine => sub ($scope, $cmb, $self, $args) {

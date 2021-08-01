@@ -11,7 +11,7 @@ export make => \&make;
 sub make ($int) { _make IntR, => $int }
 
 method to_xcl_string => sub ($scope, $cmb, $self, $) {
-  return ([ JUST => make_String(''.raw($self)) ]);
+  return JUST make_String(''.raw($self));
 };
 
 wrap method eq => sub ($scope, $cmb, $self, $args) {
@@ -19,9 +19,7 @@ wrap method eq => sub ($scope, $cmb, $self, $args) {
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be ints' unless mset($r) == $mset;
-  return (
-    [ JUST => make_Bool(raw($self) == raw($r)) ],
-  );
+  return JUST make_Bool(raw($self) == raw($r));
 };
 
 wrap method gt => sub ($scope, $cmb, $self, $args) {
@@ -29,9 +27,7 @@ wrap method gt => sub ($scope, $cmb, $self, $args) {
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be ints' unless mset($r) == $mset;
-  return (
-    [ JUST => make_Bool(raw($self) > raw($r)) ],
-  );
+  return JUST make_Bool(raw($self) > raw($r));
 };
 
 wrap method quotient => sub ($scope, $cmb, $self, $args) {
@@ -39,9 +35,7 @@ wrap method quotient => sub ($scope, $cmb, $self, $args) {
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be ints' unless mset($r) == $mset;
-  return (
-    [ JUST => make int(raw($self) / raw($r)) ],
-  );
+  return JUST make int(raw($self) / raw($r));
 };
 
 wrap method remainder => sub ($scope, $cmb, $self, $args) {
@@ -49,38 +43,32 @@ wrap method remainder => sub ($scope, $cmb, $self, $args) {
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be ints' unless mset($r) == $mset;
-  return (
-    [ JUST => make(raw($self) % raw($r)) ],
-  );
+  return JUST make(raw($self) % raw($r));
 };
 
 wrap method minus => sub ($scope, $cmb, $self, $args) {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   unless ($r) {
-    return (
-      [ JUST => make(-raw($self)) ],
-    );
+    return JUST make(-raw($self));
   }
   my $mset = mset($self);
   panic 'Must be ints' unless mset($r) == $mset;
-  return (
-    [ JUST => make(raw($self) - raw($r)) ],
-  );
+  return JUST make(raw($self) - raw($r));
 };
 
 wrap method times => sub ($scope, $cmb, $self, $args) {
   my @ints = flatten $args;
   my $mset = mset($self);
   panic 'Must be ints' for grep mset($_) != $mset, @ints;
-  return [ JUST => make reduce { $a * $b } map raw($_), $self, @ints ];
+  return JUST make reduce { $a * $b } map raw($_), $self, @ints;
 };
 
 wrap method plus => sub ($scope, $cmb, $self, $args) {
   my @ints = flatten $args;
   my $mset = mset($self);
   panic 'Must be ints' for grep mset($_) != $mset, @ints;
-  return [ JUST => make reduce { $a + $b } map raw($_), $self, @ints ];
+  return JUST make reduce { $a + $b } map raw($_), $self, @ints;
 };
 
 1;

@@ -2,6 +2,7 @@ package NXCL::MethodUtils;
 
 use NXCL::Exporter;
 use NXCL::Utils qw(panic mset raw flatten uncons);
+use NXCL::OpUtils;
 use NXCL::TypeFunctions qw(
   OpDict_Inst Native_Inst Name_Inst String_Inst Int_Inst
   make_List make_String cons_Curry make_Curry make_Native make_Apv
@@ -36,13 +37,13 @@ sub call_method ($scope, $self, $methodp, $args, $kstack) {
       return raw($handler)->($scope, $handler, $args, $kstack);
     }
     return (
-      [ CMB9 => $scope, $handler, $args ],
+      CMB9($scope => $handler, $args),
       $kstack
     );
   }
   return (
-    [ CMB9 => $scope, $mset, make_List($method_String) ],
-    [ CMB6 => $scope, $args ],
+    CMB9($scope => $mset, make_List($method_String)),
+    CMB6($scope => $args),
     $kstack
   );
 }
@@ -60,15 +61,15 @@ sub lookup_method ($scope, $self, $methodp, $kstack) {
       .(join(', ', sort keys %{raw($mset)})||'(none)').")"
       unless my $handler = raw($mset)->{$method_name};
     return (
-      [ JUST => make_Curry($handler, $self) ],
+      JUST(make_Curry($handler, $self)),
       $kstack
     );
   }
   return (
-    [ CMB9 => $scope, $mset, make_List($method_String) ],
-    [ CMB9 => $scope => make_Native(sub ($scope, $cmb, $args, $kstack) {
+    CMB9($scope => $mset, make_List($method_String)),
+    CMB9($scope => make_Native(sub ($scope, $cmb, $args, $kstack) {
         make_Curry((uncons($args))[0], $self)
-    }) ],
+    })),
     $kstack
   );
 }
@@ -76,14 +77,14 @@ sub lookup_method ($scope, $self, $methodp, $kstack) {
 sub dot_lookup ($scope, $, $args, $kstack) {
   my ($lookup, $obj) = flatten $args;
   return (
-    [ CMB9 => $scope => $obj => make_List($lookup) ],
+    CMB9($scope => $obj => make_List($lookup)),
     $kstack
   );
 }
 
 sub dot_curryable ($scope, $, $args, $kstack) {
   return (
-    [ JUST => cons_Curry($N{dot_curried}, $args) ],
+    JUST(cons_Curry($N{dot_curried}, $args)),
     $kstack
   );
 }
@@ -105,7 +106,7 @@ sub dot_f ($scope, $, $args, $kstack) {
     }
 
     return (
-      [ JUST => make_Curry($N{dot_curryable}, $method) ],
+      JUST(make_Curry($N{dot_curryable}, $method)),
       $kstack
     );
   }
@@ -114,13 +115,13 @@ sub dot_f ($scope, $, $args, $kstack) {
 
   if ($obj) {
     return (
-      [ CMB9 => $scope => $obj => make_List($callp) ],
+      CMB9($scope => $obj => make_List($callp)),
       $kstack
     );
   }
 
   return (
-    [ JUST => make_Curry($N{dot_lookup}, $callp) ],
+    JUST(make_Curry($N{dot_lookup}, $callp)),
     $kstack
   );
 }
@@ -136,15 +137,15 @@ sub dot ($scope, $cmb, $args, $kstack) {
     }
 
     return (
-      [ EVAL => $scope => make_List($args[0]) ],
-      [ CONS => $args[-1] ],
-      [ CMB9 => $scope => $N{dot_f} ],
+      EVAL($scope => make_List($args[0])),
+      CONS($args[-1]),
+      CMB9($scope => $N{dot_f}),
       $kstack
     );
   }
   return (
-    [ EVAL => $scope, $args ],
-    [ CMB9 => $scope => $N{dot_f} ],
+    EVAL($scope, $args),
+    CMB9($scope => $N{dot_f}),
     $kstack
   );
 }

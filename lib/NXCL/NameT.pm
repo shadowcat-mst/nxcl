@@ -19,17 +19,13 @@ method evaluate => sub ($scope, $cmb, $self, $args) {
     my $cell = raw($store)->{raw($self)};
     panic "No value for ${\raw($self)} in current scope" unless $cell;
     if (mset($cell) == Val_Inst or mset($cell) == Var_Inst) {
-      return (
-        [ JUST => raw($cell) ],
-      );
+      return JUST raw($cell);
     }
-    return (
-      [ CMB9 => $scope => $cell => empty_List ],
-    );
+    return CMB9 $scope => $cell => empty_List;
   }
   return (
-    [ CMB9 => $scope => $store => make_List(make_String(raw($self))) ],
-    [ CMB6 => $scope => empty_List ],
+    CMB9($scope => $store => make_List(make_String(raw($self)))),
+    CMB6($scope => empty_List),
   );
 };
 

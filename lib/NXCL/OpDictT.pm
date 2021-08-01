@@ -10,7 +10,7 @@ method combine => sub ($scope, $cmb, $self, $args) {
   my $key = raw((uncons($args))[0]);
   my $value = raw($self)->{$key};
   panic unless $value;
-  return ([ JUST => $value ]);
+  return JUST $value;
 };
 
 1;

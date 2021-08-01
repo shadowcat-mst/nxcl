@@ -11,8 +11,8 @@ export cons => sub ($call, $args) { _make ConsR ,=> $call, $args };
 method evaluate => sub ($scope, $cmb, $self, $args) {
   my ($call, $call_args) = uncons $self;
   return (
-    [ EVAL => $scope => $call ],
-    [ CMB6 => $scope => $call_args ],
+    EVAL($scope => $call),
+    CMB6($scope => $call_args),
   );
 };
 

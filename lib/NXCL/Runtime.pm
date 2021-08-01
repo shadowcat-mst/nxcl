@@ -3,6 +3,7 @@ package NXCL::Runtime;
 use NXCL::Exporter;
 use NXCL::Utils qw(mset uncons raw rnilp);
 use NXCL::MethodUtils;
+use NXCL::OpUtils;
 use NXCL::TypeFunctions qw(Native_Inst make_List cons_List);
 use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 
@@ -36,13 +37,13 @@ sub take_step_CMB6 ($scope, $args, $cmb, $kstack) {
 sub take_step_ECDR ($scope, $cdr, $car, $kstack) {
   if (rnilp $cdr) {
     return (
-      [ JUST => make_List($car) ],
+      JUST(make_List($car)),
       $kstack
     );
   }
   return (
-    [ EVAL => $scope => $cdr ],
-    [ CONS => $car ],
+    EVAL($scope => $cdr),
+    CONS($car),
     $kstack
   );
 }

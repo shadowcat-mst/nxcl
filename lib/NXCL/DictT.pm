@@ -14,14 +14,14 @@ wrap static new => sub ($scope, $cmb, $self, $args) {
     my $kstr = raw($kp);
     $setup{$kstr} = $v;
   }
-  return ([ JUST => _make DictR, => \%setup ]);
+  return JUST _make DictR, => \%setup;
 };
 
 wrap method combine => sub ($scope, $cmb, $self, $args) {
   my $key = raw((uncons($args))[0]);
   my $value = raw($self)->{$key};
   panic unless $value;
-  return ([ JUST => $value ]);
+  return JUST $value;
 };
 
 1;

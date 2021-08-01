@@ -7,9 +7,7 @@ use NXCL::TypePackage;
 
 export of_list => \&of_list;
 
-sub of_list ($list) {
-  _make ValR ,=> $list;
-}
+sub of_list ($list) { _make ValR ,=> $list }
 
 export make => sub (@parts) { of_list(make_List @parts) };
 
@@ -18,10 +16,10 @@ method evaluate => sub ($scope, $cmb, $self, $args) {
   panic "Empty call list" if rnilp($call_list);
   my ($first, $rest) = uncons($call_list);
   return (
-    [ EVAL => $scope => $first ],
+    EVAL($scope => $first),
     (rnilp($rest)
       ? ()
-      : ([ 'DROP' ], [ EVAL => $scope => of_list($rest) ])
+      : (DROP(), EVAL($scope => of_list($rest)))
     )
   );
 };

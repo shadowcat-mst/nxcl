@@ -3,6 +3,7 @@ package NXCL::Environment;
 use NXCL::Class;
 use NXCL::Runtime qw(run_til_done);
 use NXCL::TypeFunctions qw(make_List);
+use NXCL::OpUtils;
 use NXCL::RV;
 
 lazy scope => nxcl_require_and_call('NXCL::BaseScope', 'scope');
@@ -30,11 +31,11 @@ sub eval_string ($self, $string) {
 }
 
 sub eval ($self, $value) {
-  $self->_run([ EVAL => $self->scope, $value ], make_List([ 'HOST' ]));
+  $self->_run(EVAL($self->scope, $value), make_List(HOST()));
 }
 
 sub resume ($self, $value, $kstack) {
-  $self->_run([ JUST => $value ], $kstack);
+  $self->_run(JUST($value), $kstack);
 }
 
 1;

@@ -8,7 +8,7 @@ export make => sub ($val) { _make ValR ,=> $val };
 
 method combine => sub ($scope, $cmb, $self, $args) {
   panic unless rnilp $args;
-  return ([ JUST => raw($self) ]);
+  return JUST raw($self);
 };
 
 1;
