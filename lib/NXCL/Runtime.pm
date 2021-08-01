@@ -48,12 +48,16 @@ sub take_step_ECDR ($scope, $cdr, $car, $kstack) {
   );
 }
 
-sub take_step_CONS ($car, $cdr, $kstack) {
+sub take_step_JUST ($val, $kstack) {
   my ($kar, $kdr) = uncons $kstack;
   return (
-    [ @$kar, cons_List($car, $cdr) ],
+    [ @$kar, $val ],
     $kdr
   );
+}
+
+sub take_step_CONS ($car, $cdr, $kstack) {
+  take_step_JUST(cons_List($car, $cdr), $kstack);
 }
 
 sub take_step_SNOC ($cdr, $car, $kstack) {
@@ -64,20 +68,12 @@ sub take_step_SNOC ($cdr, $car, $kstack) {
 #  raw($arg) ? $to : $kstack;
 #}
 
-sub take_step_JUST ($val, $kstack) {
-  my ($kar, $kdr) = uncons $kstack;
-  return (
-    [ @$kar, $val ],
-    $kdr
-  );
-}
-
 sub take_step_DROP ($val, $kstack) {
   return uncons($kstack);
 }
 
 our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
-  qw(EVAL CALL CMB9 CMB6 ECDR CONS SNOC JUST DROP);
+  qw(EVAL CALL CMB9 CMB6 ECDR JUST CONS SNOC DROP);
 
 sub take_step ($prog, $kstack) {
   DEBUG and DEBUG_WARN($prog, $kstack);
