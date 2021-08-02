@@ -1,0 +1,48 @@
+#!/bin/sh
+
+es () {
+  echo "\$ $1"
+  perl sketches/evalstring "$1"
+}
+
+es '1 + 2'
+
+es '1 + 2; 3 + 4'
+
+es '1 - 3'
+
+es '1.minus 3'
+
+es '1.eq 3'
+
+es '1.eq 1'
+
+es '1 == 1'
+
+es '1 == 3'
+
+es '1.eq(1)'
+
+es '1.plus(2, 3)'
+
+es '1.plus 2 3'
+
+es "'foo' ++ 'bar'"
+
+es '(3, 2, 1)(1)'
+
+es '.plus() 1 2 3'
+
+es '.plus(1) 2 3'
+
+es '(1, 2, 3).map .plus(1)'
+
+es '+ 1 2 3'
+
+es '(1, 2, 3) ++ (4, 5)'
+
+es "( (1), (2), (3) ).map .concat(('x'))"
+
+es '[ 1 == 1 ].ifelse 3 4'
+
+es '[ 1 == 0 ].ifelse 3 4'
