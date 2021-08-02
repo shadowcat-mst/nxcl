@@ -54,12 +54,10 @@ sub _mset_of ($self, $mset_type, $proto) {
       : $native;
   }
   $mset{evaluate} ||= do {
-    # This should probably live somewhere else. Where TBD.
-    state $id = make_Native(
-      set_subname identity => sub ($scope, $cmb, $args, $kstack) {
-        return (JUST((uncons $args)[0]), $kstack);
-      }
-    );
+    state $eval = do {
+      require NXCL::ExprUtils;
+      $NXCL::ExprUtils::ESCAPE;
+    };
   };
   my $mset_v = make_OpDict(\%mset);
   my $mset_name = $self->name.($mset_type eq 'Type' ? 'T' : '');

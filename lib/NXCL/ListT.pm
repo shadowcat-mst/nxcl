@@ -81,14 +81,13 @@ wrap method combine => sub ($scope, $cmb, $self, $args) {
   return JUST $car;
 };
 
-sub map_continue ($scope, $cmb, $args, $kstack, $flat = undef) {
+sub map_continue ($scope, $cmb, $args, $flat = undef) {
   my ($func, $argcdr) = uncons($args);
   my ($val, $rest) = uncons($argcdr);
   my ($mapname, @vals) = ($flat ? $flat->($val) : (map => $val));
   return (
     CALL($scope => $mapname => make($rest, $func)),
     (map CONS($_), @vals),
-    $kstack
   );
 }
 

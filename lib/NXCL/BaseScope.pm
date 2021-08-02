@@ -35,9 +35,9 @@ use NXCL::BaseOps qw(%OP_MAP);
 my %opmeth = map {
   my ($opname, $opmeth) = ($_, $OP_MAP{$_});
   ($opname => make_Val make_Native set_subname "dot_${opmeth}" =>
-    sub ($scope, $, $args, $kstack) {
+    sub ($scope, $, $args) {
       my ($obj) = uncons $args;
-      call_method($scope, $obj, $opmeth, $args, $kstack);
+      call_method($scope, $obj, $opmeth, $args);
     })
 } (
   sort keys %OP_MAP
