@@ -9,20 +9,20 @@ use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 
 our @EXPORT_OK = qw(run_til_done);
 
-sub step_call_method ($scope, $inv, $methodp, $args, $kstack) {
+sub take_method_step ($scope, $inv, $methodp, $args, $kstack) {
   return ($scope, call_method(
     $scope, $inv, $methodp, $args
   ), $kstack);
 }
 
 sub take_step_EVAL ($scope, $value, $kstack) {
-  return step_call_method(
+  return take_method_step(
     $scope, $value, 'evaluate', make_List($value), $kstack
   );
 }
 
 sub take_step_CALL ($scope, $methodp, $args, $kstack) {
-  return step_call_method(
+  return take_method_step(
     $scope, (uncons($args))[0], $methodp, $args, $kstack
   );
 }
@@ -31,7 +31,7 @@ sub take_step_CMB9 ($scope, $cmb, $args, $kstack) {
   if (mset($cmb) == Native_Inst) {
     return ($scope, raw($cmb)->($scope, $cmb, $args), $kstack);
   }
-  return step_call_method(
+  return take_method_step(
     $scope, $cmb, 'combine', cons_List($cmb, $args), $kstack
   );
 }
@@ -97,10 +97,11 @@ sub take_step ($scope, $prog, $kstack) {
 }
 
 sub run_til_done ($scope, $prog, $kstack) {
-  while ((($scope, $prog, my @stack) = take_step($scope, $prog, $kstack)) >= 3) {
+  while (($scope, $prog, my @stack) = take_step($scope, $prog, $kstack)) {
+    return ($scope, @$prog) unless @stack;
     $kstack = cons_List(@stack);
   }
-  return ($scope, @$prog);
+  die "notreached";
 }
 
 1;
