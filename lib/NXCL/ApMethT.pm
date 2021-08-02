@@ -10,19 +10,19 @@ export make => sub ($opv) { _make ValR ,=> $opv };
 method to_xcl_string => sub ($scope, $, $self, $) {
   state $fmt = make_String('ApMeth(%s)');
   return (
-    CALL($scope => 'to_xcl_string' => make_List(raw($self))),
+    CALL('to_xcl_string' => make_List(raw($self))),
     SNOC(empty_List),
     CONS($fmt),
-    CALL($scope => 'sprintf'),
+    CALL('sprintf'),
   );
 };
 
 method combine => sub ($scope, $cmb, $self, $args) {
   my ($inv, $method_args) = uncons($args);
   return (
-    EVAL($scope => $method_args),
+    EVAL($method_args),
     CONS($inv),
-    CMB9($scope => raw($self)),
+    CMB9(raw($self)),
   );
 };
 

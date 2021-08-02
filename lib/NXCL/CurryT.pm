@@ -18,11 +18,11 @@ sub cons ($cmb, $i_args) { _make ConsR ,=> $cmb, $i_args }
 method to_xcl_string => sub ($scope, $, $self, $) {
   state $fmt = make_String('Curry%s');
   return (
-    CALL($scope => 'to_xcl_string'
+    CALL('to_xcl_string'
       => make_List(make_List(flatten($self)))),
     SNOC(empty_List),
     CONS($fmt),
-    CALL($scope => 'sprintf'),
+    CALL('sprintf'),
   );
 };
 
@@ -31,10 +31,10 @@ method to_xcl_string => sub ($scope, $, $self, $) {
 method combine => sub ($scope, $, $self, $c_args) {
   my ($cmb, $i_args) = uncons($self);
   if (rnilp $c_args) {
-    return CMB9 $scope => $cmb => $i_args;
+    return CMB9 $cmb => $i_args;
   }
   my $full_args = cons_List(flatten($i_args), $c_args);
-  return CMB9 $scope => $cmb => $full_args;
+  return CMB9 $cmb => $full_args;
 };
 
 1;

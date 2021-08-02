@@ -25,7 +25,7 @@ static empty => sub { return JUST _make(NilR) };
 export empty => sub { _make(NilR) };
 
 method to_xcl_string => sub ($scope, $cmb, $self, $) {
-  return CALL $scope => '_to_xcl_string' => make($self);
+  return CALL '_to_xcl_string' => make($self);
 };
 
 method _to_xcl_string => sub ($scope, $cmb, $self, $args) {
@@ -36,10 +36,10 @@ method _to_xcl_string => sub ($scope, $cmb, $self, $args) {
   }
   my ($car, $cdr) = uncons($self);
   return (
-    CALL($scope => 'to_xcl_string' => make($car)),
+    CALL('to_xcl_string' => make($car)),
     SNOC($args),
     CONS($cdr),
-    CALL($scope => '_to_xcl_string'),
+    CALL('_to_xcl_string'),
   );
 };
 
@@ -61,8 +61,8 @@ method evaluate => sub ($scope, $cmb, $self, $args) {
   }
   my ($car, $cdr) = uncons $self;
   return (
-    EVAL($scope => $car),
-    ECDR($scope => $cdr),
+    EVAL($car),
+    ECDR($cdr),
   );
 };
 
@@ -86,7 +86,7 @@ sub map_continue ($scope, $cmb, $args, $flat = undef) {
   my ($val, $rest) = uncons($argcdr);
   my ($mapname, @vals) = ($flat ? $flat->($val) : (map => $val));
   return (
-    CALL($scope => $mapname => make($rest, $func)),
+    CALL($mapname => make($rest, $func)),
     (map CONS($_), @vals),
   );
 }
@@ -106,10 +106,10 @@ sub map_body ($scope, $cmb, $self, $args, $continue = $map_continue) {
   my ($car, $cdr) = uncons($self);
   my ($func) = uncons($args);
   return (
-    CMB9($scope => $func => make($car)),
+    CMB9($func => make($car)),
     SNOC($cdr),
     CONS($func),
-    CMB9($scope => $continue),
+    CMB9($continue),
   );
 };
 

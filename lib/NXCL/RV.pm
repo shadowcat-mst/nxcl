@@ -6,11 +6,13 @@ use Autoload::AUTOCAN;
 
 ro 'raw_value';
 ro 'kstack';
+ro 'scope';
 ro 'env';
 
 lazy value => sub ($self) {
   NXCL::WV->new(
     _raw_xcl_value => $self->raw_value,
+    _xcl_scope => $self->scope,
     _xcl_environment => $self->env,
   );
 };

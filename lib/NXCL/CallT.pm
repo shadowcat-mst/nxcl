@@ -16,10 +16,10 @@ method evaluate => sub ($scope, $cmb, $self, $args) {
   panic "Empty call list" if rnilp($call_list);
   my ($first, $rest) = uncons($call_list);
   return (
-    EVAL($scope => $first),
+    EVAL($first),
     (rnilp($rest)
       ? ()
-      : (DROP(), EVAL($scope => of_list($rest)))
+      : (DROP(), EVAL(of_list($rest)))
     )
   );
 };

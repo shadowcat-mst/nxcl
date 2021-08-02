@@ -24,7 +24,7 @@ wrap method eq => sub ($scope, $cmb, $self, $args) {
 method ifelse => sub ($scope, $cmb, $self, $args) {
   panic 'Wrong arg count' unless 2 ==
     (my ($then, $else) = flatten $args);
-  return EVAL $scope => raw($self) ? $then : $else;
+  return EVAL raw($self) ? $then : $else;
 };
 
 static true => sub { return JUST make(1) };

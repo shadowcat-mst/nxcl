@@ -36,11 +36,11 @@ sub call_method ($scope, $self, $methodp, $args) {
     if (mset($handler) == Native_Inst) {
       return raw($handler)->($scope, $handler, $args);
     }
-    return CMB9 $scope => $handler, $args;
+    return CMB9 $handler, $args;
   }
   return (
-    CMB9($scope => $mset, make_List($method_String)),
-    CMB6($scope => $args),
+    CMB9($mset, make_List($method_String)),
+    CMB6($args),
   );
 }
 
@@ -59,8 +59,8 @@ sub lookup_method ($scope, $self, $methodp) {
     return JUST make_Curry($handler, $self);
   }
   return (
-    CMB9($scope => $mset, make_List($method_String)),
-    CMB9($scope => make_Native(sub ($scope, $cmb, $args) {
+    CMB9($mset, make_List($method_String)),
+    CMB9(make_Native(sub ($scope, $cmb, $args) {
       make_Curry((uncons($args))[0], $self)
     })),
   );
@@ -68,7 +68,7 @@ sub lookup_method ($scope, $self, $methodp) {
 
 sub dot_lookup ($scope, $, $args) {
   my ($lookup, $obj) = flatten $args;
-  return CMB9 $scope => $obj => make_List($lookup);
+  return CMB9 $obj => make_List($lookup);
 }
 
 sub dot_curryable ($scope, $, $args) {
@@ -97,7 +97,7 @@ sub dot_f ($scope, $, $args) {
   panic unless $ctype == String_Inst or $ctype == Int_Inst;
 
   if ($obj) {
-    return CMB9 $scope => $obj => make_List($callp);
+    return CMB9 $obj => make_List($callp);
   }
 
   return JUST make_Curry($N{dot_lookup}, $callp);
@@ -114,14 +114,14 @@ sub dot ($scope, $cmb, $args) {
     }
 
     return (
-      EVAL($scope => make_List($args[0])),
+      EVAL(make_List($args[0])),
       CONS($args[-1]),
-      CMB9($scope => $N{dot_f}),
+      CMB9($N{dot_f}),
     );
   }
   return (
-    EVAL($scope, $args),
-    CMB9($scope => $N{dot_f}),
+    EVAL($args),
+    CMB9($N{dot_f}),
   );
 }
 

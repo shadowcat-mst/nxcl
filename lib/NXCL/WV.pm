@@ -5,6 +5,7 @@ use NXCL::ValueBuilders;
 use Autoload::AUTOCAN;
 
 ro '_raw_xcl_value';
+ro '_xcl_scope';
 ro '_xcl_environment';
 
 sub _call_method ($self, $method) {

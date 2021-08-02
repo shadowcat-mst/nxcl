@@ -12,8 +12,8 @@ export make => sub ($first, @rest) {
 method evaluate => sub ($scope, $cmb, $self, $args) {
   my ($first, @rest) = flatten $self;
   return (
-    EVAL($scope, $first),
-    map CMB6($scope, (mset($_) == List_Inst ? $_ : make_List($_))), @rest
+    EVAL($first),
+    map CMB6(mset($_) == List_Inst ? $_ : make_List($_)), @rest
   );
 };
 
