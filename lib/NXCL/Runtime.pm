@@ -9,14 +9,20 @@ use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 
 our @EXPORT_OK = qw(run_til_done);
 
-sub take_step_EVAL ($scope, $value, $kstack) {
+sub step_call_method ($scope, $inv, $methodp, $args, $kstack) {
   return call_method(
+    $scope, $inv, $methodp, $args, $kstack
+  );
+}
+
+sub take_step_EVAL ($scope, $value, $kstack) {
+  return step_call_method(
     $scope, $value, 'evaluate', make_List($value), $kstack
   );
 }
 
 sub take_step_CALL ($scope, $methodp, $args, $kstack) {
-  return call_method(
+  return step_call_method(
     $scope, (uncons($args))[0], $methodp, $args, $kstack
   );
 }
@@ -25,7 +31,7 @@ sub take_step_CMB9 ($scope, $cmb, $args, $kstack) {
   if (mset($cmb) == Native_Inst) {
     return raw($cmb)->($scope, $cmb, $args, $kstack);
   }
-  return call_method(
+  return step_call_method(
     $scope, $cmb, 'combine', cons_List($cmb, $args), $kstack
   );
 }
