@@ -1,6 +1,6 @@
 package NXCL::Weaver;
 
-use NXCL::Utils qw(mset flatten raw);
+use NXCL::Utils qw(mset object_is flatten raw);
 use NXCL::TypeRegistry qw(mset_name);
 use NXCL::TypeMaker;
 use NXCL::TypeFunctions qw(
@@ -63,7 +63,7 @@ sub _op_weave ($self, $make, $v) {
   my %binops = %{$self->binops};
   my @op_cand = map {
     my $p = $parts[$_];
-    if (mset($p) == Name_Inst and my $op = $binops{raw($p)}) {
+    if (object_is($p, Name_Inst) and my $op = $binops{raw($p)}) {
       [ $_ => @$op ]
     } else {
       ()
@@ -105,7 +105,7 @@ sub _weave_op_dot ($self, $make, $op, $pre, $post) {
         make_Combine($op, pop(@pre), shift(@post)),
         shift(@post)
       );
-    } elsif ($make == \&make_Combine and mset($post[0]) == Compound_Inst) {
+    } elsif ($make == \&make_Combine and object_is($post[0], Compound_Inst)) {
       my ($name, $args, @rest) = flatten shift(@post);
       unshift(@post, make_Compound(@rest));
       make_Combine(

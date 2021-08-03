@@ -1,7 +1,7 @@
 package NXCL::JSON;
 
 use JSON::PP ();
-use NXCL::Utils qw(mset rtype raw uncons flatten);
+use NXCL::Utils qw(mset object_is rtype raw uncons flatten);
 use NXCL::TypeRegistry;
 use NXCL::TypeFunctions qw(List_Inst);
 use NXCL::ReprTypes;
@@ -20,8 +20,8 @@ sub nxcl2json ($v) {
   my $type = "${mset_name} (${$rtype})";
   return [ $type ] if $rtype == NilR;
   return [ "${mset_name} (flattened)", map nxcl2json($_), flatten($v) ]
-    if mset($v) == List_Inst
-      or ($rtype == ConsR and List_Inst == mset +(uncons $v)[1]);
+    if object_is($v, List_Inst)
+      or ($rtype == ConsR and object_is +(uncons $v)[1], List_Inst);
   return [ $type, map nxcl2json($_), uncons($v) ]
     if $rtype == ConsR;
   return [ $type, do {

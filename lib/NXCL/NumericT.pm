@@ -1,6 +1,6 @@
 package NXCL::NumericT;
 
-use NXCL::Utils qw(panic flatten raw mset);
+use NXCL::Utils qw(raw);
 use NXCL::ReprTypes qw(CharsR);
 use NXCL::TypeFunctions qw(make_Bool);
 use NXCL::TypePackage;

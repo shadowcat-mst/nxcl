@@ -1,7 +1,7 @@
 package NXCL::MethodUtils;
 
 use NXCL::Exporter;
-use NXCL::Utils qw(panic mset raw flatten uncons);
+use NXCL::Utils qw(panic mset object_is raw flatten uncons);
 use NXCL::OpUtils;
 use NXCL::TypeFunctions qw(
   OpDict_Inst Native_Inst Name_Inst String_Inst Int_Inst
@@ -27,13 +27,12 @@ sub call_method ($scope, $self, $methodp, $args) {
       : ($methodp, make_String($methodp))
   );
   my $mset = mset($self) // panic "Undefined mset for ${self}";
-  my $mmset = mset($mset) // panic "Undefined mset of mset for ${mset}";
-  if ($mmset == OpDict_Inst) {
+  if (object_is $mset, OpDict_Inst) {
     panic "No handler for ${method_name} on ".mset_name($mset)
       ." (mset has methods: "
       .(join(', ', sort keys %{raw($mset)})||'(none)').")"
       unless my $handler = raw($mset)->{$method_name};
-    if (mset($handler) == Native_Inst) {
+    if (object_is $handler, Native_Inst) {
       return raw($handler)->($scope, $handler, $args);
     }
     return CMB9 $handler, $args;

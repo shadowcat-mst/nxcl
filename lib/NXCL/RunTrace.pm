@@ -19,12 +19,12 @@ BEGIN {
     $_ = do { my $v = $_; sub { my $s = &$v; $scopes{$s} = ++$idx; $s } }
   }
 }
-use NXCL::Utils qw(uncons mset raw flatten);
+use NXCL::Utils qw(uncons objest_is raw flatten);
 use NXCL::TypeFunctions qw(Scope_Inst make_String);
 use NXCL::JSON;
 
 sub jsonify ($v) {
-  if (mset($v) == Scope_Inst) {
+  if (object_is $v, Scope_Inst) {
     return [ "Scope (dict) SCOPE_".$scopes{$v} ];
   }
   return nxcl2json($v);

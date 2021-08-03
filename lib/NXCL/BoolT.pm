@@ -1,6 +1,6 @@
 package NXCL::BoolT;
 
-use NXCL::Utils qw(mset panic raw flatten);
+use NXCL::Utils qw(mset object_is panic raw flatten);
 use NXCL::ReprTypes qw(BoolR);
 use NXCL::TypeFunctions qw(make_String);
 use NXCL::TypePackage;
@@ -17,7 +17,7 @@ wrap method eq => sub ($scope, $cmb, $self, $args) {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
-  panic 'Must be bools' unless mset($r) == $mset;
+  panic 'Must be bools' unless object_is $r, $mset;
   return JUST make(raw($self) == raw($r));
 };
 

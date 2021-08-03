@@ -1,6 +1,6 @@
 package NXCL::CompoundT;
 
-use NXCL::Utils qw(flatten mset);
+use NXCL::Utils qw(flatten object_is);
 use NXCL::TypeFunctions qw(List_Inst make_List);
 use NXCL::ReprTypes qw(ConsR);
 use NXCL::TypePackage;
@@ -13,7 +13,7 @@ method evaluate => sub ($scope, $cmb, $self, $args) {
   my ($first, @rest) = flatten $self;
   return (
     EVAL($first),
-    map CMB6(mset($_) == List_Inst ? $_ : make_List($_)), @rest
+    map CMB6(object_is($_, List_Inst) ? $_ : make_List($_)), @rest
   );
 };
 

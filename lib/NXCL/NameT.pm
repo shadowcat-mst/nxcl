@@ -1,6 +1,6 @@
 package NXCL::NameT;
 
-use NXCL::Utils qw(mset raw panic);
+use NXCL::Utils qw(mset object_is raw panic);
 use NXCL::ReprTypes qw(CharsR);
 use NXCL::TypeFunctions qw(
   OpDict_Inst Val_Inst Var_Inst
@@ -14,8 +14,7 @@ sub make ($name) { _make CharsR ,=> $name }
 
 method evaluate => sub ($scope, $cmb, $self, $args) {
   my $store = raw $scope;
-  my $store_mset = mset($store);
-  if ($store_mset == OpDict_Inst) {
+  if (object_is $store, OpDict_Inst) {
     my $cell = raw($store)->{raw($self)};
     panic "No value for ${\raw($self)} in current scope" unless $cell;
     if (mset($cell) == Val_Inst or mset($cell) == Var_Inst) {

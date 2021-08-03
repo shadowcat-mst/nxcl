@@ -1,7 +1,7 @@
 package NXCL::Runtime;
 
 use NXCL::Exporter;
-use NXCL::Utils qw(mset uncons raw rnilp);
+use NXCL::Utils qw(object_is uncons raw rnilp);
 use NXCL::MethodUtils;
 use NXCL::OpUtils;
 use NXCL::TypeFunctions qw(Native_Inst make_List cons_List);
@@ -28,7 +28,7 @@ sub take_step_CALL ($scope, $methodp, $args, $kstack) {
 }
 
 sub take_step_CMB9 ($scope, $cmb, $args, $kstack) {
-  if (mset($cmb) == Native_Inst) {
+  if (object_is $cmb, Native_Inst) {
     return ($scope, raw($cmb)->($scope, $cmb, $args), $kstack);
   }
   return take_method_step(

@@ -1,0 +1,2 @@
+#!/bin/sh
+perl sketches/quicktest | diff -u qt.out -

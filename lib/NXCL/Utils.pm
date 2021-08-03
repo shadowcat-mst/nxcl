@@ -7,7 +7,7 @@ use NXCL::ReprTypes;
 our @EXPORT_OK = qw(
   panic
   mkv
-  mset rtype
+  mset rtype object_is
   rboolp rcharsp rbytesp rnilp rintp rvalp rvarp rconsp rdictp rnativep
   raw uncons flatten
 );
@@ -39,6 +39,7 @@ sub mkv ($mset, $rtype, @v) {
 }
 
 sub mset ($v) { $v->[0] }
+sub object_is ($v, $mset) { $v->[0] == $mset }
 
 sub rtype ($v) { $v->[1][0] }
 
