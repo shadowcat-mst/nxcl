@@ -1,6 +1,6 @@
 package NXCL::ScopeT;
 
-use NXCL::ReprTypes qw(VarR);
+use NXCL::ReprTypes qw(DictR);
 use NXCL::Utils qw(mset object_is raw panic uncons);
 use NXCL::TypeFunctions qw(
   OpDict_Inst Val_Inst Var_Inst
@@ -8,12 +8,12 @@ use NXCL::TypeFunctions qw(
 );
 use NXCL::TypePackage;
 
-export make => sub ($store) { _make VarR ,=> $store };
+export make => sub ($store) { _make DictR ,=> { store => $store } };
 
 method combine => sub ($scope, $cmb, $self, $args) {
   my ($namep) = uncons($args);
   my $name = raw($namep);
-  my $store = raw $self;
+  my $store = raw($self)->{store};
   if (object_is $store, OpDict_Inst) {
     my $cell = raw($store)->{$name};
     panic "No value for ${name} in current scope" unless $cell;
