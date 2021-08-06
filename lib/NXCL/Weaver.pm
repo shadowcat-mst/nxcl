@@ -81,7 +81,7 @@ sub _op_weave ($self, $make, $v) {
 sub _weave_op_basic ($self, $make, $op, $pre, $post) {
   make_Combine(
     $op,
-    @$pre, @$post
+    map { @$_ > 1 ? make_Combine(@$_) : @$_ } $pre, $post
   );
 }
 
