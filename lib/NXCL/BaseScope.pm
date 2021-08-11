@@ -4,6 +4,7 @@ use NXCL::Package;
 use NXCL::Utils qw(uncons);
 use NXCL::MethodUtils;
 use NXCL::ExprUtils;
+use NXCL::OpUtils;
 use Sub::Util qw(set_subname);
 use vars qw(@BASE_TYPES);
 use NXCL::TypeFunctions (
@@ -35,9 +36,13 @@ use NXCL::BaseOps qw(%OP_MAP);
 my %opmeth = map {
   my ($opname, $opmeth) = ($_, $OP_MAP{$_});
   ($opname => make_Val make_Native set_subname "dot_${opmeth}" =>
-    sub ($scope, $, $args) {
-      my ($obj) = uncons $args;
-      call_method($scope, $obj, $opmeth, $args);
+    sub ($, $, $argsp) {
+      my ($obj, $args) = uncons $argsp;
+      return (
+        EVAL($obj),
+        SNOC($args),
+        CALL($opmeth),
+      );
     })
 } (
   sort keys %OP_MAP
