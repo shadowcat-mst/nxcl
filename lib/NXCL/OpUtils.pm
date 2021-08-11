@@ -4,8 +4,12 @@ use NXCL::Exporter;
 
 our @EXPORT = qw(EVAL CALL CMB9 CMB6 ECDR CONS SNOC JUST DROP HOST);
 
+sub make_op ($type, @args) {
+  [ $type => @args ]
+}
+
 foreach my $op_type (@EXPORT) {
-  eval "sub ${op_type} { [ ${op_type} => \@_ ] }; 1"
+  eval "sub ${op_type} { make_op ${op_type} => \@_ }; 1"
     or  die "Couldn't eval ${op_type}: $@";
 }
 

@@ -2,6 +2,7 @@ package NXCL::RunTrace;
 
 use NXCL::Package;
 use NXCL::YDump;
+use NXCL::OpUtils;
 
 our $Count = 0;
 our $Max;
@@ -19,7 +20,38 @@ BEGIN {
     $_ = do { my $v = $_; sub { my $s = &$v; $scopes{$s} = ++$idx; $s } }
   }
 }
-use NXCL::Utils qw(uncons objest_is raw flatten);
+fieldhash my %op_origins;
+BEGIN {
+  my $make_op = NXCL::OpUtils->can('make_op');
+  my $wrapped = sub {
+    my %origin;
+    my $level = 2;
+    while (1) {
+      my ($package)
+        = (undef, @origin{qw(filename line sub)})
+        = caller($level);
+      last unless
+        $package eq 'NXCL::TypeMethod'
+        or $package eq 'NXCL::MethodUtils';
+      ++$level;
+    }
+    while (1) {
+      my $callsub = $origin{callsub} = (caller($level+1))[3];
+      last unless $callsub eq 'NXCL::Runtime::take_method_step';
+      ++$level;
+    }
+    if (my $inc_file = { reverse %INC }->{$origin{filename}}) {
+      $origin{filename} = $inc_file;
+    }
+    s/^NXCL::/+/ for @origin{qw(sub callsub)};
+    my $op = $make_op->(@_);
+    $op_origins{$op} = \%origin;
+    return $op;
+  };
+  no warnings 'redefine';
+  *NXCL::OpUtils::make_op = $wrapped;
+}
+use NXCL::Utils qw(uncons object_is raw flatten);
 use NXCL::TypeFunctions qw(Scope_Inst make_String);
 use NXCL::JSON;
 
@@ -31,6 +63,9 @@ sub jsonify ($v) {
 }
 
 sub NXCL::Runtime::DEBUG_WARN ($prog, $kstack) {
+  if (my $origin = $op_origins{$prog}) {
+    warn join(' ', '#', @{$origin}{qw(callsub sub filename line)})."\n";
+  }
   eval {
     my @state = map {
       my ($op, @v) = @$_;

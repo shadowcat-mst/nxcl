@@ -60,7 +60,11 @@ sub take_step_JUST ($scope, $val, $kstack) {
   my ($kar, $kdr) = uncons $kstack;
   return (
     $scope,
-    [ @$kar, $val ],
+    # This code should probably be:
+    # [ @$kar, $val ],
+    # but I'm currently trying to get RunTrace to report things and
+    # the $kar never gets re-used so we can go with this for the moment:
+    do { push @$kar, $val; $kar },
     $kdr
   );
 }
