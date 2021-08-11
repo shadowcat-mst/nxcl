@@ -6,8 +6,8 @@ our @EXPORT_OK = qw(@WEAVE_OPS %OP_MAP);
 
 our @BASIC_BINOPS = do {
   my $basic = '
-    + -
     * /
+    + -
     < > <= >=
     == !=
     ++
