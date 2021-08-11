@@ -46,3 +46,5 @@ es "( (1), (2), (3) ).map .concat(('x'))"
 es '[ 1 == 1 ].ifelse 3 4'
 
 es '[ 1 == 0 ].ifelse 3 4'
+
+es '3 + 2 * 4'
