@@ -29,7 +29,7 @@ use NXCL::TypeFunctions (
     String
     Val
   )),
-  qw(make_Val make_Scope make_Native make_OpDict),
+  qw(make_Val make_Scope make_Scopener make_Native make_OpDict),
 );
 use NXCL::BaseOps qw(%OP_MAP);
 
@@ -53,6 +53,8 @@ our $Store = make_OpDict +{
   '.' => make_Val($DOT),
   escape => make_Val($ESCAPE),
   "\\" => make_Val($ESCAPE),
+  let => make_Val(make_Scopener(Val())),
+  # var => make_Val(make_Scopener(Var())),
   %opmeth,
   map +($_ => make_Val(__PACKAGE__->can($_)->())),
     @BASE_TYPES
