@@ -35,7 +35,7 @@ use NXCL::BaseOps qw(%OP_MAP);
 
 my %opmeth = map {
   my ($opname, $opmeth) = ($_, $OP_MAP{$_});
-  ($opname => make_Val make_Native set_subname "dot_${opmeth}" =>
+  ($opname => make_Native set_subname "dot_${opmeth}" =>
     sub ($, $, $argsp) {
       my ($obj, $args) = uncons $argsp;
       return (
@@ -48,16 +48,21 @@ my %opmeth = map {
   sort keys %OP_MAP
 );
 
-our $Store = make_OpDict +{
-  dot => make_Val($DOT),
-  '.' => make_Val($DOT),
-  escape => make_Val($ESCAPE),
-  "\\" => make_Val($ESCAPE),
-  let => make_Val(make_Scopener(Val())),
-  # var => make_Val(make_Scopener(Var())),
-  %opmeth,
-  map +($_ => make_Val(__PACKAGE__->can($_)->())),
-    @BASE_TYPES
+our $Store = make_OpDict do {
+  my %scope = (
+    dot => $DOT,
+    '.' => $DOT,
+    escape => $ESCAPE,
+    "\\" => $ESCAPE,
+    let => make_Scopener(Val),
+    # var => make_Scopener(Var),
+    %opmeth,
+    map +($_ => __PACKAGE__->can($_)->()),
+      @BASE_TYPES
+  );
+  +{
+    map +($_ => make_Val($scope{$_})), sort keys %scope
+  };
 };
 
 our $Scope = make_Scope $Store;
