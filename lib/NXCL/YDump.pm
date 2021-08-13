@@ -6,7 +6,7 @@ use NXCL::Exporter;
 
 our @EXPORT = qw(ydump);
 
-sub _cook ($type, @parts) {
+sub _cook ($type = '+++ EMPTY +++', @parts) {
   my @cooked_parts = map {
     if ($_->$_isa('JSON::PP::Boolean')) {
       ($_ ? 'true' : 'false')
