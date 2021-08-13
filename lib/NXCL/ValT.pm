@@ -9,7 +9,7 @@ sub make ($val) { _make ValR ,=> $val };
 export make => \&make;
 
 wrap static new => sub ($scope, $cmb, $self, $args) {
-  make((uncons $args)[0]);
+  return JUST make((uncons $args)[0]);
 };
 
 method combine => sub ($scope, $cmb, $self, $args) {
