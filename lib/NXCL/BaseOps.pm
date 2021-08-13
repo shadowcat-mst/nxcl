@@ -46,7 +46,6 @@ our %OP_MAP = do { my @ops = (
   and => '&&',
   or => '||',
   pipe => '|',
-  assign => '=',
   and => 'and',
   or => 'or',
 ); reverse @ops };

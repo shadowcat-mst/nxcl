@@ -56,6 +56,11 @@ our $Store = make_OpDict do {
     "\\" => $ESCAPE,
     let => make_Scopener(Val),
     # var => make_Scopener(Var),
+    '=' => make_Native(set_subname "opdot_assign_value" =>
+      sub ($, $, $args) {
+        return CALL(assign_value => $args);
+      }
+    ),
     %opmeth,
     map +($_ => __PACKAGE__->can($_)->()),
       @BASE_TYPES

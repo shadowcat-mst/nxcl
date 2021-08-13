@@ -19,6 +19,10 @@ BEGIN {
   for ($NXCL::TypeRegistry::TypeInfo{Scope}->exports->{make_Scope}) {
     $_ = do { my $v = $_; sub { my $s = &$v; $scopes{$s} = ++$idx; $s } }
   }
+  my $v = NXCL::ScopeT->can('make');
+  my $wrapped = sub { my $s = &$v; $scopes{$s} = ++$idx; $s };
+  no warnings 'redefine';
+  *NXCL::ScopeT::make = $wrapped;
 }
 fieldhash my %op_origins;
 BEGIN {

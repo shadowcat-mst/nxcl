@@ -2,7 +2,8 @@ package NXCL::CombineT;
 
 use NXCL::Utils qw(uncons);
 use NXCL::ReprTypes qw(ConsR);
-use NXCL::TypeFunctions qw(make_List);
+use NXCL::TypeFunctions qw(make_List cons_List);
+use NXCL::MethodUtils qw(call_method);
 use NXCL::TypePackage;
 
 export make => sub ($call, @args) { _make ConsR ,=> $call, make_List @args };
@@ -13,6 +14,15 @@ method evaluate => sub ($scope, $cmb, $self, $args) {
   return (
     EVAL($call),
     CMB6($call_args),
+  );
+};
+
+wrap method assign_value => sub ($scope, $cmb, $self, $args) {
+  my ($call, $call_args) = uncons $self;
+  return (
+    EVAL($call),
+    SNOC(cons_List($call_args, $args)),
+    CALL('assign_via_call'),
   );
 };
 
