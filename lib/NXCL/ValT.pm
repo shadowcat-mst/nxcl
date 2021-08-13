@@ -1,10 +1,16 @@
 package NXCL::ValT;
 
-use NXCL::Utils qw(rnilp raw panic);
+use NXCL::Utils qw(rnilp raw panic uncons);
 use NXCL::ReprTypes qw(ValR);
 use NXCL::TypePackage;
 
-export make => sub ($val) { _make ValR ,=> $val };
+sub make ($val) { _make ValR ,=> $val };
+
+export make => \&make;
+
+wrap static new => sub ($scope, $cmb, $self, $args) {
+  make((uncons $args)[0]);
+};
 
 method combine => sub ($scope, $cmb, $self, $args) {
   panic unless rnilp $args;
