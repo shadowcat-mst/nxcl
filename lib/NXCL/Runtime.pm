@@ -85,8 +85,12 @@ sub take_step_DROP ($scope, $val, $kstack) {
   return ($scope, uncons($kstack));
 }
 
+sub take_step_RPLS ($, $scope, $kstack) {
+  return ($scope, uncons($kstack));
+}
+
 our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
-  qw(EVAL CALL CMB9 CMB6 ECDR JUST CONS SNOC DROP);
+  qw(EVAL CALL CMB9 CMB6 ECDR JUST CONS SNOC DROP RPLS);
 
 sub take_step ($scope, $prog, $kstack) {
   DEBUG and DEBUG_WARN($prog, $kstack);
