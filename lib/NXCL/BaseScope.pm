@@ -28,6 +28,7 @@ use NXCL::TypeFunctions (
     Scope
     String
     Val
+    Var
   )),
   qw(make_Val make_Scope make_Scopener make_Native make_OpDict),
 );
@@ -55,7 +56,7 @@ our $Store = make_OpDict do {
     escape => $ESCAPE,
     "\\" => $ESCAPE,
     let => make_Scopener(Val),
-    # var => make_Scopener(Var),
+    var => make_Scopener(Var),
     '=' => make_Native(set_subname "opdot_assign_value" =>
       sub ($, $, $args) {
         return CALL(assign_value => $args);

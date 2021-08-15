@@ -54,7 +54,7 @@ sub rconsp ($v) { rtype($v) eq ConsR }
 sub rdictp ($v) { rtype($v) eq DictR }
 sub rnativep ($v) { rtype($v) eq NativeR }
 
-sub raw ($v) { $v->[1][1] }
+sub raw :lvalue ($v) { $v->[1][1] }
 
 sub uncons ($cons) { @{$cons->[1]}[1,2] }
 

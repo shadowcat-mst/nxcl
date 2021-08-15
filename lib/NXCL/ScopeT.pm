@@ -24,7 +24,7 @@ method combine => sub ($scope, $cmb, $self, $args) {
   if (object_is $store, OpDict_Inst) {
     my $cell = raw($store)->{$name};
     panic "No value for ${name} in current scope" unless $cell;
-    if (mset($cell) == Val_Inst) { # or mset($cell) == Var_Inst) {
+    if (mset($cell) == Val_Inst or mset($cell) == Var_Inst) {
       return JUST raw($cell);
     }
     return CMB9 $cell => empty_List;
