@@ -57,9 +57,15 @@ our $Store = make_OpDict do {
     "\\" => $ESCAPE,
     let => make_Scopener(Val),
     var => make_Scopener(Var),
-    '=' => make_Native(set_subname "opdot_assign_value" =>
+    '=' => make_Native(set_subname "assign_guts" =>
       sub ($, $, $args) {
-        return CALL(assign_value => $args);
+        my ($lhs, $cdr) = uncons($args);
+        my ($rhs) = uncons($cdr);
+        return (
+          CALL(assign_value => $args),
+          DROP(),
+          JUST($rhs)
+        );
       }
     ),
     %opmeth,
