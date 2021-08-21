@@ -65,7 +65,7 @@ method but_with_entry => sub ($scope, $cmb, $self, $args) {
   my $store = (my $selfd = raw($self))->{store};
   panic unless object_is($store, OpDict_Inst);
   my $new_store = make_OpDict({ %{raw($store)}, raw($namep) => $value });
-  return JUST make($new_store, $selfd->{into_as});
+  return JUST make($new_store, $selfd->{intro_as});
 };
 
 method but_intro_as => sub ($scope, $cmb, $self, $args) {
