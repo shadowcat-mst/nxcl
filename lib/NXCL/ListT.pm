@@ -21,8 +21,10 @@ sub cons (@members) {
   return $ret;
 }
 
-static empty => sub { return JUST _make(NilR) };
-export empty => sub { _make(NilR) };
+sub empty { _make(NilR) };
+
+export empty => \&empty;
+static new_empty => sub { return JUST empty };
 
 method to_xcl_string => sub ($scope, $cmb, $self, $) {
   return CALL '_to_xcl_string' => make($self);
@@ -124,5 +126,18 @@ my $each_continue = make_Native sub {
 };
 
 wrap method each => sub { map_body(@_, $each_continue) };
+
+method assign_value => sub ($scope, $cmb, $self, $args) {
+  return JUST($self) if rnilp($self);
+  my ($scar, $scdr) = uncons($self);
+  my ($arg) = uncons($args);
+  panic "WHAT" if rnilp($arg);
+  my ($acar, $acdr) = uncons($arg);
+  return (
+    CALL(assign_value => make($scar, $acar)),
+    DROP(),
+    CALL(assign_value => make($scdr, $acdr)),
+  );
+};
 
 1;
