@@ -1,6 +1,6 @@
 package NXCL::Reader;
 
-our $SYMBOL_CHARS = '.!$%&*+-/:<=>@\\^|~?';
+our $SYMBOL_CHARS = '.!$%&:<=>@\\^|~?*/+-'; # - last to avoid creating a range
 
 our %START = (
   ' ' => 'ws',
