@@ -47,7 +47,7 @@ sub _weave_type_Numeric ($self, $v) {
 sub _weave_type_List ($self, $v) { $self->_flat_weave(\&make_List, $v) }
 sub _weave_type_Call ($self, $v) { $self->_flat_weave(\&make_Call, raw($v)) }
 sub _weave_type_BlockProto ($self, $v) {
-   $self->_flat_weave(\&make_BlockProto, $v)
+   make_BlockProto($self->weave(raw($v)));
 }
 
 sub _flat_weave ($self, $make, $v) {

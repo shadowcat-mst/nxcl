@@ -89,8 +89,13 @@ sub take_step_RPLS ($, $scope, $kstack) {
   return ($scope, uncons($kstack));
 }
 
+sub take_step_OVER ($scope, $val, $kstack) {
+  my ($kar, $kdr) = uncons $kstack;
+  return ($scope, $kar, JUST($val), $kdr);
+}
+
 our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
-  qw(EVAL CALL CMB9 CMB6 ECDR JUST CONS SNOC DROP RPLS);
+  @NXCL::OpUtils::OPNAMES;
 
 sub take_step ($scope, $prog, $kstack) {
   DEBUG and DEBUG_WARN($prog, $kstack);

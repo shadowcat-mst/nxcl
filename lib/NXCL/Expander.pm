@@ -19,6 +19,8 @@ sub expand_enter_list { () }
 sub expand_leave_list { () }
 sub expand_enter_call { () }
 sub expand_leave_call { () }
+sub expand_enter_block { () }
+sub expand_leave_block { () }
 
 sub expand_word ($self, $name) { $self->make(Name => $name) }
 
@@ -41,7 +43,7 @@ sub expand_list ($self, @v) {
 }
 
 sub expand_block ($self, @v) {
-  $self->make(BlockProto => map $self->expand($_), @v);
+  $self->make(BlockProto => $self->make(Call => map $self->expand($_), @v));
 }
 
 sub expand_call ($self, @v) {

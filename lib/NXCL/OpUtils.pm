@@ -2,7 +2,9 @@ package NXCL::OpUtils;
 
 use NXCL::Exporter;
 
-our @EXPORT = qw(EVAL CALL CMB9 CMB6 ECDR CONS SNOC JUST DROP HOST RPLS);
+our @EXPORT
+  = our @OPNAMES
+  = qw(EVAL CALL CMB9 CMB6 ECDR CONS SNOC JUST DROP HOST RPLS OVER);
 
 sub make_op ($type, @args) {
   [ $type => @args ]
