@@ -71,11 +71,14 @@ sub NXCL::Runtime::DEBUG_WARN ($prog, $kstack) {
     warn join(' ', '#', @{$origin}{qw(callsub sub filename line)})."\n";
   }
   eval {
-    my @state = map {
+    my ($pst, @stst) = map {
       my ($op, @v) = @$_;
       [ $op => map jsonify(ref() ? $_ : make_String($_//'NULL')), @v ];
     } ($prog, flatten($kstack));
-    warn join('', map ydump($_), @state)."\n";
+    warn join('',
+      ydump($pst) =~ s/^/  /mgr,
+      map ydump($_) =~ s/^/+ /mgr, @stst
+    )."\n";
     1;
   } or do {
     warn ydump([ debug_render_error => $@ ]);
