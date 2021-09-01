@@ -52,6 +52,7 @@ my %opmeth = map {
 our $Store = make_OpDict do {
   my %scope = (
     dot => $DOT,
+    dot_f => $DOT_F,
     '.' => $DOT,
     escape => $ESCAPE,
     "\\" => $ESCAPE,

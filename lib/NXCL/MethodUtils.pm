@@ -9,13 +9,15 @@ use NXCL::TypeFunctions qw(
 );
 use NXCL::TypeRegistry;
 
-our @EXPORT = qw(call_method lookup_method $DOT);
+our @EXPORT = qw(call_method lookup_method $DOT $DOT_F);
 
 our $DOT = make_Native \&dot;
 
 our %N =
   map +($_ => make_Native(__PACKAGE__->can($_))),
     qw(dot_lookup dot_curryable dot_curried dot_f);
+
+our $DOT_F = $N{dot_f};
 
 $_ = make_Apv($_) for $N{dot_curried};
 
