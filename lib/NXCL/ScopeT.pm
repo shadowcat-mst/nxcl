@@ -1,7 +1,7 @@
 package NXCL::ScopeT;
 
 use NXCL::ReprTypes qw(DictR);
-use NXCL::Utils qw(mset object_is raw panic uncons flatten);
+use NXCL::Utils qw(mset object_is raw panic uncons flatten rnilp);
 use NXCL::TypeFunctions qw(
   make_OpDict OpDict_Inst Val_Inst Var_Inst
   make_String make_List cons_List empty_List
@@ -46,7 +46,8 @@ method assign_via_call => sub ($scope, $cmb, $self, $args) {
       return CALL(assign_via_call => cons_List($cell, empty_List, $vlist));
     }
     panic "No value for ${name} in current scope"
-      unless my $intro_as = $selfd->{intro_as};
+      if rnilp($selfd->{intro_as});
+    my ($intro_as) = uncons($selfd->{intro_as});
     return (
       CALL(new => cons_List($intro_as, $vlist)),
       SNOC(empty_List),
@@ -70,8 +71,7 @@ method set_entry => sub ($scope, $cmb, $self, $args) {
 };
 
 method but_intro_as => sub ($scope, $cmb, $self, $args) {
-  my ($as) = uncons($args);
-  return JUST make(raw($self)->{store}, $as);
+  return JUST make(raw($self)->{store}, $args);
 };
 
 method but_closed => sub ($scope, $cmb, $self, $args) {
