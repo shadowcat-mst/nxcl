@@ -52,20 +52,21 @@ method assign_via_call => sub ($scope, $cmb, $self, $args) {
       SNOC(empty_List),
       CONS($namep),
       CONS($self),
-      CALL('but_with_entry'),
-      RPLS(),
+      CALL('set_entry'),
+      DROP(),
       JUST((uncons $vlist)[0]),
     );
   }
   die "NYI";
 };
 
-method but_with_entry => sub ($scope, $cmb, $self, $args) {
+method set_entry => sub ($scope, $cmb, $self, $args) {
   my ($namep, $value) = flatten($args);
   my $store = (my $selfd = raw($self))->{store};
   panic unless object_is($store, OpDict_Inst);
   my $new_store = make_OpDict({ %{raw($store)}, raw($namep) => $value });
-  return JUST make($new_store, $selfd->{intro_as});
+  $selfd->{store} = $new_store;
+  return JUST $value;
 };
 
 method but_intro_as => sub ($scope, $cmb, $self, $args) {
