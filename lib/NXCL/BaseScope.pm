@@ -30,7 +30,7 @@ use NXCL::TypeFunctions (
     Val
     Var
   )),
-  qw(make_Val make_Scope make_Scopener make_Native make_OpDict),
+  qw(make_Val make_Scope make_Scopener make_Native make_OpDict make_ApMeth),
 );
 use NXCL::BaseOps qw(%OP_MAP);
 
@@ -57,7 +57,8 @@ our $Store = make_OpDict do {
     "\\" => $ESCAPE,
     let => make_Scopener(Val),
     var => make_Scopener(Var),
-    '=' => make_Native(set_subname "assign_guts" =>
+    # Using ApMethT to get the RHS eval-ed and the LHS not is kinda cheating.
+    '=' => make_ApMeth(make_Native(set_subname "assign_guts" =>
       sub ($, $, $args) {
         my ($lhs, $cdr) = uncons($args);
         my ($rhs) = uncons($cdr);
@@ -67,7 +68,7 @@ our $Store = make_OpDict do {
           JUST($rhs)
         );
       }
-    ),
+    )),
     %opmeth,
     map +($_ => __PACKAGE__->can($_)->()),
       @BASE_TYPES
