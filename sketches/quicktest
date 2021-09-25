@@ -52,3 +52,5 @@ es '3 + 2 * 4'
 es 'let x = 3; x + 2'
 
 es 'let x = [ let y = 3 ] + 4;'
+
+es 'let (x, y) = (1, 2); y + 3;'
