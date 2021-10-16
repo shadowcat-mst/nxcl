@@ -43,7 +43,7 @@ sub expand_list ($self, @v) {
 }
 
 sub expand_block ($self, @v) {
-  $self->make(BlockProto => $self->make(Call => map $self->expand($_), @v));
+  $self->make(Block => $self->make(Call => map $self->expand($_), @v));
 }
 
 sub expand_call ($self, @v) {

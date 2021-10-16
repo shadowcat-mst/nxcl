@@ -6,7 +6,7 @@ use NXCL::TypeMaker;
 use NXCL::TypeFunctions qw(
   make_List
   make_Call
-  make_BlockProto
+  make_Block
   make_Combine
   cons_Combine
   make_Compound
@@ -46,8 +46,8 @@ sub _weave_type_Numeric ($self, $v) {
 
 sub _weave_type_List ($self, $v) { $self->_flat_weave(\&make_List, $v) }
 sub _weave_type_Call ($self, $v) { $self->_flat_weave(\&make_Call, raw($v)) }
-sub _weave_type_BlockProto ($self, $v) {
-   make_BlockProto($self->weave(raw($v)));
+sub _weave_type_Block ($self, $v) {
+   make_Block($self->weave(raw($v)));
 }
 
 sub _flat_weave ($self, $make, $v) {

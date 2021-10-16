@@ -1,20 +1,17 @@
 package NXCL::BlockT;
 
-use NXCL::ReprTypes qw(DictR);
-use NXCL::Utils qw(raw);
+use NXCL::ReprTypes qw(ValR);
+use NXCL::Utils qw(raw panic object_is);
+use NXCL::TypeFunctions qw(make_Scope make_OpDict OpDict_Inst);
 use NXCL::TypePackage;
 
-sub make ($scope, $body) {
-  _make DictR ,=> {
-    scope => $scope,
-    body => $body,
-  };
-}
-
-export make => \&make;
+export make => sub ($call) { _make ValR ,=> $call };
 
 method combine => sub ($scope, $cmb, $self, $args) {
-  my ($block_scope, $block_body) = @{raw($self)}{qw(scope body)};
+  my $store = raw($scope)->{store};
+  panic 'NYI' unless object_is $store, OpDict_Inst;
+  my $block_scope = make_Scope(make_OpDict({ %{raw($store)} }));
+  my $block_body = raw($self);
   return (
     RPLS($block_scope),
     EVAL($block_body),
