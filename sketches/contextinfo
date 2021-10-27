@@ -1,0 +1,53 @@
+let x = [ log 'Calculating x'; 3 ]; # Determined by fair dice roll
+
+weaver produces:
+
+= [ let x ] [ log 'Calculating x'; 3 ]
+
+So execution is (starting with scope S):
+
+= [ let x ] [ log 'Calculating x'; 3 ]
+
+[ let x ].assign_value [ log 'Calculating x'; 3 ]
+
+let.assign_via_call x [ log 'Calculating x'; 3 ]
+
+# eval [ log 'Calculating x'; 3 ]
+
+log 'Calculating x'
+
+3
+
+RPLS: S1 = S.but_intro_as Val
+
+x.assign_value 3
+
+#{{{
+current restore code:
+RPLS: S2 = S1.but_closed()
+}}}#
+
+restore scope: S
+
+
+################################################
+
+let config
+  = where [ let cfg = env.MYAPP_CONFIG ] {
+      fs.file(cfg).string()
+    } else {
+      DEFAUlT_CONFIG
+    }
+
+Assume MYAPP_CONFIG="/foo/bar" but error loading the file
+
+Error: .string() can't read file "/foo/bar"
+  at fs.file(cfg).string
+  at where # at line 3
+  at let config = # at line 2
+
+Error: .string() can't read file "/foo/bar"
+  at fs.file(cfg = "/foo/bar").string
+  at where # at line 3
+  at let config = # at line 2
+

@@ -1,0 +1,22 @@
+
+let data = (
+  ('foo', '', 3),
+  ('more of a name', 'x', 27),
+);
+
+#{{{ md
+
+Some text first then a table:
+
+    #!!! ecopy
+    foo 		\E	3
+    more of a name	x	27
+
+Text with heading and an emoji:
+
+    #!!! ecopy :headers
+    Name	Description		Rank
+    Bob		Happy bob \e{thumbs up}	27
+    Undescribed	\E			42
+
+}}}#
