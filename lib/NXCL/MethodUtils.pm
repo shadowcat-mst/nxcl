@@ -21,7 +21,8 @@ our $DOT_F = $N{dot_f};
 
 $_ = make_Apv($_) for $N{dot_curried};
 
-sub call_method ($scope, $self, $methodp, $args) {
+sub call_method ($scope, $, $methodp, $args) {
+  my ($self) = uncons($args);
   panic "Undefined self" unless defined($self);
   my ($method_name, $method_String) = (
     ref($methodp)
