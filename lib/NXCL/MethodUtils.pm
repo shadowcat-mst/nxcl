@@ -21,7 +21,7 @@ our $DOT_F = $N{dot_f};
 
 $_ = make_Apv($_) for $N{dot_curried};
 
-sub call_method ($scope, $, $methodp, $args) {
+sub call_method ($scope, $methodp, $args) {
   my ($self) = uncons($args);
   panic "Undefined self" unless defined($self);
   my ($method_name, $method_String) = (
@@ -79,8 +79,7 @@ sub dot_curryable ($scope, $, $args) {
 
 sub dot_curried ($scope, $, $argsp) {
   my ($method, $args) = uncons $argsp;
-  my ($obj) = uncons $args;
-  call_method($scope, $obj, $method, $args);
+  call_method($scope, $method, $args);
 }
 
 sub dot_f ($scope, $, $args) {

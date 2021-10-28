@@ -11,7 +11,7 @@ our @EXPORT_OK = qw(run_til_done);
 
 sub take_method_step ($scope, $inv, $methodp, $args, $kstack) {
   return ($scope, call_method(
-    $scope, $inv, $methodp, $args
+    $scope, $methodp, $args
   ), $kstack);
 }
 
