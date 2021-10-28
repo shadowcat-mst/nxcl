@@ -3,7 +3,6 @@ package NXCL::CombineT;
 use NXCL::Utils qw(uncons);
 use NXCL::ReprTypes qw(ConsR);
 use NXCL::TypeFunctions qw(make_List cons_List);
-use NXCL::MethodUtils qw(call_method);
 use NXCL::TypePackage;
 
 export make => sub ($call, @args) { _make ConsR ,=> $call, make_List @args };
