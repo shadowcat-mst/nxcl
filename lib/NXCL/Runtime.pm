@@ -9,7 +9,7 @@ use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 
 our @EXPORT_OK = qw(run_til_done);
 
-sub take_method_step ($scope, $inv, $methodp, $args, $kstack) {
+sub take_method_step ($scope, $methodp, $args, $kstack) {
   return ($scope, call_method(
     $scope, $methodp, $args
   ), $kstack);
@@ -17,13 +17,13 @@ sub take_method_step ($scope, $inv, $methodp, $args, $kstack) {
 
 sub take_step_EVAL ($scope, $value, $kstack) {
   return take_method_step(
-    $scope, $value, 'evaluate', make_List($value), $kstack
+    $scope, 'evaluate', make_List($value), $kstack
   );
 }
 
 sub take_step_CALL ($scope, $methodp, $args, $kstack) {
   return take_method_step(
-    $scope, (uncons($args))[0], $methodp, $args, $kstack
+    $scope, $methodp, $args, $kstack
   );
 }
 
@@ -32,7 +32,7 @@ sub take_step_CMB9 ($scope, $cmb, $args, $kstack) {
     return ($scope, raw($cmb)->($scope, $cmb, $args), $kstack);
   }
   return take_method_step(
-    $scope, $cmb, 'combine', cons_List($cmb, $args), $kstack
+    $scope, 'combine', cons_List($cmb, $args), $kstack
   );
 }
 
