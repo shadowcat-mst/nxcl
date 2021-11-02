@@ -9,7 +9,7 @@ our $Max;
 
 sub import { $Max = $_[1] if defined $_[1] }
 
-sub NXCL::Runtime::DEBUG { 1 }
+sub NXCL::Runtime::DEBUG :prototype() { 1 }
 
 use NXCL::ScopeT;
 use Hash::Util qw(fieldhash);
