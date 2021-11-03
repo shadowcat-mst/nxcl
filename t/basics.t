@@ -3,6 +3,7 @@ use NXCL::Utils qw(uncons raw);
 use NXCL::Environment;
 use NXCL::JSON;
 use NXCL::TypeFunctions qw(make_Native);
+use NXCL::OpUtils;
 use JSON::Dumper::Compact jdc => { max_width => 76 };
 use NXCL::ValueBuilders;
 
@@ -25,7 +26,7 @@ sub isv ($code, $val, $msg = undef) {
 }
 
 my $func = make_Native(sub ($scope, $cmb, $args) {
-  return ([ JUST => I(raw((uncons($args))[0])+1) ]);
+  return JUST I(raw((uncons($args))[0])+1)
 });
 
 foreach my $ident (

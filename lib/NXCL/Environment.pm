@@ -18,8 +18,6 @@ sub _run ($self, $scope, $value, $kstack) {
   ($scope, $value, $kstack) = run_til_done($scope, $value, $kstack);
   return NXCL::RV->new(
     raw_value => $value,
-    kstack => $kstack,
-    scope => $scope,
     env => $self
   );
 }
