@@ -19,13 +19,13 @@ sub Ev($tag, $v) {
 }
 
 sub isv ($code, $val, $msg = undef) {
-  my ($ret) = $env->eval($code);
+  my ($ret) = $env->eval($code)->raw_value;
   @_ = (nxcl2json($ret), nxcl2json($val), $msg, jdc(nxcl2json($ret)));
   goto &is;
 }
 
-my $func = make_Native(sub ($scope, $cmb, $args, $kstack) {
-  return ([ JUST => I(raw((uncons($args))[0])+1) ], $kstack);
+my $func = make_Native(sub ($scope, $cmb, $args) {
+  return ([ JUST => I(raw((uncons($args))[0])+1) ]);
 });
 
 foreach my $ident (
@@ -42,6 +42,6 @@ isv(Cmb($func, I 2), I 3);
 
 isv(Cmb( Cmb( N"dot", I 7, N"minus" ), I 3 ), I 4);
 
-isv(Cmb( Cmb( Call( dot => N"minus" ) ), I 7, I 3), I 4);
+isv(Cmb( Cmb( Cmb( N"dot" => N"minus" ) ), I 7, I 3), I 4);
 
 done_testing;
