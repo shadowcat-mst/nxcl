@@ -24,7 +24,7 @@ sub take_step_CALL ($cxs, $opq, $methodp, $args) {
 sub take_step_CMB9 ($cxs, $opq, $cmb, $args) {
   my $scope = $cxs->[-1][1];
   if (object_is $cmb, Native_Inst) {
-    return ($scope, raw($cmb)->($scope, $cmb, $args), $kstack);
+    return raw($cmb)->($scope, $cmb, $args);
   }
   push @$opq, reverse 
     call_method($scope, combine => cons_List($cmb, $args));
@@ -73,20 +73,20 @@ our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
 
 sub take_step ($cxs, $opq) {
   DEBUG and DEBUG_WARN($cxs, $opq);
-  my ($op, @v) = @{pop @$opq}
+  my ($op, @v) = @{pop @$opq};
   die "Unkown op type $op" unless my $step_func = $step_func{$op};
-  $step_func->($scope, $cxs, $opq, @v);
+  $step_func->($cxs, $opq, @v);
   return;
 }
 
 sub run_til_host ($cxs, $opq) {
   while ($opq->[-1][0] ne 'HOST') {
-    take_step($cxs, $opq, $next);
+    take_step($cxs, $opq);
     DEBUG and die "EMPTY CX STACK" unless @$cxs;
     DEBUG and die "EMPTY OP QUEUE" unless @$opq;
   }
-  my (undef, @host) = @{pop @$opq};
-  return [ \@host, $cxs, $opq ];
+  my (undef, $host) = @{pop @$opq};
+  return $host;
 }
 
 1;
