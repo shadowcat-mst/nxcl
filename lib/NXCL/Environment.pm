@@ -14,14 +14,6 @@ lazy expander => nxcl_require_and_call('NXCL::Expander', 'new');
 
 lazy weaver => nxcl_require_and_call('NXCL::Weaver', 'new');
 
-sub _run ($self, $scope, $value, $kstack) {
-  ($scope, $value, $kstack) = run_til_done($scope, $value, $kstack);
-  return NXCL::RV->new(
-    xcl_value => $value,
-    xcl_environment => $self
-  );
-}
-
 sub eval_string ($self, $string) {
   $self->eval_string_in($self->scope, $string);
 }
@@ -34,15 +26,17 @@ sub eval_string_in ($self, $scope, $string) {
 }
 
 sub eval_in ($self, $scope, $value) {
-  $self->_run($scope, EVAL($value), make_List(HOST()));
+  (undef, $value) = run_til_done(
+    $scope, EVAL($value), make_List(HOST())
+  );
+  return NXCL::RV->new(
+    xcl_value => $value,
+    xcl_environment => $self
+  );
 }
 
 sub eval ($self, $value) {
   $self->eval_in($self->scope, $value);
-}
-
-sub resume ($self, $value, $kstack) {
-  $self->_run($self->scope, JUST($value), $kstack);
 }
 
 1;
