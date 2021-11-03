@@ -17,8 +17,8 @@ lazy weaver => nxcl_require_and_call('NXCL::Weaver', 'new');
 sub _run ($self, $scope, $value, $kstack) {
   ($scope, $value, $kstack) = run_til_done($scope, $value, $kstack);
   return NXCL::RV->new(
-    raw_value => $value,
-    env => $self
+    xcl_value => $value,
+    xcl_environment => $self
   );
 }
 

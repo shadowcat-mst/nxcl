@@ -20,7 +20,7 @@ sub Ev($tag, $v) {
 }
 
 sub isv ($code, $val, $msg = undef) {
-  my ($ret) = $env->eval($code)->raw_value;
+  my ($ret) = $env->eval($code)->xcl_value;
   @_ = (nxcl2json($ret), nxcl2json($val), $msg, jdc(nxcl2json($ret)));
   goto &is;
 }

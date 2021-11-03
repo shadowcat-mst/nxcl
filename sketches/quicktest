@@ -2,7 +2,7 @@
 
 es () {
   echo "\$ $1"
-  perl sketches/evalstring "$1"
+  perl dev/es "$1"
 }
 
 es '1 + 2'
