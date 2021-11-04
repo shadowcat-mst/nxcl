@@ -1,0 +1,11 @@
+use NXCL::Package;
+use NXCL::Utils qw(raw);
+use NXCL::Environment;
+
+my $env = NXCL::Environment->new;
+
+my $rv = $env->eval_string(
+  $ARGV[0]//die "No argument given"
+)->value_to_xcl_string;
+
+say $rv->xcl_raw_value;
