@@ -35,7 +35,7 @@ sub mkv ($mset, $rtype, @v) {
       panic "mkv called with undefined ${failed} of ".scalar(@v);
     }
   }
-  return [ $mset => [ $rtype => @v ] ]
+  return bless([ $mset => [ $rtype => @v ] ], 'NXCL::_::V');
 }
 
 sub mset ($v) { $v->[0] }

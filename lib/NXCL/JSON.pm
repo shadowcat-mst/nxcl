@@ -18,7 +18,7 @@ sub nxcl2json ($v) {
   my $rtype = rtype($v);
   return [ "${mset_name} (UNDEF)" ] unless defined($rtype);
   return [ "${mset_name} (CORRUPT ${rtype})" ]
-    unless ref($rtype) eq 'SCALAR';
+    unless ref($rtype) =~ /^NXCL::_::RType::/;
   my $type = "${mset_name} (${$rtype})";
   return [ $type ] if $rtype == NilR;
   return [ "${mset_name} (flattened)", map nxcl2json($_), flatten($v) ]
