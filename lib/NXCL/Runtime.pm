@@ -7,114 +7,87 @@ use NXCL::OpUtils;
 use NXCL::TypeFunctions qw(Native_Inst make_List cons_List);
 use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 
-our @EXPORT_OK = qw(run_til_done);
+our @EXPORT_OK = qw(run_til_host);
 
-sub take_method_step ($scope, $methodp, $args, $kstack) {
-  return ($scope, call_method(
-    $scope, $methodp, $args
-  ), $kstack);
+sub take_step_EVAL ($cxs, $opq, $value) {
+  my $scope = $cxs->[-1][1];
+  push @$opq, reverse
+    call_method($scope, evaluate => make_List($value));
 }
 
-sub take_step_EVAL ($scope, $value, $kstack) {
-  return take_method_step(
-    $scope, 'evaluate', make_List($value), $kstack
+sub take_step_CALL ($cxs, $opq, $methodp, $args) {
+  my $scope = $cxs->[-1][1];
+  push @$opq, reverse
+    call_method($scope, $methodp, $args);
+}
+
+sub take_step_CMB9 ($cxs, $opq, $cmb, $args) {
+  my $scope = $cxs->[-1][1];
+  push @$opq, reverse(
+    object_is($cmb, Native_Inst)
+      ? raw($cmb)->($scope, $cmb, $args)
+      : call_method($scope, combine => cons_List($cmb, $args))
   );
 }
 
-sub take_step_CALL ($scope, $methodp, $args, $kstack) {
-  return take_method_step(
-    $scope, $methodp, $args, $kstack
+sub take_step_CMB6 ($cxs, $opq, $args, $cmb) {
+  take_step_CMB9($cxs, $opq, $cmb, $args);
+}
+
+sub take_step_ECDR ($cxs, $opq, $cdr, $car) {
+  push @$opq, (rnilp($cdr)
+    ? JUST(make_List($car))
+    : (CONS($car), EVAL($cdr))
   );
 }
 
-sub take_step_CMB9 ($scope, $cmb, $args, $kstack) {
-  if (object_is $cmb, Native_Inst) {
-    return ($scope, raw($cmb)->($scope, $cmb, $args), $kstack);
-  }
-  return take_method_step(
-    $scope, 'combine', cons_List($cmb, $args), $kstack
-  );
+sub take_step_JUST ($cxs, $opq, $val) {
+  push @{$opq->[-1]}, $val;
 }
 
-sub take_step_CMB6 ($scope, $args, $cmb, $kstack) {
-  return take_step_CMB9($scope, $cmb, $args, $kstack);
+sub take_step_CONS ($cxs, $opq, $car, $cdr) {
+  push @{$opq->[-1]}, cons_List($car, $cdr);
 }
 
-sub take_step_ECDR ($scope, $cdr, $car, $kstack) {
-  if (rnilp $cdr) {
-    return (
-      $scope,
-      JUST(make_List($car)),
-      $kstack
-    );
-  }
-  return (
-    $scope,
-    EVAL($cdr),
-    CONS($car),
-    $kstack
-  );
+sub take_step_SNOC ($cxs, $opq, $cdr, $car) {
+  push @{$opq->[-1]}, cons_List($car, $cdr);
 }
 
-sub take_step_JUST ($scope, $val, $kstack) {
-  my ($kar, $kdr) = uncons $kstack;
-  return (
-    $scope,
-    # This code should probably be:
-    # [ @$kar, $val ],
-    # but I'm currently trying to get RunTrace to report things and
-    # the $kar never gets re-used so we can go with this for the moment:
-    do { push @$kar, $val; $kar },
-    $kdr
-  );
+sub take_step_DROP { }
+
+sub take_step_OVER ($cxs, $opq, $val) {
+  push @$opq, JUST($val), pop @$opq;
 }
 
-sub take_step_CONS ($scope, $car, $cdr, $kstack) {
-  take_step_JUST($scope, cons_List($car, $cdr), $kstack);
+sub take_step_ECTX ($cxs, $opq, $expr, $scope) {
+  push @$cxs, [ cons_List($expr, $cxs->[-1][0]), $scope ];
 }
 
-sub take_step_SNOC ($scope, $cdr, $car, $kstack) {
-  take_step_CONS($scope, $car, $cdr, $kstack);
-}
-
-#sub take_step_JUMP ($to, $arg, $kstack) {
-#  raw($arg) ? $to : $kstack;
-#}
-
-sub take_step_DROP ($scope, $val, $kstack) {
-  return ($scope, uncons($kstack));
-}
-
-sub take_step_RPLS ($, $scope, $kstack) {
-  return ($scope, uncons($kstack));
-}
-
-sub take_step_OVER ($scope, $val, $kstack) {
-  my ($kar, $kdr) = uncons $kstack;
-  return ($scope, $kar, JUST($val), $kdr);
+sub take_step_LCTX ($cxs, $opq, $val) {
+  pop @$cxs;
+  push @{$opq->[-1]}, $val;
 }
 
 our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
   @NXCL::OpUtils::OPNAMES;
 
-sub take_step ($scope, $prog, $kstack) {
-  DEBUG and DEBUG_WARN($prog, $kstack);
-  my ($op, @v) = @$prog;
-  if (my $step_func = $step_func{$op}) {
-    return $step_func->($scope, @v, $kstack);
-  }
-  if ($op eq 'HOST') {
-    return ($scope, [ $v[0], $kstack ]);
-  }
-  die "Unkown op type $op";
+sub take_step ($cxs, $opq) {
+  DEBUG and DEBUG_WARN($cxs, $opq);
+  my ($op, @v) = @{pop @$opq};
+  die "Unkown op type $op" unless my $step_func = $step_func{$op};
+  $step_func->($cxs, $opq, @v);
+  return;
 }
 
-sub run_til_done ($scope, $prog, $kstack) {
-  while (($scope, $prog, my @stack) = take_step($scope, $prog, $kstack)) {
-    return ($scope, @$prog) unless @stack;
-    $kstack = cons_List(@stack);
+sub run_til_host ($cxs, $opq) {
+  while ($opq->[-1][0] ne 'HOST') {
+    take_step($cxs, $opq);
+    DEBUG and die "EMPTY CX STACK" unless @$cxs;
+    DEBUG and die "EMPTY OP QUEUE" unless @$opq;
   }
-  die "notreached";
+  DEBUG and DEBUG_WARN($cxs, $opq);
+  my (undef, $host) = @{pop @$opq};
+  return $host;
 }
 
 1;

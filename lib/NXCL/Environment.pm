@@ -1,7 +1,7 @@
 package NXCL::Environment;
 
 use NXCL::Class;
-use NXCL::Runtime qw(run_til_done);
+use NXCL::Runtime qw(run_til_host);
 use NXCL::TypeFunctions qw(make_List);
 use NXCL::OpUtils;
 use NXCL::RV;
@@ -26,11 +26,12 @@ sub eval_string_in ($self, $scope, $string) {
 }
 
 sub eval_in ($self, $scope, $value) {
-  (undef, $value) = run_til_done(
-    $scope, EVAL($value), make_List(HOST())
+  my $return_value = run_til_host(
+    [ [ [ make_List($value) ], $scope ] ],
+    [ HOST(), EVAL($value) ],
   );
   return NXCL::RV->new(
-    xcl_value => $value,
+    xcl_value => $return_value,
     xcl_environment => $self
   );
 }
