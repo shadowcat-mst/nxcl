@@ -35,9 +35,10 @@ sub take_step_CMB6 ($cxs, $opq, $args, $cmb) {
 }
 
 sub take_step_ECDR ($cxs, $opq, $cdr, $car) {
-  push @$opq, (rnilp($cdr)
-    ? JUST(make_List($car))
-    : (CONS($car), EVAL($cdr))
+  push @$opq, reverse(
+    rnilp($cdr)
+      ? JUST(make_List($car))
+      : (EVAL($cdr), CONS($car))
   );
 }
 
