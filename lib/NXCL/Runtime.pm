@@ -60,8 +60,12 @@ sub take_step_OVER ($cxs, $opq, $val) {
   push @$opq, JUST($val), pop @$opq;
 }
 
-sub take_step_ECTX ($cxs, $opq, $expr, $scope) {
-  push @$cxs, [ cons_List($expr, $cxs->[-1][0]), $scope ];
+sub take_step_ECTX ($cxs, $opq, $thing, $count, $scope) {
+  push @$cxs, [
+     cons_List($thing, $cxs->[-1][0]),
+     $scope,
+     scalar(@$opq) - $count,
+  ];
 }
 
 sub take_step_LCTX ($cxs, $opq, $val) {

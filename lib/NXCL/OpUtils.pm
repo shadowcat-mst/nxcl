@@ -15,4 +15,14 @@ foreach my $op_type (@EXPORT) {
     or  die "Couldn't eval ${op_type}: $@";
 }
 
+push @EXPORT, qw(INCTX);
+
+sub INCTX {
+  die unless @_ == 2 or @_ == 3;
+  my $thing = shift;
+  my @scope = $#_ ? shift : ();
+  my @ops = (@{+shift}, LCTX());
+  return (ECTX($thing, scalar(@ops), @scope), @ops);
+}
+
 1;

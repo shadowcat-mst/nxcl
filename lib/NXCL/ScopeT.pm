@@ -1,6 +1,6 @@
 package NXCL::ScopeT;
 
-use NXCL::ReprTypes qw(DictR);
+use NXCL::ReprTypes qw(VarR);
 use NXCL::Utils qw(mset object_is raw panic uncons flatten rnilp);
 use NXCL::TypeFunctions qw(
   make_OpDict OpDict_Inst Val_Inst Var_Inst
@@ -8,19 +8,16 @@ use NXCL::TypeFunctions qw(
 );
 use NXCL::TypePackage;
 
-sub make ($store, $intro_as = empty_List) {
- _make DictR ,=> {
-    store => $store,
-    intro_as => $intro_as,
-  };
+sub make ($store) {
+ _make VarR ,=> $store;
 }
 
 export make => \&make;
 
-method combine => sub ($scope, $cmb, $self, $args) {
+method get_value_for_name => sub ($scope, $cmb, $self, $args) {
   my ($namep) = uncons($args);
   my $name = raw($namep);
-  my $store = raw($self)->{store};
+  my $store = raw($self);
   if (object_is $store, OpDict_Inst) {
     my $cell = raw($store)->{$name};
     panic "No value for ${name} in current scope" unless $cell;
@@ -35,47 +32,22 @@ method combine => sub ($scope, $cmb, $self, $args) {
   );
 };
 
-method assign_via_call => sub ($scope, $cmb, $self, $args) {
+method set_value_for_name => sub ($scope, $cmb, $self, $args) {
   my ($callargs, $vlist) = uncons $args;
   my ($namep) = uncons($callargs);
   my $name = raw($namep);
-  my $store = (my $selfd = raw($self))->{store};
+  my $store = raw($self);
   if (object_is $store, OpDict_Inst) {
     if (my $cell = raw($store)->{$name}) {
       # cell() = value
       return CALL(assign_via_call => cons_List($cell, empty_List, $vlist));
     }
-    panic "No value for ${name} in current scope"
-      if rnilp($selfd->{intro_as});
-    my ($intro_as) = uncons($selfd->{intro_as});
-    return (
-      CALL(new => cons_List($intro_as, $vlist)),
-      SNOC(empty_List),
-      CONS($namep),
-      CONS($self),
-      CALL('set_entry'),
-      DROP(),
-      JUST((uncons $vlist)[0]),
-    );
+    panic "No value for ${name} in current scope";
   }
-  die "NYI";
+  panic "NYI";
 };
 
-method set_entry => sub ($scope, $cmb, $self, $args) {
-  my ($namep, $value) = flatten($args);
-  my $store = (my $selfd = raw($self))->{store};
-  panic unless object_is($store, OpDict_Inst);
-  my $new_store = make_OpDict({ %{raw($store)}, raw($namep) => $value });
-  $selfd->{store} = $new_store;
-  return JUST $value;
-};
-
-method but_intro_as => sub ($scope, $cmb, $self, $args) {
-  return JUST make(raw($self)->{store}, $args);
-};
-
-method but_closed => sub ($scope, $cmb, $self, $args) {
-  return JUST make(raw($self)->{store});
-};
+# combine() should do eval-in-scope
+# assign_via_call() should pass through to eval-in-scope where possible
 
 1;

@@ -14,16 +14,16 @@ sub make ($name) { _make CharsR ,=> $name }
 
 method evaluate => sub ($scope, $cmb, $self, $args) {
   return call_method(
-    $scope, combine => make_List($scope, make_String raw($self))
+    $scope, get_value_for_name => make_List($scope, $self)
   );
 };
 
 method assign_value => sub ($scope, $cmb, $self, $args) {
   return JUST empty_List if raw($self) eq '$';
+  my ($new_value) = uncons($args);
   return call_method(
-    $scope,
-      assign_via_call
-      => cons_List $scope, make_List(make_String raw($self)), $args
+    $scope, set_value_for_name =>
+      make_List $scope, $self, $new_value
   );
 };
 
