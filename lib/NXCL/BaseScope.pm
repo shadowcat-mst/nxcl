@@ -26,6 +26,7 @@ use NXCL::TypeFunctions (
     OpDict
     Pair
     Scope
+    IntroScope
     String
     Val
     Var
@@ -58,6 +59,8 @@ our $Store = make_OpDict do {
     "\\" => $ESCAPE,
     let => make_Scopener(Val),
     var => make_Scopener(Var),
+    # uncomment this later when it'll actually work
+    # cur => make_Scopener(undef),
     # Using ApMethT to get the RHS eval-ed and the LHS not is kinda cheating.
     '=' => make_ApMeth(make_Native(set_subname "assign_guts" =>
       sub ($, $, $args) {

@@ -15,7 +15,7 @@ foreach my $op_type (@EXPORT) {
     or  die "Couldn't eval ${op_type}: $@";
 }
 
-push @EXPORT, qw(INCTX);
+push @EXPORT, qw(INCTX OVERCTX);
 
 sub INCTX {
   die unless @_ == 2 or @_ == 3;
@@ -23,6 +23,14 @@ sub INCTX {
   my @scope = $#_ ? shift : ();
   my @ops = (@{+shift}, LCTX());
   return (ECTX($thing, scalar(@ops), @scope), @ops);
+}
+
+sub OVERCTX {
+  die unless @_ == 2 or @_ == 3;
+  my $thing = shift;
+  my @scope = $#_ ? shift : ();
+  my @ops = (@{+shift}, LCTX());
+  return (OVER(), ECTX($thing, scalar(@ops) + 1, @scope), @ops);
 }
 
 1;

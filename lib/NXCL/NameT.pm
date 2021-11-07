@@ -1,6 +1,6 @@
 package NXCL::NameT;
 
-use NXCL::Utils qw(mset object_is raw panic);
+use NXCL::Utils qw(mset object_is raw panic uncons);
 use NXCL::ReprTypes qw(CharsR);
 use NXCL::TypeFunctions qw(
   make_String make_List cons_List empty_List
