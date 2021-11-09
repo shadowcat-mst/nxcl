@@ -35,7 +35,8 @@ method get_value_for_name => sub ($scope, $cmb, $self, $args) {
 method set_value_for_name => sub ($scope, $cmb, $self, $args) {
   my ($callargs, $vlist) = uncons $args;
   my ($namep) = uncons($callargs);
-  my $name = raw($namep);
+  # I am not convinced this conditional is a good idea
+  my $name = ref($namep) ? raw($namep) : $namep;
   my $store = raw($self);
   if (object_is $store, OpDict_Inst) {
     if (my $cell = raw($store)->{$name}) {
@@ -45,6 +46,10 @@ method set_value_for_name => sub ($scope, $cmb, $self, $args) {
     panic "No value for ${name} in current scope";
   }
   panic "NYI";
+};
+
+method set_cell_for_name => sub ($scope, $cmb, $self, $args) {
+  panic "Invalid";
 };
 
 # combine() should do eval-in-scope

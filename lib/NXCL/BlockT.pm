@@ -8,16 +8,11 @@ use NXCL::TypePackage;
 export make => sub ($call) { _make ValR ,=> $call };
 
 method combine => sub ($scope, $cmb, $self, $args) {
-  my $store = raw($scope)->{store};
+  my $store = raw($scope);
   panic 'NYI' unless object_is $store, OpDict_Inst;
   my $block_scope = make_Scope(make_OpDict({ %{raw($store)} }));
   my $block_body = raw($self);
-  return (
-    RPLS($block_scope),
-    EVAL($block_body),
-    OVER(),
-    RPLS($scope)
-  );
+  return DOCTX($block_body, $block_scope, [ EVAL $block_body ]);
 };
 
 1;
