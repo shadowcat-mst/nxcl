@@ -52,6 +52,11 @@ method set_cell_for_name => sub ($scope, $cmb, $self, $args) {
   panic "Invalid";
 };
 
+method derive => sub ($scope, $cmb, $self, $args) {
+  panic "NYI" unless rnilp $args; # should accept extra value pairs
+  return JUST make raw $self;
+};
+
 # combine() should do eval-in-scope
 # assign_via_call() should pass through to eval-in-scope where possible
 
