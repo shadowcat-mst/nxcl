@@ -30,7 +30,7 @@ method set_value_for_name => sub ($scope, $cmb, $self, $args) {
     CALL(new => cons_List($intro_as, $vlist)),
     SNOC(empty_List),
     CONS($namep),
-    CONS($self),
+    CONS(raw($self)->{scope}),
     CALL('set_cell_for_name'),
     DROP(),
     JUST((uncons($vlist))[0])
@@ -38,13 +38,9 @@ method set_value_for_name => sub ($scope, $cmb, $self, $args) {
 };
 
 method set_cell_for_name => sub ($scope, $cmb, $self, $args) {
-  my ($namep, $cell) = flatten($args);
-  my $store = raw(my $intscope = raw($self)->{scope});
-  panic "NYI" unless object_is($store, OpDict_Inst);
-  # this probably *could* mutate the hashref directly but meh
-  my $new_store = make_OpDict({ %{raw($store)}, raw($namep) => $cell });
-  raw($intscope) = $new_store;
-  return JUST $cell;
+  return CALL(set_cell_for_name
+    => cons_List(raw($self)->{scope}, $args)
+  );
 };
 
 1;

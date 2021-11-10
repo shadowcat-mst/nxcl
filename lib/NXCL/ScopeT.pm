@@ -49,7 +49,13 @@ method set_value_for_name => sub ($scope, $cmb, $self, $args) {
 };
 
 method set_cell_for_name => sub ($scope, $cmb, $self, $args) {
-  panic "Invalid";
+  my ($namep, $cell) = flatten($args);
+  my $store = raw($self);
+  panic "NYI" unless object_is($store, OpDict_Inst);
+  # this probably *could* mutate the hashref directly but meh
+  my $new_store = make_OpDict({ %{raw($store)}, raw($namep) => $cell });
+  raw($self) = $new_store;
+  return JUST $cell;
 };
 
 method derive => sub ($scope, $cmb, $self, $args) {
