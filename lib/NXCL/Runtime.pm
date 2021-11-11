@@ -56,8 +56,8 @@ sub take_step_SNOC ($cxs, $opq, $cdr, $car) {
 
 sub take_step_DROP { }
 
-sub take_step_OVER ($cxs, $opq, $val) {
-  push @$opq, JUST($val), pop @$opq;
+sub take_step_OVER ($cxs, $opq, $count, $val) {
+  splice @$opq, -$count, 0, JUST($val);
 }
 
 sub take_step_ECTX ($cxs, $opq, $thing, $count, $scope) {

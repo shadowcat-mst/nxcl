@@ -30,7 +30,7 @@ sub INCTX {
   my $thing = shift;
   my @scope = $#_ ? shift : ();
   my @ops = (@{+shift}, LCTX());
-  return (OVER(), ECTX($thing, scalar(@ops) + 1, @scope), @ops);
+  return (OVER(1), ECTX($thing, scalar(@ops) + 1, @scope), @ops);
 }
 
 1;
