@@ -10,7 +10,7 @@ export make => sub ($call) { _make ValR ,=> $call };
 method combine => sub ($scope, $cmb, $self, $args) {
   return(
     CALL(derive => make_List($scope)),
-    DOCTX($self, [ EVAL raw($self) ])
+    DOCTX($self, 0, [ EVAL raw($self) ])
   );
 };
 

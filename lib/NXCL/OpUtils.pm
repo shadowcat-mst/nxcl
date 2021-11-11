@@ -18,19 +18,12 @@ foreach my $op_type (@EXPORT) {
 push @EXPORT, qw(DOCTX INCTX);
 
 sub DOCTX {
-  die unless @_ == 2 or @_ == 3;
+  die unless @_ == 3 or @_ == 4;
   my $thing = shift;
+  my $count = shift;
   my @scope = $#_ ? shift : ();
   my @ops = (@{+shift}, LCTX());
-  return (ECTX($thing, scalar(@ops), @scope), @ops);
-}
-
-sub INCTX {
-  die unless @_ == 2 or @_ == 3;
-  my $thing = shift;
-  my @scope = $#_ ? shift : ();
-  my @ops = (@{+shift}, LCTX());
-  return (OVER(1), ECTX($thing, scalar(@ops) + 1, @scope), @ops);
+  return (ECTX($thing, scalar(@ops) + $count, @scope), @ops);
 }
 
 1;

@@ -17,7 +17,8 @@ method assign_via_call => sub ($scope, $cmb, $self, $args) {
   my $iscope = make_IntroScope($scope, $type);
   return (
     EVAL($valuep),
-    INCTX($self, $iscope, [
+    OVER(1),
+    DOCTX($self, 1, $iscope, [
       SNOC(empty_List),
       CONS($target),
       CALL('assign_value'),
