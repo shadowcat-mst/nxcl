@@ -30,6 +30,7 @@ use NXCL::TypeFunctions (
     String
     Val
     Var
+    Lambda
   )),
   qw(make_Val make_Scope make_Scopener make_Native make_OpDict make_ApMeth),
 );

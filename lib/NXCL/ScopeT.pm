@@ -5,6 +5,7 @@ use NXCL::Utils qw(mset object_is raw panic uncons flatten rnilp);
 use NXCL::TypeFunctions qw(
   make_OpDict OpDict_Inst Val_Inst Var_Inst
   make_String make_List cons_List empty_List
+  make_IntroScope
 );
 use NXCL::TypePackage;
 
@@ -61,6 +62,11 @@ method set_cell_for_name => sub ($scope, $cmb, $self, $args) {
 method derive => sub ($scope, $cmb, $self, $args) {
   panic "NYI" unless rnilp $args; # should accept extra value pairs
   return JUST make raw $self;
+};
+
+method introscope => sub ($scope, $cmb, $self, $args) {
+  my ($type) = uncons($args);
+  return JUST make_IntroScope($self, $type);
 };
 
 # combine() should do eval-in-scope

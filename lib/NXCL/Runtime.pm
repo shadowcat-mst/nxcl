@@ -46,18 +46,27 @@ sub take_step_JUST ($cxs, $opq, $val) {
   push @{$opq->[-1]}, $val;
 }
 
-sub take_step_CONS ($cxs, $opq, $car, $cdr) {
-  push @{$opq->[-1]}, cons_List($car, $cdr);
+sub take_step_CONS ($cxs, $opq, @cons) {
+  push @{$opq->[-1]}, cons_List(@cons);
 }
 
 sub take_step_SNOC ($cxs, $opq, $cdr, $car) {
   push @{$opq->[-1]}, cons_List($car, $cdr);
 }
 
+sub take_step_LIST ($cxs, $opq, @list) {
+  push @{$opq->[-1]}, make_List(@list);
+}
+
 sub take_step_DROP { }
 
 sub take_step_OVER ($cxs, $opq, $count, $val) {
   splice @$opq, -$count, 0, JUST($val);
+}
+
+sub take_step_DUP2 ($cxs, $opq, $count, $val) {
+  splice @$opq, -$count, 0, JUST($val);
+  push @$opq, JUST($val);
 }
 
 sub take_step_ECTX ($cxs, $opq, $thing, $count, $scope) {
