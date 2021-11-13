@@ -58,3 +58,5 @@ es 'let (x, y) = (1, 2); y + 3;'
 es 'var x = 3; { let y = 4; x = x + y }(); x'
 
 es 'let f = Lambda.new (x) { x + 1 }; f 3'
+
+es 'let f = { let x = 3; Lambda.new (y) { x + y } }(); f 7'

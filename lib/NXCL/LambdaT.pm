@@ -23,17 +23,28 @@ static new => sub ($scope, $cmb, $self, $args) {
 method combine => sub ($scope, $cmb, $self, $args) {
   my %me = %{raw($self)};
   return (
+    # Evaluate args in calling environment
+
     EVAL($args),
     OVER(5),
+
+    # Create execution scope
+
     CALL(derive => make_List($me{scope})),
     DUP2(8),
     SNOC(make_List(Val)),
     CALL('introscope'),
+
+    # Unpack arguments
+
     DOCTX($self, 1, [
       LIST($me{argspec}),
       CALL('assign_value'),
     ]),
     DROP(),
+
+    # Execute function body
+
     DOCTX($self, 1, [
       CMB9($me{body}, empty_List),
     ]),
