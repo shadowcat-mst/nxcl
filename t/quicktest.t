@@ -15,7 +15,7 @@ if (@ARGV and $ARGV[0] eq '--rewrite') {
   exit 0;
 }
 
-my $diff = diff \$result, 't/quicktest.transcript';
+my $diff = diff 't/quicktest.transcript', \$result;
 
 is $diff, '', 'No diffs';
 
