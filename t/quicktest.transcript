@@ -48,9 +48,9 @@
 = 7
 ? let (x, y) = (1, 2); y + 3;
 = 5
-? var x = 3; { let y = 4; x = x + y }(); x
+? var x = 3; do { let y = 4; x = x + y }; x
 = 7
 ? let f = Lambda.new (x) { x + 1 }; f 3
 = 4
-? let f = { let x = 3; Lambda.new (y) { x + y } }(); f 7
+? let f = do { let x = 3; Lambda.new (y) { x + y } }; f 7
 = 10

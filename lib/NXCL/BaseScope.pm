@@ -74,6 +74,8 @@ our $Store = make_OpDict do {
         );
       }
     )),
+    do => make_ApMeth(make_Native(set_subname "do" =>
+            sub ($, $, $args) { CALL(combine => $args) })),
     %opmeth,
     map +($_ => __PACKAGE__->can($_)->()),
       @BASE_TYPES
