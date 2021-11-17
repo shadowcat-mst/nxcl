@@ -69,15 +69,15 @@ sub jsonify ($v) {
   return nxcl2json($v);
 }
 
-sub NXCL::Runtime::DEBUG_WARN ($cxs, $opq) {
-  if (my $origin = $op_origins{$opq->[-1]}) {
+sub NXCL::Runtime::DEBUG_WARN ($cxs, $ops) {
+  if (my $origin = $op_origins{$ops->[-1]}) {
     warn join(' ', '#', @{$origin}{qw(callsub sub filename line)})."\n";
   }
   eval {
     my ($pst, @stst) = map {
       my ($op, @v) = @$_;
       [ $op => map jsonify(ref() ? $_ : make_String($_//'NULL')), @v ];
-    } reverse @$opq;
+    } reverse @$ops;
     warn join('',
       ydump($pst) =~ s/^/  /mgr,
       map ydump($_) =~ s/^/+ /mgr, @stst
