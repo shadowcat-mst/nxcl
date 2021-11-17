@@ -1,0 +1,21 @@
+use NXCL::Package;
+use NXCL::Environment;
+
+my $env = NXCL::Environment->new;
+
+my $fh = do {
+  if (my $file = $ARGV[0]) {
+    open my $fh, '<', $file or die "Couldn't open ${file}: $!";
+    $fh;
+  } else {
+    \*STDIN;
+  }
+};
+
+while (defined(my $orig = my $line = <$fh>)) {
+  if ($line =~ s/^\? //) {
+    my $rv = $env->eval_string($line)->value_to_xcl_string;
+    print $orig;
+    say '= '.$rv->xcl_raw_value;
+  }
+}
