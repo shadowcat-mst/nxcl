@@ -1,5 +1,4 @@
 use NXCL::Package;
-use NXCL::Utils qw(raw);
 use NXCL::Environment;
 
 my $env = NXCL::Environment->new;
