@@ -13,7 +13,7 @@ my $fh = do {
 };
 
 while (defined(my $orig = my $line = <$fh>)) {
-  if ($line =~ s/^\? //) {
+  if ($line =~ s/^\$ //) {
     my $rv = $env->eval_string($line)->value_to_xcl_string;
     print $orig;
     say '= '.$rv->xcl_raw_value;
