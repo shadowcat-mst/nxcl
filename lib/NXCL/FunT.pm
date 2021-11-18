@@ -1,4 +1,4 @@
-package NXCL::LambdaT;
+package NXCL::FunT;
 
 use NXCL::Utils qw(flatten raw);
 use NXCL::TypeFunctions qw(make_List empty_List Val);

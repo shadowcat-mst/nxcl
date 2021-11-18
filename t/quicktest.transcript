@@ -50,7 +50,7 @@
 = 5
 ? var x = 3; do { let y = 4; x = x + y }; x
 = 7
-? let f = Lambda.new (x) { x + 1 }; f 3
+? let f = fun (x) { x + 1 }; f 3
 = 4
-? let f = do { let x = 3; Lambda.new (y) { x + y } }; f 7
+? let f = do { let x = 3; fun (y) { x + y } }; f 7
 = 10
