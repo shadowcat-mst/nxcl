@@ -36,7 +36,7 @@ sub call_method ($scope, $methodp, $args) {
       .(join(', ', sort keys %{raw($mset)})||'(none)').")"
       unless my $handler = raw($mset)->{$method_name};
     if (object_is $handler, Native_Inst) {
-      return raw($handler)->($scope, $handler, $args);
+      return raw($handler)->($scope, $args);
     }
     return CMB9 $handler, $args;
   }
@@ -62,27 +62,27 @@ sub lookup_method ($scope, $self, $methodp) {
   }
   return (
     CMB9($mset, make_List($method_String)),
-    CMB9(make_Native(sub ($scope, $cmb, $args) {
+    CMB9(make_Native(sub ($scope, $args) {
       make_Curry((uncons($args))[0], $self)
     })),
   );
 }
 
-sub dot_lookup ($scope, $, $args) {
+sub dot_lookup ($scope, $args) {
   my ($lookup, $obj) = flatten $args;
   return CMB9 $obj => make_List($lookup);
 }
 
-sub dot_curryable ($scope, $, $args) {
+sub dot_curryable ($scope, $args) {
   return JUST cons_Curry($N{dot_curried}, $args);
 }
 
-sub dot_curried ($scope, $, $argsp) {
+sub dot_curried ($scope, $argsp) {
   my ($method, $args) = uncons $argsp;
   call_method($scope, $method, $args);
 }
 
-sub dot_f ($scope, $, $args) {
+sub dot_f ($scope, $args) {
   my ($callp, $obj) = flatten $args;
   my $ctype = mset($callp);
   if ($ctype == Name_Inst) {
@@ -104,14 +104,14 @@ sub dot_f ($scope, $, $args) {
   return JUST make_Curry($N{dot_lookup}, $callp);
 }
 
-sub dot ($scope, $cmb, $args) {
+sub dot ($scope, $args) {
   my @args = flatten $args;
   panic unless @args == 1 or @args == 2;
   my $mset = mset($args[-1]);
   if ($mset == Name_Inst or $mset == Int_Inst or $mset == String_Inst) {
 
     unless (@args == 2) {
-      return dot_f($scope, undef, $args);
+      return dot_f($scope, $args);
     }
 
     return (

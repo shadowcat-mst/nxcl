@@ -10,7 +10,7 @@ export make => \&make;
 
 sub make ($type) { _make ValR ,=> $type }
 
-method assign_via_call => sub ($scope, $cmb, $self, $args) {
+method assign_via_call => sub ($scope, $self, $args) {
   my ($targetp, $valuep) = flatten($args);
   my ($target) = uncons($targetp);
   my $type = raw($self);

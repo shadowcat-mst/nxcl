@@ -12,13 +12,13 @@ export make => \&make;
 
 sub make ($name) { _make CharsR ,=> $name }
 
-method evaluate => sub ($scope, $cmb, $self, $args) {
+method evaluate => sub ($scope, $self, $args) {
   return call_method(
     $scope, get_value_for_name => make_List($scope, $self)
   );
 };
 
-method assign_value => sub ($scope, $cmb, $self, $args) {
+method assign_value => sub ($scope, $self, $args) {
   return JUST empty_List if raw($self) eq '$';
   my ($new_value) = uncons($args);
   return call_method(

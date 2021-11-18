@@ -40,7 +40,7 @@ use NXCL::BaseOps qw(%OP_MAP);
 my %opmeth = map {
   my ($opname, $opmeth) = ($_, $OP_MAP{$_});
   ($opname => make_Native set_subname "dot_${opmeth}" =>
-    sub ($, $, $argsp) {
+    sub ($, $argsp) {
       my ($obj, $args) = uncons $argsp;
       return (
         EVAL($obj),
@@ -65,7 +65,7 @@ our $Store = make_OpDict do {
     # cur => ...
     # Using ApMethT to get the RHS eval-ed and the LHS not is kinda cheating.
     '=' => make_ApMeth(make_Native(set_subname "assign_guts" =>
-      sub ($, $, $args) {
+      sub ($, $args) {
         my ($lhs, $cdr) = uncons($args);
         my ($rhs) = uncons($cdr);
         return (
@@ -76,9 +76,9 @@ our $Store = make_OpDict do {
       }
     )),
     do => make_ApMeth(make_Native(set_subname "do" =>
-            sub ($, $, $args) { CALL(combine => $args) })),
+            sub ($, $args) { CALL(combine => $args) })),
     fun => make_ApMeth(make_Native(set_subname "lambda" =>
-             sub ($, $, $args) { CALL(new => cons_List(Fun, $args)) })),
+             sub ($, $args) { CALL(new => cons_List(Fun, $args)) })),
     %opmeth,
     map +($_ => __PACKAGE__->can($_)->()),
       @BASE_TYPES

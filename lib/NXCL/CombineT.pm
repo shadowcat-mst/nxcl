@@ -8,7 +8,7 @@ use NXCL::TypePackage;
 export make => sub ($call, @args) { _make ConsR ,=> $call, make_List @args };
 export cons => sub ($call, $args) { _make ConsR ,=> $call, $args };
 
-method evaluate => sub ($scope, $cmb, $self, $args) {
+method evaluate => sub ($scope, $self, $args) {
   my ($call, $call_args) = uncons $self;
   return (
     EVAL($call),
@@ -16,7 +16,7 @@ method evaluate => sub ($scope, $cmb, $self, $args) {
   );
 };
 
-wrap method assign_value => sub ($scope, $cmb, $self, $args) {
+wrap method assign_value => sub ($scope, $self, $args) {
   my ($call, $call_args) = uncons $self;
   return (
     EVAL($call),

@@ -15,7 +15,7 @@ sub make ($store) {
 
 export make => \&make;
 
-method get_value_for_name => sub ($scope, $cmb, $self, $args) {
+method get_value_for_name => sub ($scope, $self, $args) {
   my ($namep) = uncons($args);
   my $name = raw($namep);
   my $store = raw($self);
@@ -33,7 +33,7 @@ method get_value_for_name => sub ($scope, $cmb, $self, $args) {
   );
 };
 
-method set_value_for_name => sub ($scope, $cmb, $self, $args) {
+method set_value_for_name => sub ($scope, $self, $args) {
   my ($callargs, $vlist) = uncons $args;
   my ($namep) = uncons($callargs);
   # I am not convinced this conditional is a good idea
@@ -49,7 +49,7 @@ method set_value_for_name => sub ($scope, $cmb, $self, $args) {
   panic "NYI";
 };
 
-method set_cell_for_name => sub ($scope, $cmb, $self, $args) {
+method set_cell_for_name => sub ($scope, $self, $args) {
   my ($namep, $cell) = flatten($args);
   my $store = raw($self);
   panic "NYI" unless object_is($store, OpDict_Inst);
@@ -59,12 +59,12 @@ method set_cell_for_name => sub ($scope, $cmb, $self, $args) {
   return JUST $cell;
 };
 
-method derive => sub ($scope, $cmb, $self, $args) {
+method derive => sub ($scope, $self, $args) {
   panic "NYI" unless rnilp $args; # should accept extra value pairs
   return JUST make raw $self;
 };
 
-method introscope => sub ($scope, $cmb, $self, $args) {
+method introscope => sub ($scope, $self, $args) {
   my ($type) = uncons($args);
   return JUST make_IntroScope($self, $type);
 };

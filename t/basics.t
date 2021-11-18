@@ -25,7 +25,7 @@ sub isv ($code, $val, $msg = undef) {
   goto &is;
 }
 
-my $func = make_Native(sub ($scope, $cmb, $args) {
+my $func = make_Native(sub ($scope, $args) {
   return JUST I(raw((uncons($args))[0])+1)
 });
 

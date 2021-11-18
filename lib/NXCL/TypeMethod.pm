@@ -9,8 +9,8 @@ ro 'code';
 
 sub as_method ($self, @) {
   my $code = $self->code;
-  Sub::Util::set_subname $self->subname, sub ($scope, $cmb, $args) {
-    $code->($scope, $cmb, uncons($args));
+  Sub::Util::set_subname $self->subname, sub ($scope, $args) {
+    $code->($scope, uncons($args));
   }
 }
 

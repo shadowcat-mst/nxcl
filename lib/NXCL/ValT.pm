@@ -8,11 +8,11 @@ sub make ($val) { _make ValR ,=> $val };
 
 export make => \&make;
 
-wrap static new => sub ($scope, $cmb, $self, $args) {
+wrap static new => sub ($scope, $self, $args) {
   return JUST make((uncons $args)[0]);
 };
 
-method combine => sub ($scope, $cmb, $self, $args) {
+method combine => sub ($scope, $self, $args) {
   panic unless rnilp $args;
   return JUST raw($self);
 };

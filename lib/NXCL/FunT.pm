@@ -15,12 +15,12 @@ sub make ($scope, $argspec, $body) {
 
 export make => \&make;
 
-static new => sub ($scope, $cmb, $self, $args) {
+static new => sub ($scope, $self, $args) {
   my ($argspec, $body) = flatten $args;
   return JUST make $scope, $argspec, $body;
 };
 
-method combine => sub ($scope, $cmb, $self, $args) {
+method combine => sub ($scope, $self, $args) {
   my %me = %{raw($self)};
   return (
     # Evaluate args in calling environment

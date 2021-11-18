@@ -5,17 +5,12 @@ use NXCL::ReprTypes qw(ConsR);
 use NXCL::TypeFunctions qw(cons_List make_List make_String empty_List);
 use NXCL::TypePackage;
 
-export make => sub ($cmb, @i_args) { cons($cmb, make_List @i_args) };
+export make => sub ($curried, @i_args) { cons($curried, make_List @i_args) };
 export cons => \&cons;
 
-sub cons ($cmb, $i_args) { _make ConsR ,=> $cmb, $i_args }
+sub cons ($curried, $i_args) { _make ConsR ,=> $curried, $i_args }
 
-# Should be used as list_to_maybe_Curry($list) later
-#export list_to_maybe => sub ($cmb, $i_args) {
-#  rnilp($i_args) ? $cmb : cons($cmb, $i_args)
-#};
-
-method to_xcl_string => sub ($scope, $, $self, $) {
+method to_xcl_string => sub ($scope, $self, $) {
   state $fmt = make_String('Curry%s');
   return (
     CALL('to_xcl_string'
@@ -27,13 +22,13 @@ method to_xcl_string => sub ($scope, $, $self, $) {
 
 # called args versus implicit args - c_args versus i_args
 
-method combine => sub ($scope, $, $self, $c_args) {
-  my ($cmb, $i_args) = uncons($self);
+method combine => sub ($scope, $self, $c_args) {
+  my ($curried, $i_args) = uncons($self);
   if (rnilp $c_args) {
-    return CMB9 $cmb => $i_args;
+    return CMB9 $curried => $i_args;
   }
   my $full_args = cons_List(flatten($i_args), $c_args);
-  return CMB9 $cmb => $full_args;
+  return CMB9 $curried => $full_args;
 };
 
 1;

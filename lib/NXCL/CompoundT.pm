@@ -9,7 +9,7 @@ export make => sub ($first, @rest) {
   _make ConsR ,=> $first, make_List(@rest);
 };
 
-method evaluate => sub ($scope, $cmb, $self, $args) {
+method evaluate => sub ($scope, $self, $args) {
   my ($first, @rest) = flatten $self;
   return (
     EVAL($first),

@@ -7,7 +7,7 @@ use NXCL::TypePackage;
 
 export make => sub ($opv) { _make ValR ,=> $opv };
 
-method to_xcl_string => sub ($scope, $, $self, $) {
+method to_xcl_string => sub ($scope, $self, $) {
   state $fmt = make_String('ApMeth(%s)');
   return (
     CALL('to_xcl_string' => make_List(raw($self))),
@@ -16,7 +16,7 @@ method to_xcl_string => sub ($scope, $, $self, $) {
   );
 };
 
-method combine => sub ($scope, $cmb, $self, $args) {
+method combine => sub ($scope, $self, $args) {
   my ($inv, $method_args) = uncons($args);
   return (
     EVAL($method_args),

@@ -26,11 +26,11 @@ sub empty { _make(NilR) };
 export empty => \&empty;
 static new_empty => sub { return JUST empty };
 
-method to_xcl_string => sub ($scope, $cmb, $self, $) {
+method to_xcl_string => sub ($scope, $self, $) {
   return CALL '_to_xcl_string' => make($self);
 };
 
-method _to_xcl_string => sub ($scope, $cmb, $self, $args) {
+method _to_xcl_string => sub ($scope, $self, $args) {
   if (rnilp($self)) {
     return JUST make_String(
       '('.join(', ', map raw($_), reverse flatten $args).')'
@@ -45,19 +45,19 @@ method _to_xcl_string => sub ($scope, $cmb, $self, $args) {
   );
 };
 
-method first => sub ($scope, $cmb, $self, $args) {
+method first => sub ($scope, $self, $args) {
   panic unless rconsp $self;
   my ($first) = uncons $self;
   return JUST $first;
 };
 
-method rest => sub ($scope, $cmb, $self, $args) {
+method rest => sub ($scope, $self, $args) {
   panic unless rconsp $self;
   my (undef, $rest) = uncons $self;
   return JUST $rest;
 };
 
-method evaluate => sub ($scope, $cmb, $self, $args) {
+method evaluate => sub ($scope, $self, $args) {
   if (rnilp $self) {
     return JUST $self;
   }
@@ -68,12 +68,12 @@ method evaluate => sub ($scope, $cmb, $self, $args) {
   );
 };
 
-wrap method concat => sub ($scope, $cmb, $self, $args) {
+wrap method concat => sub ($scope, $self, $args) {
   my ($concat) = uncons($args);
   return JUST cons(flatten($self), $concat);
 };
 
-wrap method combine => sub ($scope, $cmb, $self, $args) {
+wrap method combine => sub ($scope, $self, $args) {
   panic "List.combine called without an index" if rnilp($args);
   my $idx = raw((uncons($args))[0]);
   my $value = $self;
@@ -83,7 +83,7 @@ wrap method combine => sub ($scope, $cmb, $self, $args) {
   return JUST $car;
 };
 
-sub map_continue ($scope, $cmb, $args, $flat = undef) {
+sub map_continue ($scope, $args, $flat = undef) {
   my ($func, $argcdr) = uncons($args);
   my ($val, $rest) = uncons($argcdr);
   my ($mapname, @vals) = ($flat ? $flat->($val) : (map => $val));
@@ -101,7 +101,7 @@ my $lmap_continue = make_Native sub {
   });
 };
 
-sub map_body ($scope, $cmb, $self, $args, $continue = $map_continue) {
+sub map_body ($scope, $self, $args, $continue = $map_continue) {
   if (rnilp($self)) {
     return JUST $self;
   }
@@ -127,7 +127,7 @@ my $each_continue = make_Native sub {
 
 wrap method each => sub { map_body(@_, $each_continue) };
 
-method assign_value => sub ($scope, $cmb, $self, $args) {
+method assign_value => sub ($scope, $self, $args) {
   return JUST($self) if rnilp($self);
   my ($scar, $scdr) = uncons($self);
   my ($arg) = uncons($args);

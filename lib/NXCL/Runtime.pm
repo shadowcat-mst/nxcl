@@ -25,7 +25,7 @@ sub take_step_CMB9 ($cxs, $ops, $cmb, $args) {
   my $scope = $cxs->[-1][1];
   push @$ops, reverse(
     object_is($cmb, Native_Inst)
-      ? raw($cmb)->($scope, $cmb, $args)
+      ? raw($cmb)->($scope, $args)
       : call_method($scope, combine => cons_List($cmb, $args))
   );
 }

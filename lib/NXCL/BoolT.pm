@@ -9,11 +9,11 @@ export make => \&make;
 
 sub make ($val) { _make BoolR ,=> 0+!!$val };
 
-method to_xcl_string => sub ($scope, $cmb, $self, $) {
+method to_xcl_string => sub ($scope, $self, $) {
   return JUST make_String(!!(raw($self)) ? 'true' : 'false');
 };
 
-wrap method eq => sub ($scope, $cmb, $self, $args) {
+wrap method eq => sub ($scope, $self, $args) {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
@@ -21,7 +21,7 @@ wrap method eq => sub ($scope, $cmb, $self, $args) {
   return JUST make(raw($self) == raw($r));
 };
 
-method ifelse => sub ($scope, $cmb, $self, $args) {
+method ifelse => sub ($scope, $self, $args) {
   panic 'Wrong arg count' unless 2 ==
     (my ($then, $else) = flatten $args);
   return EVAL raw($self) ? $then : $else;
