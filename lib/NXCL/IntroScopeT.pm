@@ -28,9 +28,7 @@ method set_value_for_name => sub ($scope, $cmb, $self, $args) {
   my $intro_as = raw($self)->{intro_as};
   return (
     CALL(new => cons_List($intro_as, $vlist)),
-    SNOC(empty_List),
-    CONS($namep),
-    CONS(raw($self)->{scope}),
+    LIST(raw($self)->{scope}, $namep),
     CALL('set_cell_for_name'),
     DROP(),
     JUST((uncons($vlist))[0])
