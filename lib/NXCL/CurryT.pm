@@ -20,8 +20,7 @@ method to_xcl_string => sub ($scope, $, $self, $) {
   return (
     CALL('to_xcl_string'
       => make_List(make_List(flatten($self)))),
-    SNOC(empty_List),
-    CONS($fmt),
+    LIST($fmt),
     CALL('sprintf'),
   );
 };
