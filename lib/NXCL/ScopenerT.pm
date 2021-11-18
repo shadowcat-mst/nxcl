@@ -19,8 +19,7 @@ method assign_via_call => sub ($scope, $cmb, $self, $args) {
     EVAL($valuep),
     OVER(1),
     DOCTX($self, 1, $iscope, [
-      SNOC(empty_List),
-      CONS($target),
+      LIST($target),
       CALL('assign_value'),
     ])
   );
