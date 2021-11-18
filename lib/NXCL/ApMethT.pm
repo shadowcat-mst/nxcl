@@ -11,8 +11,7 @@ method to_xcl_string => sub ($scope, $, $self, $) {
   state $fmt = make_String('ApMeth(%s)');
   return (
     CALL('to_xcl_string' => make_List(raw($self))),
-    SNOC(empty_List),
-    CONS($fmt),
+    LIST($fmt),
     CALL('sprintf'),
   );
 };
