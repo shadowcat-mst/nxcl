@@ -97,7 +97,7 @@ sub run_til_host ($cxs, $ops) {
   while ($ops->[-1][0] ne 'HOST') {
     take_step($cxs, $ops);
     DEBUG and die "EMPTY CX STACK" unless @$cxs;
-    DEBUG and die "EMPTY OP QUEUE" unless @$ops;
+    DEBUG and die "EMPTY OP STACK" unless @$ops;
   }
   DEBUG and DEBUG_WARN($cxs, $ops);
   my (undef, $host) = @{pop @$ops};
