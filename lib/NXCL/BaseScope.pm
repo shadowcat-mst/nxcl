@@ -33,7 +33,7 @@ use NXCL::TypeFunctions (
     Fun
   )),
   qw(make_Val make_Scope make_Scopener make_Native make_OpDict),
-  qw(make_ApMeth make_Apv make_String make_List),
+  qw(make_ApMeth make_Apv make_String make_List make_Bool),
   qw(cons_List),
 );
 use NXCL::BaseOps qw(%OP_MAP);
@@ -76,6 +76,8 @@ our $Store = make_OpDict do {
         );
       }
     )),
+    true => make_Bool(1),
+    false => make_Bool(0),
     do => make_ApMeth(make_Native(set_subname "do" =>
             sub ($, $args) { CALL(combine => $args) })),
     fun => make_ApMeth(make_Native(set_subname "fun" =>

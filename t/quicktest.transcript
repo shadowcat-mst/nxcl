@@ -54,7 +54,7 @@ $ let f = fun (x) { x + 1 }; f 3
 = 4
 $ let f = do { let x = 3; fun (y) { x + y } }; f 7
 = 10
-$ let f = fun (x) { x.ifelse do{ return 1 } 2; 3 }; f [0==1]
+$ let f = fun (x) { x.ifelse do{ return 1 } 2; 3 }; f false
 = 3
-$ let f = fun (x) { x.ifelse do{ return 1 } 2; 3 }; f [0==0]
+$ let f = fun (x) { x.ifelse do{ return 1 } 2; 3 }; f true
 = 1
