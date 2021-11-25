@@ -11,11 +11,11 @@ export make => sub ($cx) {
   _make ValR ,=> $cx;
 };
 
-method 'is-active' => sub ($, $self, $) {
+method is_active => sub ($, $self, $) {
   JUST make_Bool defined(raw($self));
 };
 
-method 'return-to' => sub ($, $self, $args) {
+method return_to => sub ($, $self, $args) {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   LCTX $cx, (uncons($args))[0];
 };

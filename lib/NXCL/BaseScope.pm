@@ -89,7 +89,7 @@ our $Store = make_OpDict do {
           CALL(get_dynamic_value
             => make_List($scope, make_String('callctx'))),
           SNOC(make_List($ret)),
-          CALL('return-to'),
+          CALL('return_to'),
         );
       }
     )),
