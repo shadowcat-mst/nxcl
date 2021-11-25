@@ -1,7 +1,10 @@
 package NXCL::FunT;
 
 use NXCL::Utils qw(flatten raw);
-use NXCL::TypeFunctions qw(make_List empty_List Val);
+use NXCL::TypeFunctions qw(
+  make_List empty_List Val
+  make_String
+);
 use NXCL::ReprTypes qw(DictR);
 use NXCL::TypePackage;
 
@@ -22,21 +25,25 @@ static new => sub ($scope, $self, $args) {
 
 method combine => sub ($scope, $self, $args) {
   my %me = %{raw($self)};
-  return (
+  return DOCTX $self, 0, $scope, [
     # Evaluate args in calling environment
 
     EVAL($args),
-    OVER(5),
+    OVER(9, 'JUST'),
 
     # Create execution scope
 
     CALL(derive => make_List($me{scope})),
-    DUP2(8),
-    SNOC(make_List(Val)),
-    CALL('introscope'),
+    OVER(2, 'CONS'),
+    GCTX(),
+    LIST(make_String('callctx')),
+    CALL('with_dynamic_value'),
+    DUP2(8, 'JUST'),
 
     # Unpack arguments
 
+    SNOC(make_List(Val)),
+    CALL('introscope'),
     DOCTX($self, 1, [
       LIST($me{argspec}),
       CALL('assign_value'),
@@ -45,8 +52,8 @@ method combine => sub ($scope, $self, $args) {
 
     # Execute function body
 
-    DOCTX($self, 1, [
+    DOCTX($self, 0, [
       CMB9($me{body}, empty_List),
     ]),
-  );
+  ];
 };

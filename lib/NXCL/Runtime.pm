@@ -1,10 +1,10 @@
 package NXCL::Runtime;
 
 use NXCL::Exporter;
-use NXCL::Utils qw(object_is uncons raw rnilp);
+use NXCL::Utils qw(object_is uncons raw rnilp panic);
 use NXCL::MethodUtils;
 use NXCL::OpUtils;
-use NXCL::TypeFunctions qw(Native_Inst make_List cons_List);
+use NXCL::TypeFunctions qw(Native_Inst make_List cons_List make_CxRef);
 use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 
 our @EXPORT_OK = qw(run_til_host);
@@ -60,12 +60,12 @@ sub take_step_LIST ($cxs, $ops, @list) {
 
 sub take_step_DROP { }
 
-sub take_step_OVER ($cxs, $ops, $count, $val) {
-  splice @$ops, -$count, 0, JUST($val);
+sub take_step_OVER ($cxs, $ops, $count, $type, $val) {
+  splice @$ops, -$count, 0, [ $type => $val ];
 }
 
-sub take_step_DUP2 ($cxs, $ops, $count, $val) {
-  splice @$ops, -$count, 0, JUST($val);
+sub take_step_DUP2 ($cxs, $ops, $count, $type, $val) {
+  splice @$ops, -$count, 0, [ $type => $val ];
   push @$ops, JUST($val);
 }
 
@@ -77,9 +77,26 @@ sub take_step_ECTX ($cxs, $ops, $thing, $count, $scope) {
   ];
 }
 
-sub take_step_LCTX ($cxs, $ops, $val) {
-  pop @$cxs;
+sub take_step_LCTX ($cxs, $ops, $cx, $val) {
+  my $lctx_idx;
+  if ($cx) {
+    FIND: foreach my $cand (1..$#$cxs) {
+      if ($cxs->[-$cand] == $cx) {
+        $lctx_idx = -$cand;
+        last FIND;
+      }
+    }
+    panic "Attempt to leave invalid cx" unless $lctx_idx;
+  } else {
+    $lctx_idx = -1;
+  }
+  my @left = splice @$cxs, $lctx_idx;
+  $#$ops = $left[0][-1] - 1;
   push @{$ops->[-1]}, $val;
+}
+
+sub take_step_GCTX ($cxs, $ops) {
+  push @{$ops->[-1]}, make_CxRef($cxs->[-1]);
 }
 
 our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),

@@ -32,7 +32,8 @@ use NXCL::TypeFunctions (
     Var
     Fun
   )),
-  qw(make_Val make_Scope make_Scopener make_Native make_OpDict make_ApMeth),
+  qw(make_Val make_Scope make_Scopener make_Native make_OpDict),
+  qw(make_ApMeth make_Apv make_String make_List),
   qw(cons_List),
 );
 use NXCL::BaseOps qw(%OP_MAP);
@@ -77,8 +78,19 @@ our $Store = make_OpDict do {
     )),
     do => make_ApMeth(make_Native(set_subname "do" =>
             sub ($, $args) { CALL(combine => $args) })),
-    fun => make_ApMeth(make_Native(set_subname "lambda" =>
+    fun => make_ApMeth(make_Native(set_subname "fun" =>
              sub ($, $args) { CALL(new => cons_List(Fun, $args)) })),
+    return => make_Apv(make_Native(set_subname "return" =>
+      sub ($scope, $args) {
+        my ($ret) = uncons($args);
+        return (
+          CALL(get_dynamic_value
+            => make_List($scope, make_String('callctx'))),
+          SNOC(make_List($ret)),
+          CALL('return-to'),
+        );
+      }
+    )),
     %opmeth,
     map +($_ => __PACKAGE__->can($_)->()),
       @BASE_TYPES

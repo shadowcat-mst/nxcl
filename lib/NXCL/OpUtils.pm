@@ -18,6 +18,7 @@ our @EXPORT
       HOST
       ECTX
       LCTX
+      GCTX
       OVER
       DUP2
     );
@@ -38,7 +39,7 @@ sub DOCTX {
   my $thing = shift;
   my $count = shift;
   my @scope = $#_ ? shift : ();
-  my @ops = (@{+shift}, LCTX());
+  my @ops = (@{+shift}, LCTX(undef));
   return (ECTX($thing, scalar(@ops) + $count, @scope), @ops);
 }
 
