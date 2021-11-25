@@ -29,14 +29,12 @@ method combine => sub ($scope, $self, $args) {
     # Evaluate args in calling environment
 
     EVAL($args),
-    OVER(9, 'JUST'),
+    OVER(7, 'JUST'),
 
     # Create execution scope
 
-    CALL(derive => make_List($me{scope})),
-    OVER(2, 'CONS'),
     GCTX(),
-    LIST(make_String('callctx')),
+    LIST($me{scope}, make_String('callctx')),
     CALL('with_dynamic_value'),
     DUP2(8, 'JUST'),
 
