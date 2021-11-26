@@ -75,6 +75,15 @@ method introscope => sub ($, $self, $args) {
 # combine() should do eval-in-scope
 # assign_via_call() should pass through to eval-in-scope where possible
 
+method lexicals => sub ($, $self, $) {
+  return JUST raw($self)->{lexicals};
+};
+
+method with_lexicals => sub ($, $self, $args) {
+  my ($new) = uncons $args;
+  return JUST make $new, raw($self)->{dynamics};
+};
+
 method get_dynamic_value => sub ($, $self, $args) {
   my $name = raw((uncons($args))[0]);
   panic "No dynamic value for ${name}"

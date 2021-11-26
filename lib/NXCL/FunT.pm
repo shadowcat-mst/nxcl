@@ -8,9 +8,9 @@ use NXCL::TypeFunctions qw(
 use NXCL::ReprTypes qw(DictR);
 use NXCL::TypePackage;
 
-sub make ($scope, $argspec, $body) {
+sub make ($lexicals, $argspec, $body) {
   _make DictR ,=> {
-    scope => $scope,
+    lexicals => $lexicals,
     argspec => $argspec,
     body => $body,
   };
@@ -19,8 +19,17 @@ sub make ($scope, $argspec, $body) {
 export make => \&make;
 
 static new => sub ($scope, $self, $args) {
-  my ($argspec, $body) = flatten $args;
-  return JUST make $scope, $argspec, $body;
+  return (
+    CALL(lexicals => make_List($scope)),
+    SNOC($args),
+    CONS($self),
+    CALL('_new'),
+  );
+};
+
+static _new => sub ($scope, $self, $args) {
+  my ($lexicals, $argspec, $body) = flatten $args;
+  return JUST make $lexicals, $argspec, $body;
 };
 
 method combine => sub ($scope, $self, $args) {
@@ -29,12 +38,14 @@ method combine => sub ($scope, $self, $args) {
     # Evaluate args in calling environment
 
     EVAL($args),
-    OVER(7, 'JUST'),
+    OVER(9, 'JUST'),
 
     # Create execution scope
 
+    CALL(with_lexicals => make_List($scope, $me{lexicals})),
+    OVER(2, 'CONS'),
     GCTX(),
-    LIST($me{scope}, make_String('callctx')),
+    LIST(make_String('callctx')),
     CALL('with_dynamic_value'),
     DUP2(8, 'JUST'),
 
