@@ -3,9 +3,10 @@ package NXCL::FunT;
 use NXCL::Utils qw(flatten raw);
 use NXCL::TypeFunctions qw(
   make_List empty_List Val
-  make_String
+  make_String make_Name
 );
 use NXCL::ReprTypes qw(DictR);
+use NXCL::MethodUtils qw($DOT_F);
 use NXCL::TypePackage;
 
 sub make ($lexicals, $argspec, $body) {
@@ -38,14 +39,16 @@ method combine => sub ($scope, $self, $args) {
     # Evaluate args in calling environment
 
     EVAL($args),
-    OVER(9, 'JUST'),
+    OVER(11, 'JUST'),
 
-    # Create execution scope
+    # Create execution scope and setup return target
 
     CALL(with_lexicals => make_List($scope, $me{lexicals})),
-    OVER(2, 'CONS'),
+    OVER(4, 'CONS'),
     GCTX(),
-    LIST(make_String('callctx')),
+    LIST(make_Name('return_to')),
+    CMB9($DOT_F),
+    LIST(make_String('return-target')),
     CALL('with_dynamic_value'),
     DUP2(8, 'JUST'),
 

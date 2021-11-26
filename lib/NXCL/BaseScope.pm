@@ -83,13 +83,13 @@ our $Store = make_OpDict do {
     fun => make_ApMeth(make_Native(set_subname "fun" =>
              sub ($, $args) { CALL(new => cons_List(Fun, $args)) })),
     return => make_Apv(make_Native(set_subname "return" =>
-      sub ($scope, $args) {
+      sub ($scope, $args) { # dynamic('return-target')(arg0)
         my ($ret) = uncons($args);
         return (
           CALL(get_dynamic_value
-            => make_List($scope, make_String('callctx'))),
+            => make_List($scope, make_String('return-target'))),
           SNOC(make_List($ret)),
-          CALL('return_to'),
+          CALL('combine'),
         );
       }
     )),
