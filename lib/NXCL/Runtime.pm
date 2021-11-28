@@ -70,10 +70,11 @@ sub take_step_DUP2 ($cxs, $ops, $count, $type, $val) {
 }
 
 sub take_step_ECTX ($cxs, $ops, $thing, $dynv, $count, $scope) {
+  my ($top_thing, $top_dynv, $top_scope) = @{$cxs->[-1]};
   push @$cxs, [
-     cons_List($thing, $cxs->[-1][0]),
-     ($dynv // $cxs->[-1][1]),
-     $scope,
+     cons_List($thing, $top_thing),
+     ($dynv // $top_dynv),
+     ($scope // $top_scope),
      scalar(@$ops) - $count,
   ];
 }

@@ -86,8 +86,9 @@ our $Store = make_OpDict do {
       sub ($scope, $args) { # dynamic('return-target')(arg0)
         my ($ret) = uncons($args);
         return (
-          CALL(get_dynamic_value
-            => make_List($scope, make_String('return-target'))),
+          GCTX(),
+          SNOC(make_List(make_String('return-target'))),
+          CALL('get_dynamic_value'),
           SNOC(make_List($ret)),
           CALL('combine'),
         );

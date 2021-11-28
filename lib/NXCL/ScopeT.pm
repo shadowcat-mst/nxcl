@@ -9,10 +9,9 @@ use NXCL::TypeFunctions qw(
 );
 use NXCL::TypePackage;
 
-sub make ($store, $dynvals = {}) {
+sub make ($store) {
   _make DictR ,=> {
-    lexicals => $store,
-    dynamics => $dynvals,
+    store => $store,
   };
 }
 
@@ -21,7 +20,7 @@ export make => \&make;
 method get_value_for_name => sub ($, $self, $args) {
   my ($namep) = uncons($args);
   my $name = raw($namep);
-  my $store = raw($self)->{lexicals};
+  my $store = raw($self)->{store};
   if (object_is $store, OpDict_Inst) {
     my $cell = raw($store)->{$name};
     panic "No value for ${name} in current scope" unless $cell;
@@ -41,7 +40,7 @@ method set_value_for_name => sub ($, $self, $args) {
   my ($namep) = uncons($callargs);
   # I am not convinced this conditional is a good idea
   my $name = ref($namep) ? raw($namep) : $namep;
-  my $store = raw($self)->{lexicals};
+  my $store = raw($self)->{store};
   if (object_is $store, OpDict_Inst) {
     if (my $cell = raw($store)->{$name}) {
       # cell() = value
@@ -54,17 +53,17 @@ method set_value_for_name => sub ($, $self, $args) {
 
 method set_cell_for_name => sub ($, $self, $args) {
   my ($namep, $cell) = flatten($args);
-  my $store = raw($self)->{lexicals};
+  my $store = raw($self)->{store};
   panic "NYI" unless object_is($store, OpDict_Inst);
   # this probably *could* mutate the hashref directly but meh
   my $new_store = make_OpDict({ %{raw($store)}, raw($namep) => $cell });
-  raw($self)->{lexicals} = $new_store;
+  raw($self)->{store} = $new_store;
   return JUST $cell;
 };
 
 method derive => sub ($, $self, $args) {
   panic "NYI" unless rnilp $args; # should accept extra value pairs
-  return JUST make @{raw($self)}{qw(lexicals dynamics)};
+  return JUST make raw($self)->{store};
 };
 
 method introscope => sub ($, $self, $args) {
@@ -74,29 +73,5 @@ method introscope => sub ($, $self, $args) {
 
 # combine() should do eval-in-scope
 # assign_via_call() should pass through to eval-in-scope where possible
-
-method lexicals => sub ($, $self, $) {
-  return JUST raw($self)->{lexicals};
-};
-
-method with_lexicals => sub ($, $self, $args) {
-  my ($new) = uncons $args;
-  return JUST make $new, raw($self)->{dynamics};
-};
-
-method get_dynamic_value => sub ($, $self, $args) {
-  my $name = raw((uncons($args))[0]);
-  panic "No dynamic value for ${name}"
-    unless my $value = raw($self)->{dynamics}{$name};
-  return JUST $value;
-};
-
-method with_dynamic_value => sub ($, $self, $args) {
-  my ($namep, $value) = flatten($args);
-  my $name = raw($namep);
-  my $raw = raw($self);
-  my $dynvals = { %{$raw->{dynamics}}, $name => $value };
-  return JUST make $raw->{lexicals}, $dynvals;
-};
 
 1;

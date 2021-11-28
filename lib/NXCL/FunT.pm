@@ -9,9 +9,9 @@ use NXCL::ReprTypes qw(DictR);
 use NXCL::MethodUtils qw($DOT_F);
 use NXCL::TypePackage;
 
-sub make ($lexicals, $argspec, $body) {
+sub make ($scope, $argspec, $body) {
   _make DictR ,=> {
-    lexicals => $lexicals,
+    scope => $scope,
     argspec => $argspec,
     body => $body,
   };
@@ -20,12 +20,8 @@ sub make ($lexicals, $argspec, $body) {
 export make => \&make;
 
 static new => sub ($scope, $self, $args) {
-  return (
-    CALL(lexicals => make_List($scope)),
-    SNOC($args),
-    CONS($self),
-    CALL('_new'),
-  );
+  my ($argspec, $body) = flatten $args;
+  return JUST make $scope, $argspec, $body;
 };
 
 static _new => sub ($scope, $self, $args) {
@@ -35,21 +31,22 @@ static _new => sub ($scope, $self, $args) {
 
 method combine => sub ($scope, $self, $args) {
   my %me = %{raw($self)};
-  return DOCTX $self, 0, $scope, [
+  return DOCTX $self, 0, undef, [
     # Evaluate args in calling environment
 
     EVAL($args),
-    OVER(11, 'JUST'),
+    OVER(12, 'JUST'),
 
     # Create execution scope and setup return target
 
-    CALL(with_lexicals => make_List($scope, $me{lexicals})),
-    OVER(4, 'CONS'),
     GCTX(),
+    DUP2(3, 'CONS'),
     LIST(make_Name('return_to')),
     CMB9($DOT_F),
     LIST(make_String('return-target')),
-    CALL('with_dynamic_value'),
+    CALL('set_dynamic_value'),
+    DROP(),
+    CALL('derive', make_List($me{scope})),
     DUP2(8, 'JUST'),
 
     # Unpack arguments
