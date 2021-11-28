@@ -12,10 +12,11 @@ my $fh = do {
   }
 };
 
-while (defined(my $orig = my $line = <$fh>)) {
-  if ($line =~ s/^\$ //) {
-    my $rv = $env->eval_string($line)->value_to_xcl_string;
-    print $orig;
-    say '= '.$rv->xcl_raw_value;
-  }
+my $data = do { local $/; <$fh> };
+
+while ($data =~ m/^(\$ (.*)\n)/mg) {
+  my ($orig, $expr) = ($1, $2);
+  my $rv = $env->eval_string($expr)->value_to_xcl_string;
+  print $orig;
+  say '= '.$rv->xcl_raw_value;
 }
