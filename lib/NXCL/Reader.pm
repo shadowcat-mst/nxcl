@@ -47,7 +47,8 @@ sub extract_expr_seq ($self, $delim) {
     if ($IS_FLUFF{$type} or $type eq $delim) {
       push @seq, $self->${\"parse_${type}"};
     } elsif ($IS_ATOMSTART{$type}) {
-      push @seq, $self->parse_expr($autoterm);
+      push @seq, my $expr = $self->parse_expr($autoterm);
+      push @seq, pop @$expr while $IS_FLUFF{$expr->[-1][0]};
     } else {
       last;
     }
