@@ -75,12 +75,7 @@ sub parse_expr ($self, $autoterm) {
   while (my $type = $self->peek_type) {
     if ($IS_FLUFF{$type}) {
       push @expr, $self->${\"parse_${type}"};
-      if (
-        $autoterm and $was_block
-        and $type eq 'ws' and $expr[-1][1] =~ /\n/
-      ) {
-        last;
-      }
+      last if $autoterm and $was_block and $expr[-1][1] =~ /\n/;
     } elsif ($IS_ATOMSTART{$type}) {
       $was_block = 0+($type eq 'block');
       push @expr, $self->parse_compound;

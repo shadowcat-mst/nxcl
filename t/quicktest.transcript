@@ -66,3 +66,9 @@ $ var x = 1;
   inc();
   x
 = 3
+$ var x = 1;
+  let inc = fun () { x = x + 1 } # increment
+  inc();
+  inc();
+  x
+= 3
