@@ -42,11 +42,12 @@ sub extract_char ($self, $char) {
 
 sub extract_expr_seq ($self, $delim) {
   my @seq;
+  my $autoterm = 0+($delim eq 'semicolon');
   while (my $type = $self->peek_type) {
     if ($IS_FLUFF{$type} or $type eq $delim) {
       push @seq, $self->${\"parse_${type}"};
     } elsif ($IS_ATOMSTART{$type}) {
-      push @seq, $self->parse_expr;
+      push @seq, $self->parse_expr($autoterm);
     } else {
       last;
     }
@@ -68,12 +69,20 @@ sub parse_script ($self) {
   [ script => $self->extract_expr_seq('semicolon') ];
 }
 
-sub parse_expr ($self) {
+sub parse_expr ($self, $autoterm) {
   my @expr;
+  my $was_block = 0;
   while (my $type = $self->peek_type) {
     if ($IS_FLUFF{$type}) {
       push @expr, $self->${\"parse_${type}"};
+      if (
+        $autoterm and $was_block
+        and $type eq 'ws' and $expr[-1][1] =~ /\n/
+      ) {
+        last;
+      }
     } elsif ($IS_ATOMSTART{$type}) {
+      $was_block = 0+($type eq 'block');
       push @expr, $self->parse_compound;
     } else {
       last;

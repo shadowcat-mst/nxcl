@@ -14,8 +14,9 @@ my $fh = do {
 
 my $data = do { local $/; <$fh> };
 
-while ($data =~ m/^(\$ (.*)\n)/mg) {
-  my ($orig, $expr) = ($1, $2);
+while ($data =~ m/^(\$ .*\n(?:  .*\n)*)/mg) {
+  my $orig = $1;
+  my $expr = $orig =~ s/^..//mgr;
   my $rv = $env->eval_string($expr)->value_to_xcl_string;
   print $orig;
   say '= '.$rv->xcl_raw_value;

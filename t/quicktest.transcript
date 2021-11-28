@@ -48,7 +48,9 @@ $ let x = [ let y = 3 ] + 4;
 = 7
 $ let (x, y) = (1, 2); y + 3;
 = 5
-$ var x = 3; do { let y = 4; x = x + y }; x
+$ var x = 3;
+  do { let y = 4; x = x + y }
+  x
 = 7
 $ let f = fun (x) { x + 1 }; f 3
 = 4
@@ -58,3 +60,9 @@ $ let f = fun (x) { x.ifelse do{ return 1 } 2; 3 }; f false
 = 3
 $ let f = fun (x) { x.ifelse do{ return 1 } 2; 3 }; f true
 = 1
+$ var x = 1;
+  let inc = fun () { x = x + 1 }
+  inc();
+  inc();
+  x
+= 3
