@@ -19,17 +19,23 @@ sub make ($scope, $argspec, $body) {
 
 export make => \&make;
 
-static new => sub ($scope, $self, $args) {
-  my ($argspec, $body) = flatten $args;
+static new => sub ($self, $args) {
+  return (
+    GCTX(),
+    LIST(),
+    CALL('scope'),
+    SNOC($args),
+    CONS($self),
+    CALL('_new')
+  );
+};
+
+static _new => sub ($self, $args) {
+  my ($scope, $argspec, $body) = flatten $args;
   return JUST make $scope, $argspec, $body;
 };
 
-static _new => sub ($scope, $self, $args) {
-  my ($lexicals, $argspec, $body) = flatten $args;
-  return JUST make $lexicals, $argspec, $body;
-};
-
-method combine => sub ($scope, $self, $args) {
+method combine => sub ($self, $args) {
   my %me = %{raw($self)};
   return DOCTX $self, 0, undef, [
     # Evaluate args in calling environment

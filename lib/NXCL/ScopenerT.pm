@@ -3,22 +3,26 @@ package NXCL::ScopenerT;
 use NXCL::Utils qw(uncons raw panic rnilp flatten);
 use NXCL::OpUtils;
 use NXCL::ReprTypes qw(ValR);
-use NXCL::TypeFunctions qw(empty_List make_IntroScope);
+use NXCL::TypeFunctions qw(make_List make_IntroScope);
 use NXCL::TypePackage;
 
 export make => \&make;
 
 sub make ($type) { _make ValR ,=> $type }
 
-method assign_via_call => sub ($scope, $self, $args) {
+method assign_via_call => sub ($self, $args) {
   my ($targetp, $valuep) = flatten($args);
   my ($target) = uncons($targetp);
   my $type = raw($self);
-  my $iscope = make_IntroScope($scope, $type);
   return (
     EVAL($valuep),
-    OVER(1, 'JUST'),
-    DOCTX($self, 1, $iscope, [
+    OVER(6, 'JUST'),
+    GCTX(),
+    LIST(),
+    CALL('scope'),
+    SNOC(make_List($type)),
+    CALL('introscope'),
+    DOCTX($self, 1, [
       LIST($target),
       CALL('assign_value'),
     ])

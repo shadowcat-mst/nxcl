@@ -11,11 +11,11 @@ export make => \&make;
 
 sub make ($name) { _make CharsR ,=> $name }
 
-method evaluate => sub ($scope, $self, $args) {
+method evaluate => sub ($self, $args) {
   return GETN($self);
 };
 
-method assign_value => sub ($scope, $self, $args) {
+method assign_value => sub ($self, $args) {
   return JUST empty_List if raw($self) eq '$';
   my ($new_value) = uncons($args);
   return SETN($self, $new_value);

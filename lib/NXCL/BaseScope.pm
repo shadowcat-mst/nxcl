@@ -41,7 +41,7 @@ use NXCL::BaseOps qw(%OP_MAP);
 my %opmeth = map {
   my ($opname, $opmeth) = ($_, $OP_MAP{$_});
   ($opname => make_Native set_subname "dot_${opmeth}" =>
-    sub ($, $argsp) {
+    sub ($argsp) {
       my ($obj, $args) = uncons $argsp;
       return (
         EVAL($obj),
@@ -66,7 +66,7 @@ our $Store = make_OpDict do {
     # cur => ...
     # Using ApMethT to get the RHS eval-ed and the LHS not is kinda cheating.
     '=' => make_ApMeth(make_Native(set_subname "assign_guts" =>
-      sub ($, $args) {
+      sub ($args) {
         my ($lhs, $cdr) = uncons($args);
         my ($rhs) = uncons($cdr);
         return (
@@ -79,11 +79,11 @@ our $Store = make_OpDict do {
     true => make_Bool(1),
     false => make_Bool(0),
     do => make_ApMeth(make_Native(set_subname "do" =>
-            sub ($, $args) { CALL(combine => $args) })),
+            sub ($args) { CALL(combine => $args) })),
     fun => make_ApMeth(make_Native(set_subname "fun" =>
-             sub ($, $args) { CALL(new => cons_List(Fun, $args)) })),
+             sub ($args) { CALL(new => cons_List(Fun, $args)) })),
     return => make_Apv(make_Native(set_subname "return" =>
-      sub ($scope, $args) { # dynamic('return-target')(arg0)
+      sub ($args) { # dynamic('return-target')(arg0)
         my ($ret) = uncons($args);
         return (
           GCTX(),

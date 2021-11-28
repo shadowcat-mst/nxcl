@@ -8,16 +8,16 @@ sub make ($val) { _make VarR ,=> $val };
 
 export make => \&make;
 
-wrap static new => sub ($scope, $self, $args) {
+wrap static new => sub ($self, $args) {
   return JUST make((uncons $args)[0]);
 };
 
-method combine => sub ($scope, $self, $args) {
+method combine => sub ($self, $args) {
   panic unless rnilp $args;
   return JUST raw($self);
 };
 
-method assign_via_call => sub ($scope, $self, $args) {
+method assign_via_call => sub ($self, $args) {
   my ($call_args, $assign) = uncons($args);
   my ($new_value) = uncons($assign);
   raw($self) = $new_value;

@@ -10,23 +10,20 @@ use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 our @EXPORT_OK = qw(run_til_host);
 
 sub take_step_EVAL ($cxs, $ops, $value) {
-  my $scope = $cxs->[-1][2];
   push @$ops, reverse
-    call_method($scope, evaluate => make_List($value));
+    call_method(evaluate => make_List($value));
 }
 
 sub take_step_CALL ($cxs, $ops, $methodp, $args) {
-  my $scope = $cxs->[-1][2];
   push @$ops, reverse
-    call_method($scope, $methodp, $args);
+    call_method($methodp, $args);
 }
 
 sub take_step_CMB9 ($cxs, $ops, $cmb, $args) {
-  my $scope = $cxs->[-1][2];
   push @$ops, reverse(
     object_is($cmb, Native_Inst)
-      ? raw($cmb)->($scope, $args)
-      : call_method($scope, combine => cons_List($cmb, $args))
+      ? raw($cmb)->($args)
+      : call_method(combine => cons_List($cmb, $args))
   );
 }
 
@@ -104,14 +101,13 @@ sub take_step_GCTX ($cxs, $ops) {
 sub take_step_GETN ($cxs, $ops, $name) {
   my $scope = $cxs->[-1][2];
   push @$ops, reverse
-    call_method($scope, get_value_for_name => make_List($scope, $name));
+    call_method(get_value_for_name => make_List($scope, $name));
 }
 
 sub take_step_SETN ($cxs, $ops, $name, $value) {
   my $scope = $cxs->[-1][2];
   push @$ops, reverse
-    call_method($scope,
-      set_value_for_name => make_List($scope, $name, $value));
+    call_method(set_value_for_name => make_List($scope, $name, $value));
 }
 
 our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),

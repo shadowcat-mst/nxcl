@@ -6,7 +6,7 @@ use NXCL::TypePackage;
 
 export make => sub ($hash) { _make DictR ,=> $hash };
 
-method combine => sub ($scope, $self, $args) {
+method combine => sub ($self, $args) {
   my $key = raw((uncons($args))[0]);
   my $value = raw($self)->{$key};
   panic unless $value;

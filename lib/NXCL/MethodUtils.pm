@@ -21,7 +21,7 @@ our $DOT_F = $N{dot_f};
 
 $_ = make_Apv($_) for $N{dot_curried};
 
-sub call_method ($scope, $methodp, $args) {
+sub call_method ($methodp, $args) {
   my ($self) = uncons($args);
   panic "Undefined self" unless defined($self);
   my ($method_name, $method_String) = (
@@ -36,7 +36,7 @@ sub call_method ($scope, $methodp, $args) {
       .(join(', ', sort keys %{raw($mset)})||'(none)').")"
       unless my $handler = raw($mset)->{$method_name};
     if (object_is $handler, Native_Inst) {
-      return raw($handler)->($scope, $args);
+      return raw($handler)->($args);
     }
     return CMB9 $handler, $args;
   }
@@ -46,7 +46,7 @@ sub call_method ($scope, $methodp, $args) {
   );
 }
 
-sub lookup_method ($scope, $self, $methodp) {
+sub lookup_method ($self, $methodp) {
   my ($method_name, $method_String) = (
     ref($methodp)
       ? (raw($methodp), $methodp)
@@ -62,34 +62,34 @@ sub lookup_method ($scope, $self, $methodp) {
   }
   return (
     CMB9($mset, make_List($method_String)),
-    CMB9(make_Native(sub ($scope, $args) {
+    CMB9(make_Native(sub ($args) {
       make_Curry((uncons($args))[0], $self)
     })),
   );
 }
 
-sub dot_lookup ($scope, $args) {
+sub dot_lookup ($args) {
   my ($lookup, $obj) = flatten $args;
   return CMB9 $obj => make_List($lookup);
 }
 
-sub dot_curryable ($scope, $args) {
+sub dot_curryable ($args) {
   return JUST cons_Curry($N{dot_curried}, $args);
 }
 
-sub dot_curried ($scope, $argsp) {
+sub dot_curried ($argsp) {
   my ($method, $args) = uncons $argsp;
-  call_method($scope, $method, $args);
+  call_method($method, $args);
 }
 
-sub dot_f ($scope, $args) {
+sub dot_f ($args) {
   my ($callp, $obj) = flatten $args;
   my $ctype = mset($callp);
   if ($ctype == Name_Inst) {
     my $method = make_String raw($callp);
 
     if ($obj) {
-      return lookup_method($scope, $obj, $method);
+      return lookup_method($obj, $method);
     }
 
     return JUST make_Curry($N{dot_curryable}, $method);
@@ -104,14 +104,14 @@ sub dot_f ($scope, $args) {
   return JUST make_Curry($N{dot_lookup}, $callp);
 }
 
-sub dot ($scope, $args) {
+sub dot ($args) {
   my @args = flatten $args;
   panic unless @args == 1 or @args == 2;
   my $mset = mset($args[-1]);
   if ($mset == Name_Inst or $mset == Int_Inst or $mset == String_Inst) {
 
     unless (@args == 2) {
-      return dot_f($scope, $args);
+      return dot_f($args);
     }
 
     return (

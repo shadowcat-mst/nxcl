@@ -17,7 +17,7 @@ sub make ($store) {
 
 export make => \&make;
 
-method get_value_for_name => sub ($, $self, $args) {
+method get_value_for_name => sub ($self, $args) {
   my ($namep) = uncons($args);
   my $name = raw($namep);
   my $store = raw($self)->{store};
@@ -35,7 +35,7 @@ method get_value_for_name => sub ($, $self, $args) {
   );
 };
 
-method set_value_for_name => sub ($, $self, $args) {
+method set_value_for_name => sub ($self, $args) {
   my ($callargs, $vlist) = uncons $args;
   my ($namep) = uncons($callargs);
   # I am not convinced this conditional is a good idea
@@ -51,7 +51,7 @@ method set_value_for_name => sub ($, $self, $args) {
   panic "NYI";
 };
 
-method set_cell_for_name => sub ($, $self, $args) {
+method set_cell_for_name => sub ($self, $args) {
   my ($namep, $cell) = flatten($args);
   my $store = raw($self)->{store};
   panic "NYI" unless object_is($store, OpDict_Inst);
@@ -61,12 +61,12 @@ method set_cell_for_name => sub ($, $self, $args) {
   return JUST $cell;
 };
 
-method derive => sub ($, $self, $args) {
+method derive => sub ($self, $args) {
   panic "NYI" unless rnilp $args; # should accept extra value pairs
   return JUST make raw($self)->{store};
 };
 
-method introscope => sub ($, $self, $args) {
+method introscope => sub ($self, $args) {
   my ($type) = uncons($args);
   return JUST make_IntroScope($self, $type);
 };

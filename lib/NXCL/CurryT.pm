@@ -10,7 +10,7 @@ export cons => \&cons;
 
 sub cons ($curried, $i_args) { _make ConsR ,=> $curried, $i_args }
 
-method to_xcl_string => sub ($scope, $self, $) {
+method to_xcl_string => sub ($self, $) {
   state $fmt = make_String('Curry%s');
   return (
     CALL('to_xcl_string'
@@ -22,7 +22,7 @@ method to_xcl_string => sub ($scope, $self, $) {
 
 # called args versus implicit args - c_args versus i_args
 
-method combine => sub ($scope, $self, $c_args) {
+method combine => sub ($self, $c_args) {
   my ($curried, $i_args) = uncons($self);
   if (rnilp $c_args) {
     return CMB9 $curried => $i_args;

@@ -7,9 +7,13 @@ use NXCL::TypePackage;
 
 export make => sub ($call) { _make ValR ,=> $call };
 
-method combine => sub ($scope, $self, $args) {
+method combine => sub ($self, $args) {
   return(
-    CALL(derive => make_List($scope)),
+    GCTX(),
+    LIST(),
+    CALL('scope'),
+    LIST(),
+    CALL('derive'),
     DOCTX($self, 0, [ EVAL raw($self) ])
   );
 };

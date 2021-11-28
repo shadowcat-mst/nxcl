@@ -11,7 +11,7 @@ sub of_list ($list) { _make ValR ,=> $list }
 
 export make => sub (@parts) { of_list(make_List @parts) };
 
-method evaluate => sub ($scope, $self, $args) {
+method evaluate => sub ($self, $args) {
   my $call_list = raw($self);
   panic "Empty call list" if rnilp($call_list);
   my ($first, $rest) = uncons($call_list);

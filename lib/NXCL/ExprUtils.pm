@@ -10,7 +10,7 @@ our @EXPORT = qw($ESCAPE $IDENTITY);
 our $ESCAPE = make_Native \&escape;
 our $IDENTITY = make_Native \&identity;
 
-sub escape ($scope, $args) {
+sub escape ($args) {
   my ($arg, $extra) = uncons($args);
   panic "One arg only" unless rnilp($extra);
   return JUST $arg;
@@ -18,6 +18,6 @@ sub escape ($scope, $args) {
 
 # This should probably just be wrap($ESCAPE) ?
 
-sub identity ($scope, $args) { die }
+sub identity ($args) { die }
 
 1;

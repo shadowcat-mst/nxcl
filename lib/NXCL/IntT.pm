@@ -10,11 +10,11 @@ export make => \&make;
 
 sub make ($int) { _make IntR, => $int }
 
-method to_xcl_string => sub ($scope, $self, $) {
+method to_xcl_string => sub ($self, $) {
   return JUST make_String(''.raw($self));
 };
 
-wrap method eq => sub ($scope, $self, $args) {
+wrap method eq => sub ($self, $args) {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
@@ -22,7 +22,7 @@ wrap method eq => sub ($scope, $self, $args) {
   return JUST make_Bool(raw($self) == raw($r));
 };
 
-wrap method gt => sub ($scope, $self, $args) {
+wrap method gt => sub ($self, $args) {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
@@ -30,7 +30,7 @@ wrap method gt => sub ($scope, $self, $args) {
   return JUST make_Bool(raw($self) > raw($r));
 };
 
-wrap method quotient => sub ($scope, $self, $args) {
+wrap method quotient => sub ($self, $args) {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
@@ -38,7 +38,7 @@ wrap method quotient => sub ($scope, $self, $args) {
   return JUST make int(raw($self) / raw($r));
 };
 
-wrap method remainder => sub ($scope, $self, $args) {
+wrap method remainder => sub ($self, $args) {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
@@ -46,7 +46,7 @@ wrap method remainder => sub ($scope, $self, $args) {
   return JUST make(raw($self) % raw($r));
 };
 
-wrap method minus => sub ($scope, $self, $args) {
+wrap method minus => sub ($self, $args) {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   unless ($r) {
@@ -57,14 +57,14 @@ wrap method minus => sub ($scope, $self, $args) {
   return JUST make(raw($self) - raw($r));
 };
 
-wrap method times => sub ($scope, $self, $args) {
+wrap method times => sub ($self, $args) {
   my @ints = flatten $args;
   my $mset = mset($self);
   panic 'Must be ints' for grep !object_is($_, $mset), @ints;
   return JUST make reduce { $a * $b } map raw($_), $self, @ints;
 };
 
-wrap method plus => sub ($scope, $self, $args) {
+wrap method plus => sub ($self, $args) {
   my @ints = flatten $args;
   my $mset = mset($self);
   panic 'Must be ints' for grep !object_is($_, $mset), @ints;

@@ -7,12 +7,12 @@ use NXCL::TypePackage;
 
 export make => sub ($val) { _make ValR ,=> $val };
 
-wrap static new => sub ($scope, $self, $args) {
+wrap static new => sub ($self, $args) {
   my ($key) = uncons($args);
   return JUST _make ValR ,=> $key;
 };
 
-wrap method combine => sub ($scope, $self, $args) {
+wrap method combine => sub ($self, $args) {
   my ($value) = uncons($args);
   return JUST make_Pair(raw($self), $value);
 };

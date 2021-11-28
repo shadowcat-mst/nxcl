@@ -10,13 +10,13 @@ export make => \&make;
 
 sub make ($sub) { _make NativeR ,=> $sub }
 
-method to_xcl_string => sub ($scope, $self, $) {
+method to_xcl_string => sub ($self, $) {
   # should indirect via Combine maybe?
   return JUST make_String("Native('".subname(\&{raw($self)})."')");
 };
 
-method combine => sub ($scope, $self, $args) {
-  raw($self)->($scope, $self, $args);
+method combine => sub ($self, $args) {
+  raw($self)->($self, $args);
 };
 
 1;
