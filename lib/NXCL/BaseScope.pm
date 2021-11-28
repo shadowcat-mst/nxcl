@@ -103,8 +103,6 @@ our $Store = make_OpDict do {
   };
 };
 
-our $Scope = make_Scope $Store;
-
-sub scope ($class = undef) { $Scope }
+sub scope ($class = undef) { make_Scope $Store }
 
 1;
