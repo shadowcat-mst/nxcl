@@ -10,19 +10,19 @@ use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 our @EXPORT_OK = qw(run_til_host);
 
 sub take_step_EVAL ($cxs, $ops, $value) {
-  my $scope = $cxs->[-1][1];
+  my $scope = $cxs->[-1][2];
   push @$ops, reverse
     call_method($scope, evaluate => make_List($value));
 }
 
 sub take_step_CALL ($cxs, $ops, $methodp, $args) {
-  my $scope = $cxs->[-1][1];
+  my $scope = $cxs->[-1][2];
   push @$ops, reverse
     call_method($scope, $methodp, $args);
 }
 
 sub take_step_CMB9 ($cxs, $ops, $cmb, $args) {
-  my $scope = $cxs->[-1][1];
+  my $scope = $cxs->[-1][2];
   push @$ops, reverse(
     object_is($cmb, Native_Inst)
       ? raw($cmb)->($scope, $args)
@@ -69,9 +69,10 @@ sub take_step_DUP2 ($cxs, $ops, $count, $type, $val) {
   push @$ops, JUST($val);
 }
 
-sub take_step_ECTX ($cxs, $ops, $thing, $count, $scope) {
+sub take_step_ECTX ($cxs, $ops, $thing, $dynv, $count, $scope) {
   push @$cxs, [
      cons_List($thing, $cxs->[-1][0]),
+     ($dynv // $cxs->[-1][1]),
      $scope,
      scalar(@$ops) - $count,
   ];

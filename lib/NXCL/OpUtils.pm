@@ -40,7 +40,7 @@ sub DOCTX {
   my $count = shift;
   my @scope = $#_ ? shift : ();
   my @ops = (@{+shift}, LCTX(undef));
-  return (ECTX($thing, scalar(@ops) + $count, @scope), @ops);
+  return (ECTX($thing, undef, scalar(@ops) + $count, @scope), @ops);
 }
 
 1;
