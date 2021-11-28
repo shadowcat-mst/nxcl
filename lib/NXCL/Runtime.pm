@@ -101,6 +101,19 @@ sub take_step_GCTX ($cxs, $ops) {
   push @{$ops->[-1]}, make_CxRef($cxs->[-1]);
 }
 
+sub take_step_GETN ($cxs, $ops, $name) {
+  my $scope = $cxs->[-1][2];
+  push @$ops, reverse
+    call_method($scope, get_value_for_name => make_List($scope, $name));
+}
+
+sub take_step_SETN ($cxs, $ops, $name, $value) {
+  my $scope = $cxs->[-1][2];
+  push @$ops, reverse
+    call_method($scope,
+      set_value_for_name => make_List($scope, $name, $value));
+}
+
 our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
   @NXCL::OpUtils::OPNAMES;
 

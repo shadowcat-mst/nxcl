@@ -21,6 +21,8 @@ our @EXPORT
       GCTX
       OVER
       DUP2
+      GETN
+      SETN
     );
 
 sub make_op ($type, @args) {
