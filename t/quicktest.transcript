@@ -75,3 +75,11 @@ $ var x = 1;
 $ let nf = fexpr (cx, name) { name }
   nf foo
 = foo
+$ var x = 1;
+  let run-twice = fexpr (cx, expr) {
+    cx.eval expr;
+    cx.eval expr;
+  }
+  run-twice [ x = x + 1 ];
+  x
+= 3

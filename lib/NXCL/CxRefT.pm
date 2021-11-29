@@ -21,6 +21,7 @@ method return_to => sub ($self, $args) {
 };
 
 method get_dynamic_value => sub ($self, $args) {
+  panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my $name = raw((uncons($args))[0]);
   panic "No dynamic value for ${name}"
     unless my $value = raw($self)->[1]{$name};
@@ -28,6 +29,7 @@ method get_dynamic_value => sub ($self, $args) {
 };
 
 method set_dynamic_value => sub ($self, $args) {
+  panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my ($namep, $value) = flatten($args);
   my $name = raw($namep);
   $_ = { %{$_}, $name => $value } for raw($self)->[1];
@@ -35,7 +37,18 @@ method set_dynamic_value => sub ($self, $args) {
 };
 
 method scope => sub ($self, $args) {
+  panic "Inactive CxRef" unless defined(my $cx = raw($self));
   return JUST raw($self)->[2];
+};
+
+wrap method eval => sub ($self, $args) {
+  panic "Inactive CxRef" unless defined(my $cx = raw($self));
+  my ($expr) = uncons($args);
+  return (
+    ECTX($expr, $cx->[1], 2, $cx->[2]),
+    EVAL($expr),
+    LCTX(undef),
+  );
 };
 
 1;
