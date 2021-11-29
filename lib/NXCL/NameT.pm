@@ -21,4 +21,8 @@ method assign_value => sub ($self, $args) {
   return SETN($self, $new_value);
 };
 
+method to_xcl_string => sub ($self, $args) {
+  return JUST make_String raw $self;
+};
+
 1;
