@@ -1,7 +1,7 @@
 package NXCL::BaseScope;
 
 use NXCL::Package;
-use NXCL::Utils qw(uncons flatten);
+use NXCL::Utils qw(uncons flatten raw);
 use NXCL::MethodUtils;
 use NXCL::ExprUtils;
 use NXCL::OpUtils;
@@ -31,12 +31,13 @@ use NXCL::TypeFunctions (
     Val
     Var
     Fun
+    LvalueFun
     CxRef
     CxTemplate
   )),
   qw(make_Val make_Scope make_Scopener make_Native make_OpDict),
   qw(make_ApMeth make_Apv make_String make_List make_Bool),
-  qw(cons_List),
+  qw(cons_List make_LvalueFun),
 );
 use NXCL::BaseOps qw(%OP_MAP);
 
@@ -99,6 +100,25 @@ our $Store = make_OpDict do {
         );
       }
     )),
+    '^' => make_LvalueFun(
+      make_Native(set_subname "get_dynamic" => sub ($args) {
+        my ($namep) = uncons($args);
+        return (
+          GCTX(),
+          SNOC(make_List(make_String(raw($namep)))),
+          CALL('get_dynamic_value'),
+        );
+      }),
+      make_Native(set_subname "set_dynamic" => sub ($args) {
+        my ($targetp, $value) = flatten($args);
+        my ($namep) = uncons($targetp);
+        return (
+          GCTX(),
+          SNOC(make_List(make_String(raw($namep)), $value)),
+          CALL('set_dynamic_value'),
+        );
+      }),
+    ),
     %opmeth,
     map +($_ => __PACKAGE__->can($_)->()),
       @BASE_TYPES

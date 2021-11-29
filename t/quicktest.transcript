@@ -168,3 +168,17 @@ $ let _defer = fexpr (cx, cb) {
   let z = f();
   (x, y, z, savx, savy);
 = (3, 6, 7, 1, 2)
+$ let earlyret = fun () {
+    ^return-target 3;
+    0;
+  }
+  earlyret()
+= 3
+$ let dynrecv = fun () { ^dyn-name }
+  let dynmid = fun () { dynrecv() }
+  let dynsend = fun () {
+    ^dyn-name = 3;
+    dynmid()
+  }
+  dynsend()
+= 3
