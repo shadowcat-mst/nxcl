@@ -5,6 +5,7 @@ use NXCL::YDump;
 use NXCL::OpUtils;
 
 our $Count = 0;
+our $Show_OpQ = 0;
 our $Max;
 
 sub import { $Max = $_[1] if defined $_[1] }
@@ -80,7 +81,7 @@ sub NXCL::Runtime::DEBUG_WARN ($cxs, $ops) {
     my ($pst, @stst) = map {
       my ($op, @v) = @$_;
       [ $op => map jsonify(ref() ? $_ : make_String($_//'NULL')), @v ];
-    } reverse @$ops;
+    } ($Show_OpQ ? reverse @$ops : $ops->[-1]);
     warn join('',
       ydump($pst) =~ s/^/  /mgr,
       map ydump($_) =~ s/^/+ /mgr, @stst
