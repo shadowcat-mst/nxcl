@@ -19,7 +19,9 @@ our %N =
 
 our $DOT_F = $N{dot_f};
 
-$_ = make_Apv($_) for $N{dot_curried};
+# This appears to be wrong but leaving it here for reference
+
+# $_ = make_Apv($_) for $N{dot_curried};
 
 sub call_method ($methodp, $args) {
   my ($self) = uncons($args);
