@@ -4,7 +4,9 @@ use NXCL::Exporter;
 use NXCL::Utils qw(object_is uncons raw rnilp panic);
 use NXCL::MethodUtils;
 use NXCL::OpUtils;
-use NXCL::TypeFunctions qw(Native_Inst make_List cons_List make_CxRef);
+use NXCL::TypeFunctions qw(
+  Native_Inst make_List cons_List empty_List make_CxRef
+);
 use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 
 our @EXPORT_OK = qw(run_til_host);
@@ -73,25 +75,26 @@ sub take_step_ECTX ($cxs, $ops, $thing, $dynv, $count, $scope) {
      ($dynv // $top_dynv),
      ($scope // $top_scope),
      scalar(@$ops) - $count,
+     [],
   ];
 }
 
 sub take_step_LCTX ($cxs, $ops, $cx, $val) {
-  my $lctx_idx;
-  if ($cx) {
-    FIND: foreach my $cand (1..$#$cxs) {
-      if ($cxs->[-$cand] == $cx) {
-        $lctx_idx = -$cand;
-        last FIND;
-      }
-    }
-    panic "Attempt to leave invalid cx" unless $lctx_idx;
-  } else {
-    $lctx_idx = -1;
+  $#$ops = $cxs->[-1][3] - 1;
+  if (my @leave_cb = @{$cxs->[-1][4]}) {
+    $cxs->[-1][4] = [];
+    push @$ops, reverse(
+      (map +(CMB9($_, empty_List), DROP()), @leave_cb),
+      LCTX($cx, $val),
+    );
+    return;
   }
-  my @left = splice @$cxs, $lctx_idx;
-  $#$ops = $left[0][-1] - 1;
-  push @{$ops->[-1]}, $val;
+  my $left = pop @$cxs;
+  if ($cx and $cx != $left) {
+    push @$ops, LCTX($cx, $val);
+  } else {
+    push @{$ops->[-1]}, $val;
+  }
 }
 
 sub take_step_GCTX ($cxs, $ops) {

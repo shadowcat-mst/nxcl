@@ -31,6 +31,10 @@ method return_to => sub ($self, $args) {
   panic "Can't return from a CxTemplate";
 };
 
+method on_leave => sub ($self, $args) {
+  panic "Can't register leave callbacks on a CxTemplate";
+};
+
 method get_dynamic_value => sub ($self, $args) {
   my $name = raw((uncons($args))[0]);
   my $dyn = raw(raw($self)->{dynamics});

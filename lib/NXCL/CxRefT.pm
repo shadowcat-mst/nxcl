@@ -23,6 +23,13 @@ method return_to => sub ($self, $args) {
   LCTX $cx, (uncons($args))[0];
 };
 
+wrap method on_leave => sub ($self, $args) {
+  panic "Inactive CxRef" unless defined(my $cx = raw($self));
+  my ($cb) = uncons($args);
+  unshift @{$cx->[4]}, $cb;
+  JUST $self;
+};
+
 method get_dynamic_value => sub ($self, $args) {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my $name = raw((uncons($args))[0]);
