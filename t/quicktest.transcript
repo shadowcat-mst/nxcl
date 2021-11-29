@@ -130,7 +130,16 @@ $ let _if = fexpr (cx, cond, onif, onelse) {
     } {
       return '<3'
     }
-    #'notreached'
+    'notreached'
   }
-  (lt3 2, lt3 7)
-= ('<3', 'boo')
+  let lt3-retv = fun (val) {
+    let v = 0;
+    let r = _if [ [ let v = val ] > 2 ] {
+      v
+    } {
+      '<3'
+    }
+    (v, r)
+  }
+  (lt3 2, lt3 7, lt3-retv 2, lt3-retv 7)
+= ('<3', 'boo', (0, '<3'), (0, 7))
