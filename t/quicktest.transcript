@@ -119,3 +119,18 @@ $ let run-both = fexpr (cx, e1, e2) {
   run-both [ let x = 7 ] [ y = y + x ];
   (x, y)
 = (1, 10)
+$ let _if = fexpr (cx, cond, onif, onelse) {
+    let cx = cx.derive();
+    let res = cx.eval cond;
+    cx.call [res.ifelse onif onelse]
+  }
+  let lt3 = fun (val) {
+    _if [ val > 2 ] {
+      return 'boo'
+    } {
+      return '<3'
+    }
+    #'notreached'
+  }
+  (lt3 2, lt3 7)
+= ('<3', 'boo')

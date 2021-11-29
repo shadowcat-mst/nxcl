@@ -3,7 +3,7 @@ package NXCL::CxRefT;
 use Scalar::Util qw(weaken);
 use NXCL::ReprTypes qw(NativeR);
 use NXCL::TypeFunctions qw(
-  make_Bool make_List make_OpDict
+  make_Bool make_List make_OpDict list_Combine
   CxTemplate
 );
 use NXCL::Utils qw(uncons flatten raw panic);
@@ -44,7 +44,7 @@ method scope => sub ($self, $args) {
   return JUST raw($self)->[2];
 };
 
-wrap method eval => sub ($self, $args) {
+wrap method eval => my $eval = sub ($self, $args) {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my ($expr) = uncons($args);
   return (
@@ -52,6 +52,10 @@ wrap method eval => sub ($self, $args) {
     EVAL($expr),
     LCTX(undef),
   );
+};
+
+wrap method call => sub ($self, $args) {
+  $eval->($self, make_List(list_Combine($args)));
 };
 
 method derive => sub ($self, $args) {

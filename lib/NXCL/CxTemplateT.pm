@@ -3,7 +3,7 @@ package NXCL::CxTemplateT;
 use Scalar::Util qw(weaken);
 use NXCL::ReprTypes qw(DictR);
 use NXCL::TypeFunctions qw(
-  make_Bool make_List make_OpDict
+  make_Bool make_List make_OpDict list_Combine
   CxTemplate
 );
 use NXCL::Utils qw(uncons flatten raw panic);
@@ -52,7 +52,7 @@ method scope => sub ($self, $args) {
   return JUST raw($self)->{scope};
 };
 
-wrap method eval => sub ($self, $args) {
+wrap method eval => my $eval = sub ($self, $args) {
   my ($expr) = uncons($args);
   my ($scope, $dyn_dict) = @{raw($self)}{qw(scope dynamics)};
   return (
@@ -60,6 +60,10 @@ wrap method eval => sub ($self, $args) {
     EVAL($expr),
     LCTX(undef),
   );
+};
+
+wrap method call => sub ($self, $args) {
+  $eval->($self, make_List(list_Combine($args)));
 };
 
 method derive => sub ($self, $args) {
