@@ -78,3 +78,5 @@ method combine => sub ($self, $args) {
     ]
   );
 };
+
+1;
