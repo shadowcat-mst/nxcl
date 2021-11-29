@@ -143,3 +143,11 @@ $ let _if = fexpr (cx, cond, onif, onelse) {
   }
   (lt3 2, lt3 7, lt3-retv 2, lt3-retv 7)
 = ('<3', 'boo', (0, '<3'), (0, 7))
+$ let -?:- = fexpr (cx, cond, onif, onelse) {
+    let cx = cx.derive();
+    let res = cx.eval cond;
+    cx.eval [res.ifelse onif onelse]
+  }
+  let lt3 = fun (val) { -?:- [ val > 2 ] 'boo' '<3' }
+  (lt3 2, lt3 7)
+= ('<3', 'boo')
