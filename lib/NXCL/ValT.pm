@@ -8,7 +8,7 @@ sub make ($val) { _make ValR ,=> $val };
 
 export make => \&make;
 
-wrap static new => sub ($self, $args) {
+static new => sub ($self, $args) {
   return JUST make((uncons $args)[0]);
 };
 
