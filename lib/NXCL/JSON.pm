@@ -7,6 +7,7 @@ use NXCL::TypeFunctions qw(List_Inst);
 use NXCL::ReprTypes;
 use Sub::Util qw(subname);
 use NXCL::Exporter;
+use warnings FATAL => 'recursion';
 
 our @EXPORT = qw(nxcl2json json2nxcl);
 
@@ -42,7 +43,7 @@ sub repr2json ($t, $r) {
   return $r if $t == CharsR or $t == BytesR or $t == IntR;
   return nxcl2json($r) if $t == ValR or $t == VarR;
   return +{ map +($_ => nxcl2json($r->{$_})), sort keys %$r } if $t == DictR;
-  return subname(\&$r) if $t == NativeR;
+  return (eval { subname(\&$r) } // "$r") if $t == NativeR;
   die "Unserializable repr type $t";
 }
 
