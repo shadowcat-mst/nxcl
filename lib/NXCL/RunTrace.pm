@@ -63,6 +63,9 @@ use NXCL::TypeFunctions qw(Scope_Inst make_String);
 use NXCL::JSON;
 
 sub jsonify ($v) {
+  # Not an infite loop, we still call the nxcl2json we imported earlier
+  no warnings 'redefine';
+  local *NXCL::JSON::nxcl2json = \&jsonify;
   if (object_is $v, Scope_Inst) {
     return [ "Scope (dict) SCOPE_".$scopes{$v} ];
   }
