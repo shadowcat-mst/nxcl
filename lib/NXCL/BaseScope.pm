@@ -31,6 +31,8 @@ use NXCL::TypeFunctions (
     Val
     Var
     Fun
+    CxRef
+    CxTemplate
   )),
   qw(make_Val make_Scope make_Scopener make_Native make_OpDict),
   qw(make_ApMeth make_Apv make_String make_List make_Bool),

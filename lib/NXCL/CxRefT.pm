@@ -2,7 +2,10 @@ package NXCL::CxRefT;
 
 use Scalar::Util qw(weaken);
 use NXCL::ReprTypes qw(NativeR);
-use NXCL::TypeFunctions qw(make_Bool);
+use NXCL::TypeFunctions qw(
+  make_Bool make_List make_OpDict
+  CxTemplate
+);
 use NXCL::Utils qw(uncons flatten raw panic);
 use NXCL::TypePackage;
 
@@ -48,6 +51,16 @@ wrap method eval => sub ($self, $args) {
     ECTX($expr, $cx->[1], 2, $cx->[2]),
     EVAL($expr),
     LCTX(undef),
+  );
+};
+
+method derive => sub ($self, $args) {
+  panic "Inactive CxRef" unless defined(my $cx = raw($self));
+  return (
+    CALL(derive => make_List($cx->[2])),
+    SNOC(make_List(make_OpDict $cx->[1])),
+    CONS(CxTemplate),
+    CALL('new'),
   );
 };
 

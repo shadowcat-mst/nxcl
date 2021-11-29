@@ -100,3 +100,22 @@ $ let expr-then-0 = fexpr (cx, expr) {
   }
   (f1(), f2(), f3())
 = (0, 1, 2)
+$ let run-both = fexpr (cx, e1, e2) {
+    cx.eval e1;
+    cx.eval e2;
+  }
+  let x = 1;
+  var y = 3;
+  run-both [ let x = 7 ] [ y = y + x ];
+  (x, y)
+= (7, 10)
+$ let run-both = fexpr (cx, e1, e2) {
+    let cx = cx.derive();
+    cx.eval e1;
+    cx.eval e2;
+  }
+  let x = 1;
+  var y = 3;
+  run-both [ let x = 7 ] [ y = y + x ];
+  (x, y)
+= (1, 10)
