@@ -1,7 +1,7 @@
 package NXCL::BaseScope;
 
 use NXCL::Package;
-use NXCL::Utils qw(uncons);
+use NXCL::Utils qw(uncons flatten);
 use NXCL::MethodUtils;
 use NXCL::ExprUtils;
 use NXCL::OpUtils;
@@ -82,6 +82,9 @@ our $Store = make_OpDict do {
             sub ($args) { CALL(combine => $args) })),
     fun => make_ApMeth(make_Native(set_subname "fun" =>
              sub ($args) { CALL(new => cons_List(Fun, $args)) })),
+    fexpr => make_ApMeth(make_Native(set_subname "fexpr" => sub ($args) {
+               CALL(new => make_List(Fun, flatten($args), make_Bool(1)))
+             })),
     return => make_Apv(make_Native(set_subname "return" =>
       sub ($args) { # dynamic('return-target')(arg0)
         my ($ret) = uncons($args);
