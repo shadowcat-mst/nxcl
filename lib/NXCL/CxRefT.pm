@@ -1,14 +1,14 @@
 package NXCL::CxRefT;
 
 use Scalar::Util qw(weaken);
-use NXCL::ReprTypes qw(ValR);
+use NXCL::ReprTypes qw(NativeR);
 use NXCL::TypeFunctions qw(make_Bool);
 use NXCL::Utils qw(uncons flatten raw panic);
 use NXCL::TypePackage;
 
 export make => sub ($cx) {
   weaken($cx);
-  _make ValR ,=> $cx;
+  _make NativeR ,=> $cx;
 };
 
 method is_active => sub ($self, $) {
