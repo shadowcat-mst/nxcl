@@ -83,3 +83,20 @@ $ var x = 1;
   run-twice [ x = x + 1 ];
   x
 = 3
+$ let expr-then-0 = fexpr (cx, expr) {
+    cx.eval expr;
+    0;
+  }
+  let f1 = fun () {
+    expr-then-0 17;
+  }
+  let f2 = fun () {
+    expr-then-0 17;
+    1;
+  }
+  let f3 = fun () {
+    expr-then-0 return(2);
+    1;
+  }
+  (f1(), f2(), f3())
+= (0, 1, 2)

@@ -38,54 +38,43 @@ static _new => sub ($self, $args) {
 
 method combine => sub ($self, $args) {
   my %me = %{raw($self)};
-  return DOCTX $self, 0, undef, [
+  my $is_opv = 0+!!raw($me{is_opv});
+  return (
+    ($is_opv ? (GCTX(), OVER(1, 'JUST')) : ()),
+    DOCTX $self, $is_opv, undef, [
 
-    # Setup args and grab context
+      # Setup args and grab context
 
-    do {
-      if (raw($me{is_opv})) {
-        # Fexpr - unshift context onto args
-        (
-          GCTX(),
-          DUP2(2, 'JUST'),
-          SNOC($args),
-          OVER(12, 'JUST'),
-        );
-      } else {
-        # Lambda - evaluate args in calling environment
-        (
-          EVAL($args),
-          OVER(12, 'JUST'),
-          GCTX(),
-        );
-      }
-    },
+      ($is_opv ? SNOC($args) : EVAL($args)),
+      OVER(12, 'JUST'),
+      GCTX(),
 
-    # Create execution scope and setup return target
+      # Create execution scope and setup return target
 
-    DUP2(3, 'CONS'),
-    LIST(make_Name('return_to')),
-    CMB9($DOT_F),
-    LIST(make_String('return-target')),
-    CALL('set_dynamic_value'),
-    DROP(),
-    CALL('derive', make_List($me{scope})),
-    DUP2(8, 'JUST'),
+      DUP2(3, 'CONS'),
+      LIST(make_Name('return_to')),
+      CMB9($DOT_F),
+      LIST(make_String('return-target')),
+      CALL('set_dynamic_value'),
+      DROP(),
+      CALL('derive', make_List($me{scope})),
+      DUP2(8, 'JUST'),
 
-    # Unpack arguments
+      # Unpack arguments
 
-    SNOC(make_List(Val)),
-    CALL('introscope'),
-    DOCTX($self, 1, [
-      LIST($me{argspec}),
-      CALL('assign_value'),
-    ]),
-    DROP(),
+      SNOC(make_List(Val)),
+      CALL('introscope'),
+      DOCTX($self, 1, [
+        LIST($me{argspec}),
+        CALL('assign_value'),
+      ]),
+      DROP(),
 
-    # Execute function body
+      # Execute function body
 
-    DOCTX($self, 0, [
-      CMB9($me{body}, empty_List),
-    ]),
-  ];
+      DOCTX($self, 0, [
+        CMB9($me{body}, empty_List),
+      ]),
+    ]
+  );
 };
