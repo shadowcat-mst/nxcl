@@ -1,6 +1,6 @@
 package NXCL::LvalueFunT;
 
-use NXCL::Utils qw(raw);
+use NXCL::Utils qw(raw flatten);
 use NXCL::ReprTypes qw(DictR);
 use NXCL::TypePackage;
 
@@ -12,6 +12,10 @@ sub make ($call, $assign_via_call) {
 }
 
 export make => \&make;
+
+wrap static new => sub ($self, $args) {
+  JUST make flatten($args)
+};
 
 method combine => sub ($self, $args) {
   CMB9 raw($self)->{call}, $args
