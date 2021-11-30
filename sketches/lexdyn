@@ -1,0 +1,48 @@
+# Different cases that all need to work for the context/lexscope/dynscope
+# stuff to be correct
+
+# return:
+
+let if = fexpr (ctx, cond, ifblock, \else, elseblock) {
+  let dctx = ctx.derive();
+  dctx.call [[dctx.eval cond].ifelse ifblock elseblock];
+}
+
+let lt3 = fun (val) {
+  if [val < 3] {
+    return '<3'
+  } else {
+    return 'boo'
+  }
+  return 'BOTCH'
+}
+
+assert(lt3(2) == '<3');
+assert(lt3(4) == 'boo');
+
+# defer:
+
+let defer = fun (block) {
+  ^block-ctx.on_leave () => block;
+}
+
+let res = mut ();
+
+{
+  defer { res.push 1 }
+  {
+    defer { res.push 2 }
+  }
+}
+
+assert(res == (2, 1));
+
+# let0
+
+let let0 = fexpr (ctx, name) { ctx.eval \$[ let $$name = 0 ] }
+
+let0 x;
+
+assert(x == 0);
+
+# try/catch/throw

@@ -1,0 +1,24 @@
+$ let -^- = fexpr (cx, name) { apply cx.get_dynamic_value name }
+  let dynrecv = fun () { -^-dyn-name }
+  let dynmid = fun () { dynrecv() }
+  let dynsend = fun () {
+    ^dyn-name = 3;
+    dynmid()
+  }
+  dynsend()
+= 3
+$ let -^- = LvalueFun.new(
+    fexpr (cx, name) { apply cx.get_dynamic_value name },
+    fexpr (cx, targp, value) {
+      let name = targp.first();
+      apply cx.set_dynamic_value name value
+    },
+  );
+  let dynrecv = fun () { -^-dyn-name }
+  let dynmid = fun () { dynrecv() }
+  let dynsend = fun () {
+    -^-dyn-name = 3;
+    dynmid()
+  }
+  dynsend()
+= 3

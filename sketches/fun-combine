@@ -1,0 +1,13 @@
+_fexpr (cctx, @argsp) {
+
+  let args = cctx.eval argsp;
+
+  let scope = self.scope().derive();
+
+  let dynvars = cctx.dynvars().with return-target cctx.return_to;
+
+  with-dynamics dynvars {
+    scope.introscope().eval_template($$argspec = args);
+    scope.eval self.body();
+  }
+}

@@ -1,0 +1,14 @@
+let if = kexpr (ctx, cond, ifblock, elseblock) {
+  let dctx = ctx.derive();
+  let res = dctx.eval cond;
+  dctx.combine [res.ifelse ifblock elseblock];
+}
+
+let lt3 = fun (val) {
+  if [val < 3] {
+    return '<3'
+  } {
+    return 'boo'
+  }
+  return 'BOTCH'
+}
