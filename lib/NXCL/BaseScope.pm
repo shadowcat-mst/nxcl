@@ -119,6 +119,13 @@ our $Store = make_OpDict do {
         );
       }),
     ),
+    apply => make_Apv(make_Native(set_subname apply => sub ($args) {
+      my ($call, $call_args) = uncons $args;
+      return (
+        EVAL($call),
+        CMB6($call_args),
+      );
+    })),
     %opmeth,
     map +($_ => __PACKAGE__->can($_)->()),
       @BASE_TYPES
