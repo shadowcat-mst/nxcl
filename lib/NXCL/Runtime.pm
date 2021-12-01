@@ -12,6 +12,7 @@ use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 our @EXPORT_OK = qw(run_til_host);
 
 sub retops ($ops, @ret) { push @$ops, reverse @ret }
+sub retval ($ops, $val) { push @{$ops->[-1]}, $val }
 
 sub take_step_EVAL ($cxs, $ops, $value) {
   retops $ops, call_method(EVALUATE => make_List($value));
@@ -42,19 +43,19 @@ sub take_step_ECDR ($cxs, $ops, $cdr, $car) {
 }
 
 sub take_step_JUST ($cxs, $ops, $val) {
-  push @{$ops->[-1]}, $val;
+  retval $ops, $val;
 }
 
 sub take_step_CONS ($cxs, $ops, @cons) {
-  push @{$ops->[-1]}, cons_List(@cons);
+  retval $ops, cons_List(@cons);
 }
 
 sub take_step_SNOC ($cxs, $ops, $cdr, $car) {
-  push @{$ops->[-1]}, cons_List($car, $cdr);
+  retval $ops, cons_List($car, $cdr);
 }
 
 sub take_step_LIST ($cxs, $ops, @list) {
-  push @{$ops->[-1]}, make_List(@list);
+  retval $ops, make_List(@list);
 }
 
 sub take_step_DROP { }
@@ -98,7 +99,7 @@ sub take_step_LCTX ($cxs, $ops, $cx, $val) {
 }
 
 sub take_step_GCTX ($cxs, $ops) {
-  push @{$ops->[-1]}, make_CxRef($cxs->[-1]);
+  retval $ops, make_CxRef($cxs->[-1]);
 }
 
 sub take_step_GETN ($cxs, $ops, $name) {
