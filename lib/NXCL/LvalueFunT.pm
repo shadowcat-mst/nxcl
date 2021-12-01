@@ -17,7 +17,7 @@ wrap static new => sub ($self, $args) {
   JUST make flatten($args)
 };
 
-method combine => sub ($self, $args) {
+method COMBINE => sub ($self, $args) {
   CMB9 raw($self)->{call}, $args
 };
 

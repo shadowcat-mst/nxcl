@@ -22,7 +22,7 @@ method to_xcl_string => sub ($self, $) {
 
 # called args versus implicit args - c_args versus i_args
 
-method combine => sub ($self, $c_args) {
+method COMBINE => sub ($self, $c_args) {
   my ($curried, $i_args) = uncons($self);
   if (rnilp $c_args) {
     return CMB9 $curried => $i_args;

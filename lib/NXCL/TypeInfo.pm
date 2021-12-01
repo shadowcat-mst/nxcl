@@ -53,7 +53,7 @@ sub _mset_of ($self, $mset_type, $proto) {
       ? make_ApMeth($native)
       : $native;
   }
-  $mset{evaluate} ||= do {
+  $mset{EVALUATE} ||= do {
     state $eval = do {
       require NXCL::ExprUtils;
       $NXCL::ExprUtils::ESCAPE;

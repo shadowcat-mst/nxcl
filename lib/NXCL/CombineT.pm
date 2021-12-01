@@ -9,7 +9,7 @@ export make => sub ($call, @args) { _make ConsR ,=> $call, make_List @args };
 export cons => sub ($call, $args) { _make ConsR ,=> $call, $args };
 export list => sub ($list) { _make ConsR ,=> uncons($list) };
 
-method evaluate => sub ($self, $args) {
+method EVALUATE => sub ($self, $args) {
   my ($call, $call_args) = uncons $self;
   return (
     EVAL($call),

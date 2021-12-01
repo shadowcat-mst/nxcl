@@ -6,7 +6,7 @@ use NXCL::TypePackage;
 
 export make => sub ($opv) { _make ValR ,=> $opv };
 
-method combine => sub ($self, $args) {
+method COMBINE => sub ($self, $args) {
   return (
     EVAL($args),
     CMB9(raw($self)),

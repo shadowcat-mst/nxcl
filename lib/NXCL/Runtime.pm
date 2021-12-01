@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(run_til_host);
 
 sub take_step_EVAL ($cxs, $ops, $value) {
   push @$ops, reverse
-    call_method(evaluate => make_List($value));
+    call_method(EVALUATE => make_List($value));
 }
 
 sub take_step_CALL ($cxs, $ops, $methodp, $args) {
@@ -25,7 +25,7 @@ sub take_step_CMB9 ($cxs, $ops, $cmb, $args) {
   push @$ops, reverse(
     object_is($cmb, Native_Inst)
       ? raw($cmb)->($args)
-      : call_method(combine => cons_List($cmb, $args))
+      : call_method(COMBINE => cons_List($cmb, $args))
   );
 }
 

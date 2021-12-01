@@ -12,7 +12,7 @@ wrap static new => sub ($self, $args) {
   return JUST _make ValR ,=> $key;
 };
 
-wrap method combine => sub ($self, $args) {
+wrap method COMBINE => sub ($self, $args) {
   my ($value) = uncons($args);
   return JUST make_Pair(raw($self), $value);
 };

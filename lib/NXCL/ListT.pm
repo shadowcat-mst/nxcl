@@ -57,7 +57,7 @@ method rest => sub ($self, $args) {
   return JUST $rest;
 };
 
-method evaluate => sub ($self, $args) {
+method EVALUATE => sub ($self, $args) {
   if (rnilp $self) {
     return JUST $self;
   }
@@ -73,8 +73,8 @@ wrap method concat => sub ($self, $args) {
   return JUST cons(flatten($self), $concat);
 };
 
-wrap method combine => sub ($self, $args) {
-  panic "List.combine called without an index" if rnilp($args);
+wrap method COMBINE => sub ($self, $args) {
+  panic "List.COMBINE called without an index" if rnilp($args);
   my $idx = raw((uncons($args))[0]);
   my $value = $self;
   (undef, $value) = uncons($value) for 1..$idx;

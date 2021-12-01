@@ -15,7 +15,7 @@ method to_xcl_string => sub ($self, $) {
   return JUST make_String("Native('".subname(\&{raw($self)})."')");
 };
 
-method combine => sub ($self, $args) {
+method COMBINE => sub ($self, $args) {
   raw($self)->($self, $args);
 };
 

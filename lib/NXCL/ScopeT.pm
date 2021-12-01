@@ -71,7 +71,7 @@ method introscope => sub ($self, $args) {
   return JUST make_IntroScope($self, $type);
 };
 
-# combine() should do eval-in-scope
+# COMBINE() should do eval-in-scope
 # assign_via_call() should pass through to eval-in-scope where possible
 
 1;

@@ -16,7 +16,7 @@ method to_xcl_string => sub ($self, $) {
   );
 };
 
-method combine => sub ($self, $args) {
+method COMBINE => sub ($self, $args) {
   my ($inv, $method_args) = uncons($args);
   return (
     EVAL($method_args),

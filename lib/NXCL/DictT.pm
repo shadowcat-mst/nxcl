@@ -17,7 +17,7 @@ wrap static new => sub ($self, $args) {
   return JUST _make DictR, => \%setup;
 };
 
-wrap method combine => sub ($self, $args) {
+wrap method COMBINE => sub ($self, $args) {
   my $key = raw((uncons($args))[0]);
   my $value = raw($self)->{$key};
   panic unless $value;

@@ -36,7 +36,7 @@ static _new => sub ($self, $args) {
   return JUST make $scope, $argspec, $body, $is_opv;
 };
 
-method combine => sub ($self, $args) {
+method COMBINE => sub ($self, $args) {
   my %me = %{raw($self)};
   my $is_opv = 0+!!raw($me{is_opv});
   return (

@@ -11,7 +11,7 @@ export make => \&make;
 
 sub make ($name) { _make CharsR ,=> $name }
 
-method evaluate => sub ($self, $args) {
+method EVALUATE => sub ($self, $args) {
   return GETN($self);
 };
 

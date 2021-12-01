@@ -7,7 +7,7 @@ use NXCL::TypePackage;
 
 export make => sub ($call) { _make ValR ,=> $call };
 
-method combine => sub ($self, $args) {
+method COMBINE => sub ($self, $args) {
   return(
     GCTX(),
     LIST(),

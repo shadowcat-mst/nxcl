@@ -9,7 +9,7 @@ export make => sub ($first, @rest) {
   _make ConsR ,=> $first, make_List(@rest);
 };
 
-method evaluate => sub ($self, $args) {
+method EVALUATE => sub ($self, $args) {
   my ($first, @rest) = flatten $self;
   my @exp_rest = map +(object_is($_, List_Inst) ? $_ : make_List($_)), @rest;
   return (

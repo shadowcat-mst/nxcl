@@ -82,7 +82,7 @@ our $Store = make_OpDict do {
     true => make_Bool(1),
     false => make_Bool(0),
     do => make_ApMeth(make_Native(set_subname "do" =>
-            sub ($args) { CALL(combine => $args) })),
+            sub ($args) { CALL(COMBINE => $args) })),
     fun => make_ApMeth(make_Native(set_subname "fun" =>
              sub ($args) { CALL(new => cons_List(Fun, $args)) })),
     fexpr => make_ApMeth(make_Native(set_subname "fexpr" => sub ($args) {
@@ -96,7 +96,7 @@ our $Store = make_OpDict do {
           SNOC(make_List(make_String('return-target'))),
           CALL('get_dynamic_value'),
           SNOC(make_List($ret)),
-          CALL('combine'),
+          CALL('COMBINE'),
         );
       }
     )),
