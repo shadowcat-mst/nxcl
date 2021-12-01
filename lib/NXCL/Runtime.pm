@@ -66,7 +66,7 @@ sub take_step_OVER ($cxs, $ops, $count, $type, $val) {
 
 sub take_step_DUP2 ($cxs, $ops, $count, $type, $val) {
   splice @$ops, -$count, 0, [ $type => $val ];
-  push @$ops, JUST($val);
+  retops $ops, JUST($val);
 }
 
 sub take_step_ECTX ($cxs, $ops, $thing, $dynv, $count, $scope) {
@@ -84,17 +84,16 @@ sub take_step_LCTX ($cxs, $ops, $cx, $val) {
   $#$ops = $cxs->[-1][3] - 1;
   if (my @leave_cb = @{$cxs->[-1][4]}) {
     $cxs->[-1][4] = [];
-    retops $ops, (
+    return retops $ops, (
       (map +(CMB9($_, empty_List), DROP()), @leave_cb),
       LCTX($cx, $val),
     );
-    return;
   }
   my $left = pop @$cxs;
   if ($cx and $cx != $left) {
-    push @$ops, LCTX($cx, $val);
+    retops $ops, LCTX($cx, $val);
   } else {
-    push @{$ops->[-1]}, $val;
+    retval $ops, $val;
   }
 }
 
