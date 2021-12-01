@@ -11,18 +11,18 @@ use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 
 our @EXPORT_OK = qw(run_til_host);
 
+sub retops ($ops, @ret) { push @$ops, reverse @ret }
+
 sub take_step_EVAL ($cxs, $ops, $value) {
-  push @$ops, reverse
-    call_method(EVALUATE => make_List($value));
+  retops $ops, call_method(EVALUATE => make_List($value));
 }
 
 sub take_step_CALL ($cxs, $ops, $methodp, $args) {
-  push @$ops, reverse
-    call_method($methodp, $args);
+  retops $ops, call_method($methodp, $args);
 }
 
 sub take_step_CMB9 ($cxs, $ops, $cmb, $args) {
-  push @$ops, reverse(
+  retops $ops, (
     object_is($cmb, Native_Inst)
       ? raw($cmb)->($args)
       : call_method(COMBINE => cons_List($cmb, $args))
@@ -34,7 +34,7 @@ sub take_step_CMB6 ($cxs, $ops, $args, $cmb) {
 }
 
 sub take_step_ECDR ($cxs, $ops, $cdr, $car) {
-  push @$ops, reverse(
+  retops $ops, (
     rnilp($cdr)
       ? JUST(make_List($car))
       : (EVAL($cdr), CONS($car))
@@ -83,7 +83,7 @@ sub take_step_LCTX ($cxs, $ops, $cx, $val) {
   $#$ops = $cxs->[-1][3] - 1;
   if (my @leave_cb = @{$cxs->[-1][4]}) {
     $cxs->[-1][4] = [];
-    push @$ops, reverse(
+    retops $ops, (
       (map +(CMB9($_, empty_List), DROP()), @leave_cb),
       LCTX($cx, $val),
     );
@@ -103,13 +103,12 @@ sub take_step_GCTX ($cxs, $ops) {
 
 sub take_step_GETN ($cxs, $ops, $name) {
   my $scope = $cxs->[-1][2];
-  push @$ops, reverse
-    call_method(get_value_for_name => make_List($scope, $name));
+  retops $ops, call_method(get_value_for_name => make_List($scope, $name));
 }
 
 sub take_step_SETN ($cxs, $ops, $name, $value) {
   my $scope = $cxs->[-1][2];
-  push @$ops, reverse
+  retops $ops,
     call_method(set_value_for_name => make_List($scope, $name, $value));
 }
 
