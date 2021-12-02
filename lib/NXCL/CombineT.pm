@@ -17,12 +17,12 @@ method EVALUATE => sub ($self, $args) {
   );
 };
 
-wrap method assign_value => sub ($self, $args) {
+wrap method ASSIGN_VALUE => sub ($self, $args) {
   my ($call, $call_args) = uncons $self;
   return (
     EVAL($call),
     SNOC(cons_List($call_args, $args)),
-    CALL('assign_via_call'),
+    CALL('ASSIGN_VIA_CALL'),
   );
 };
 

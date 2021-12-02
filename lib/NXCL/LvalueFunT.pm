@@ -21,7 +21,7 @@ method COMBINE => sub ($self, $args) {
   CMB9 raw($self)->{call}, $args
 };
 
-method assign_via_call => sub ($self, $args) {
+method ASSIGN_VIA_CALL => sub ($self, $args) {
   CMB9 raw($self)->{assign_via_call}, $args
 };
 

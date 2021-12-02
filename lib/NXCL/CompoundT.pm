@@ -18,7 +18,7 @@ method EVALUATE => sub ($self, $args) {
   );
 };
 
-method assign_value => sub ($self, $args) {
+method ASSIGN_VALUE => sub ($self, $args) {
   my ($first, @rest) = flatten $self;
   my @exp_rest = map +(object_is($_, List_Inst) ? $_ : make_List($_)), @rest;
   my $call_args = pop @exp_rest;
@@ -26,7 +26,7 @@ method assign_value => sub ($self, $args) {
     EVAL($first),
     (map CMB6($_), @exp_rest),
     SNOC(cons_List($call_args, $args)),
-    CALL('assign_via_call'),
+    CALL('ASSIGN_VIA_CALL'),
   );
 };
 

@@ -10,7 +10,7 @@ export make => \&make;
 
 sub make ($type) { _make ValR ,=> $type }
 
-method assign_via_call => sub ($self, $args) {
+method ASSIGN_VIA_CALL => sub ($self, $args) {
   my ($targetp, $valuep) = flatten($args);
   my ($target) = uncons($targetp);
   my $type = raw($self);
@@ -24,7 +24,7 @@ method assign_via_call => sub ($self, $args) {
     CALL('introscope'),
     DOCTX($self, 1, [
       LIST($target),
-      CALL('assign_value'),
+      CALL('ASSIGN_VALUE'),
     ])
   );
 };

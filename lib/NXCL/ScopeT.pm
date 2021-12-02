@@ -44,7 +44,7 @@ method set_value_for_name => sub ($self, $args) {
   if (object_is $store, OpDict_Inst) {
     if (my $cell = raw($store)->{$name}) {
       # cell() = value
-      return CALL(assign_via_call => cons_List($cell, empty_List, $vlist));
+      return CALL(ASSIGN_VIA_CALL => cons_List($cell, empty_List, $vlist));
     }
     panic "No value for ${name} in current scope";
   }
@@ -72,6 +72,6 @@ method introscope => sub ($self, $args) {
 };
 
 # COMBINE() should do eval-in-scope
-# assign_via_call() should pass through to eval-in-scope where possible
+# ASSIGN_VIA_CALL() should pass through to eval-in-scope where possible
 
 1;

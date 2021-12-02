@@ -127,16 +127,16 @@ my $each_continue = make_Native sub {
 
 wrap method each => sub { map_body(@_, $each_continue) };
 
-method assign_value => sub ($self, $args) {
+method ASSIGN_VALUE => sub ($self, $args) {
   return JUST($self) if rnilp($self);
   my ($scar, $scdr) = uncons($self);
   my ($arg) = uncons($args);
   panic "WHAT" if rnilp($arg);
   my ($acar, $acdr) = uncons($arg);
   return (
-    CALL(assign_value => make($scar, $acar)),
+    CALL(ASSIGN_VALUE => make($scar, $acar)),
     DROP(),
-    CALL(assign_value => make($scdr, $acdr)),
+    CALL(ASSIGN_VALUE => make($scdr, $acdr)),
   );
 };
 

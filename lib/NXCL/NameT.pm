@@ -15,7 +15,7 @@ method EVALUATE => sub ($self, $args) {
   return GETN($self);
 };
 
-method assign_value => sub ($self, $args) {
+method ASSIGN_VALUE => sub ($self, $args) {
   return JUST empty_List if raw($self) eq '$';
   my ($new_value) = uncons($args);
   return SETN($self, $new_value);

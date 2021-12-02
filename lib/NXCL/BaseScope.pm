@@ -73,7 +73,7 @@ our $Store = make_OpDict do {
         my ($lhs, $cdr) = uncons($args);
         my ($rhs) = uncons($cdr);
         return (
-          CALL(assign_value => $args),
+          CALL(ASSIGN_VALUE => $args),
           DROP(),
           JUST($rhs)
         );

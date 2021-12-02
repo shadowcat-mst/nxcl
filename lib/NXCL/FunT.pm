@@ -66,7 +66,7 @@ method COMBINE => sub ($self, $args) {
       CALL('introscope'),
       DOCTX($self, 1, [
         LIST($me{argspec}),
-        CALL('assign_value'),
+        CALL('ASSIGN_VALUE'),
       ]),
       DROP(),
 

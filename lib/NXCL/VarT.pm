@@ -17,7 +17,7 @@ method COMBINE => sub ($self, $args) {
   return JUST raw($self);
 };
 
-method assign_via_call => sub ($self, $args) {
+method ASSIGN_VIA_CALL => sub ($self, $args) {
   my ($call_args, $assign) = uncons($args);
   my ($new_value) = uncons($assign);
   raw($self) = $new_value;
