@@ -18,7 +18,7 @@ method is_active => sub ($self, $) {
   JUST make_Bool defined(raw($self));
 };
 
-method return_to => sub ($self, $args) {
+wrap method return_to => sub ($self, $args) {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   LCTX $cx, (uncons($args))[0];
 };
@@ -30,7 +30,7 @@ wrap method on_leave => sub ($self, $args) {
   JUST $self;
 };
 
-method get_dynamic_value => sub ($self, $args) {
+wrap method get_dynamic_value => sub ($self, $args) {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my $name = raw((uncons($args))[0]);
   panic "No dynamic value for ${name}"
@@ -38,7 +38,7 @@ method get_dynamic_value => sub ($self, $args) {
   return JUST $value;
 };
 
-method set_dynamic_value => sub ($self, $args) {
+wrap method set_dynamic_value => sub ($self, $args) {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my ($namep, $value) = flatten($args);
   my $name = raw($namep);

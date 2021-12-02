@@ -35,7 +35,7 @@ method on_leave => sub ($self, $args) {
   panic "Can't register leave callbacks on a CxTemplate";
 };
 
-method get_dynamic_value => sub ($self, $args) {
+wrap method get_dynamic_value => sub ($self, $args) {
   my $name = raw((uncons($args))[0]);
   my $dyn = raw(raw($self)->{dynamics});
   panic "No dynamic value for ${name}"
@@ -43,7 +43,7 @@ method get_dynamic_value => sub ($self, $args) {
   return JUST $value;
 };
 
-method set_dynamic_value => sub ($self, $args) {
+wrap method set_dynamic_value => sub ($self, $args) {
   my ($namep, $value) = flatten($args);
   my $name = raw($namep);
   my $dyn = raw(raw($self)->{dynamics});
