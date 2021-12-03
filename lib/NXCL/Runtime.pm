@@ -90,7 +90,7 @@ sub take_step_LCTX ($cxs, $ops, $cx, $val) {
 }
 
 sub take_step_GCTX ($cxs, $ops) {
-  retval $ops, make_CxRef($cxs->[-1]);
+  retval $ops, $cxs->[-1][6] ||= make_CxRef($cxs->[-1]);
 }
 
 sub take_step_GETN ($cxs, $ops, $name) {
