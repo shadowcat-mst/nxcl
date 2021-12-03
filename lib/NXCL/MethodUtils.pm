@@ -4,7 +4,7 @@ use NXCL::Exporter;
 use NXCL::Utils qw(panic mset object_is raw flatten uncons);
 use NXCL::OpUtils;
 use NXCL::TypeFunctions qw(
-  OpDict_Inst Native_Inst Name_Inst String_Inst Int_Inst
+  Dict_Inst Native_Inst Name_Inst String_Inst Int_Inst
   make_List make_String cons_Curry make_Curry make_Native make_Apv
 );
 use NXCL::TypeRegistry;
@@ -32,7 +32,7 @@ sub call_method ($methodp, $args) {
       : ($methodp, make_String($methodp))
   );
   my $mset = mset($self) // panic "Undefined mset for ${self}";
-  if (object_is $mset, OpDict_Inst) {
+  if (object_is $mset, Dict_Inst) {
     panic "No handler for ${method_name} on ".mset_name($mset)
       ." (mset has methods: "
       .(join(', ', sort keys %{raw($mset)})||'(none)').")"
@@ -55,7 +55,7 @@ sub lookup_method ($self, $methodp) {
       : ($methodp, make_String($methodp))
   );
   my $mset = mset($self);
-  if (mset($mset) == OpDict_Inst) {
+  if (mset($mset) == Dict_Inst) {
     panic "No handler for ${method_name} on ".mset_name($mset)
       ." (mset has methods: "
       .(join(', ', sort keys %{raw($mset)})||'(none)').")"

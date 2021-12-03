@@ -3,7 +3,7 @@ package NXCL::CxTemplateT;
 use Scalar::Util qw(weaken);
 use NXCL::ReprTypes qw(DictR);
 use NXCL::TypeFunctions qw(
-  make_Bool make_List cons_List make_OpDict list_Combine
+  make_Bool make_List cons_List make_Dict list_Combine
   CxTemplate
 );
 use NXCL::Utils qw(uncons flatten raw panic);
@@ -48,7 +48,7 @@ wrap method set_dynamic_value => sub ($self, $args) {
   my $name = raw($namep);
   my $dyn = raw(raw($self)->{dynamics});
   my $new_dyn = { %{$dyn}, $name => $value };
-  raw($self)->{dynamics} = make_OpDict($new_dyn);
+  raw($self)->{dynamics} = make_Dict($new_dyn);
   return JUST $value;
 };
 

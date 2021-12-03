@@ -23,7 +23,7 @@ use NXCL::TypeFunctions (
     Name
     Native
     Numeric
-    OpDict
+    Dict
     Pair
     Scope
     IntroScope
@@ -35,7 +35,7 @@ use NXCL::TypeFunctions (
     CxRef
     CxTemplate
   )),
-  qw(make_Val make_Scope make_Scopener make_Native make_OpDict),
+  qw(make_Val make_Scope make_Scopener make_Native make_Dict),
   qw(make_ApMeth make_Apv make_String make_List make_Bool),
   qw(cons_List make_LvalueFun),
 );
@@ -56,7 +56,7 @@ my %opmeth = map {
   sort keys %OP_MAP
 );
 
-our $Store = make_OpDict do {
+our $Store = make_Dict do {
   my %scope = (
     dot => $DOT,
     dot_f => $DOT_F,

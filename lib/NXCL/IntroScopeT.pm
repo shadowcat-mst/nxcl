@@ -4,7 +4,7 @@ use NXCL::ReprTypes qw(DictR);
 use NXCL::Utils qw(panic flatten uncons raw object_is);
 use NXCL::TypeFunctions qw(
   cons_List empty_List
-  make_OpDict OpDict_Inst
+  make_Dict Dict_Inst
 );
 use NXCL::TypePackage;
 

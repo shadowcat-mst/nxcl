@@ -11,10 +11,10 @@ our %Mset;
 unless (our $Loading) {
   local $Loading = 1;
 
-  require NXCL::OpDictT;
+  require NXCL::DictT;
   require NXCL::NativeT;
 
-  my @bs = my ($opdict_info, $native_info) = @TypeInfo{'OpDict', 'Native'};
+  my @bs = my ($dict_info, $native_info) = @TypeInfo{'Dict', 'Native'};
 
   $_->{inst_mset} = [] for @bs;
 
@@ -27,7 +27,7 @@ unless (our $Loading) {
     $Mset{$bs->inst_mset} = $bs->name;
   }
 
-  weaken($opdict_info->inst_mset->[0]);
+  weaken($dict_info->inst_mset->[0]);
 
   weaken($_->[0]) for values %{$native_info->inst_mset->[1][1]};
 }
