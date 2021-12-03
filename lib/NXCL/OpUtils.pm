@@ -20,10 +20,12 @@ our @EXPORT
       ECTX
       LCTX
       GCTX
-      OVER
-      DUP2
       GETN
       SETN
+      SETL
+      DUPL
+      GETL
+      USEL
     );
 
 sub make_op ($type, @args) {
@@ -38,12 +40,11 @@ foreach my $op_type (@EXPORT) {
 push @EXPORT, qw(DOCTX DYNREG);
 
 sub DOCTX {
-  die unless @_ == 3 or @_ == 4;
+  die unless @_ == 2 or @_ == 3;
   my $thing = shift;
-  my $count = shift;
   my @scope = $#_ ? shift : ();
   my @ops = (@{+shift}, LCTX(undef));
-  return (ECTX($thing, undef, scalar(@ops) + $count, @scope), @ops);
+  return (ECTX($thing, undef, scalar(@ops), @scope), @ops);
 }
 
 sub DYNREG ($name) {
@@ -53,10 +54,11 @@ sub DYNREG ($name) {
   };
   return (
     GCTX(),
-    DUP2(3, 'CONS'),
+    DUPL('cx'),
     LIST(make_Name($name)),
     CMB9($DOT_F),
     LIST(make_String($name)),
+    USEL('cx', 'CONS'),
     CALL('set_dynamic_value'),
     DROP(),
   );

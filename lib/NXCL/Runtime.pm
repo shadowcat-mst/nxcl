@@ -60,15 +60,6 @@ sub take_step_LIST ($cxs, $ops, @list) {
 
 sub take_step_DROP { }
 
-sub take_step_OVER ($cxs, $ops, $count, $type, $val) {
-  splice @$ops, -$count, 0, [ $type => $val ];
-}
-
-sub take_step_DUP2 ($cxs, $ops, $count, $type, $val) {
-  splice @$ops, -$count, 0, [ $type => $val ];
-  retops $ops, JUST($val);
-}
-
 sub take_step_ECTX ($cxs, $ops, $thing, $dynv, $count, $scope) {
   my ($top_thing, $top_dynv, $top_scope) = @{$cxs->[-1]};
   push @$cxs, [
@@ -77,6 +68,7 @@ sub take_step_ECTX ($cxs, $ops, $thing, $dynv, $count, $scope) {
      ($scope // $top_scope),
      scalar(@$ops) - $count,
      [],
+     { %{$cxs->[-1][5]} },
   ];
 }
 
@@ -110,6 +102,23 @@ sub take_step_SETN ($cxs, $ops, $name, $value) {
   my $scope = $cxs->[-1][2];
   retops $ops,
     call_method(set_value_for_name => make_List($scope, $name, $value));
+}
+
+sub take_step_SETL ($cxs, $ops, $name, $value) {
+  push @{$cxs->[-1][5]{$name}}, $value;
+}
+
+sub take_step_DUPL ($cxs, $ops, $name, $value) {
+  push @{$cxs->[-1][5]{$name}}, $value;
+  retval $ops, $value;
+}
+
+sub take_step_USEL ($cxs, $ops, $name, $type, @rest) {
+  retops $ops, [ $type => pop(@{$cxs->[-1][5]{$name}}), @rest ];
+}
+
+sub take_step_GETL ($cxs, $ops, $name, $type, @rest) {
+  retval $ops, [ $type => $cxs->[-1][5]{$name}[-1], @rest ];
 }
 
 our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),

@@ -39,13 +39,13 @@ method COMBINE => sub ($self, $args) {
   my %me = %{raw($self)};
   my $is_opv = 0+!!raw($me{is_opv});
   return (
-    ($is_opv ? (GCTX(), OVER(1, 'JUST')) : ()),
-    DOCTX $self, $is_opv, undef, [
+    ($is_opv ? (GCTX(), SETL('cx')) : ()),
+    DOCTX $self, undef, [
 
       # Setup args
 
-      ($is_opv ? SNOC($args) : EVAL($args)),
-      OVER(19, 'JUST'),
+      ($is_opv ? (USEL('cx', 'JUST'), SNOC($args)) : EVAL($args)),
+      SETL('args'),
 
       # Setup return and defer dynamics
 
@@ -55,13 +55,14 @@ method COMBINE => sub ($self, $args) {
       # Create execution scope
 
       CALL('derive', make_List($me{scope})),
-      DUP2(8, 'JUST'),
+      DUPL('scope'),
 
       # Unpack arguments
 
       SNOC(make_List(Val)),
       CALL('introscope'),
-      DOCTX($self, 1, [
+      DOCTX($self, [
+        USEL('args','JUST'),
         LIST($me{argspec}),
         CALL('ASSIGN_VALUE'),
       ]),
@@ -69,7 +70,8 @@ method COMBINE => sub ($self, $args) {
 
       # Execute function body
 
-      DOCTX($self, 0, [
+      USEL('scope','JUST'),
+      DOCTX($self, [
         CMB9($me{body}, empty_List),
       ]),
     ]

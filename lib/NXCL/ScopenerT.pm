@@ -16,13 +16,14 @@ method ASSIGN_VIA_CALL => sub ($self, $args) {
   my $type = raw($self);
   return (
     EVAL($valuep),
-    OVER(6, 'JUST'),
+    SETL('value'),
     GCTX(),
     LIST(),
     CALL('scope'),
     SNOC(make_List($type)),
     CALL('introscope'),
-    DOCTX($self, 1, [
+    DOCTX($self, [
+      USEL('value', 'JUST'),
       LIST($target),
       CALL('ASSIGN_VALUE'),
     ])

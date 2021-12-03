@@ -13,7 +13,7 @@ method COMBINE => sub ($self, $args) {
     CALL('scope'),
     LIST(),
     CALL('derive'),
-    DOCTX($self, 0, [
+    DOCTX($self, [
       DYNREG('defer'),
       EVAL(raw($self)),
     ])

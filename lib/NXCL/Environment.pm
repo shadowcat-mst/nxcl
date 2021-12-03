@@ -27,7 +27,7 @@ sub eval_string_in ($self, $scope, $string) {
 
 sub eval_in ($self, $scope, $value) {
   my $return_value = run_til_host(
-    [ [ [ make_List($value) ], {}, $scope ] ],
+    [ [ [ make_List($value) ], {}, $scope, 0, [], {} ] ],
     [ HOST(), EVAL($value) ],
   );
   return NXCL::RV->new(
