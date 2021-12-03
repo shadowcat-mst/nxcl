@@ -1,0 +1,33 @@
+class SqlQuery {
+  ro sql;
+  ro args;
+
+  staticx query (cx, queryp) {
+    let args = mut ();
+    let qcx = cx.derive(:QQSTRING fexpr (cx, @argsp) {
+      ++ '' @(
+        argsp.map {
+          ?: is_String(this)
+             this
+            [ args.push cx.eval(this); '?' ]
+          }
+        );
+    });
+    let sql = qcx.eval queryp;
+    return self.new(% sql args)
+  }
+}
+
+let query = SqlQuery.query;
+
+use perl DBI;
+
+let dbh = DBI.connect(dsn, user, pass, args);
+
+let q = query "SELECT * FROM some_table WHERE id = ${id}";
+
+let results = dbh.selectall_arrayref(
+  q.sql(),
+  %(:Slice %()),
+  @(q.args())
+);

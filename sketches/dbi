@@ -1,0 +1,21 @@
+use perl DBI;
+
+class DBH {
+  has dbh;
+
+  static connect (:dsn, :user = '', :pass = '', :args = %()) {
+    args.'RaiseError' = 1;
+    args.'AutoCommit' = 0;
+    let dbh = DBI.connect(dsn, user, pass, args);
+    self.new(% dbh);
+  }
+
+  method _run (queryp, method, attrs) {
+    let q = apply SqlQuery.query queryp;
+    dbh.[$method] q.sql() attrs @(q.args())
+  }
+
+  methodx do (queryp) { self._run queryp \do %() }
+
+  methodx query (queryp) { self._run queryp \selectall_arrayref %(:Slice ()) }
+}
