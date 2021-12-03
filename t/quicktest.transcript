@@ -152,7 +152,7 @@ $ let -?:- = fexpr (cx, cond, onif, onelse) {
   (lt3 2, lt3 7)
 = ('<3', 'boo')
 $ let _defer = fexpr (cx, cb) {
-    cx.on_leave cb
+    cx.defer cb
   }
   var x = 1;
   var y = 2;
@@ -168,8 +168,22 @@ $ let _defer = fexpr (cx, cb) {
   let z = f();
   (x, y, z, savx, savy);
 = (3, 6, 7, 1, 2)
+$ var x = 1;
+  var y = 2;
+  var savx = 0;
+  var savy = 0;
+  let f = fun () {
+    defer { x = 3 }
+    defer { y = 5 + x }
+    savx = x;
+    savy = y;
+    7
+  }
+  let z = f();
+  (x, y, z, savx, savy);
+= (3, 6, 7, 1, 2)
 $ let earlyret = fun () {
-    ^return-target 3;
+    ^return 3;
     0;
   }
   earlyret()

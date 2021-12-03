@@ -3,7 +3,7 @@ package NXCL::CxRefT;
 use Scalar::Util qw(weaken);
 use NXCL::ReprTypes qw(NativeR);
 use NXCL::TypeFunctions qw(
-  make_Bool make_List make_OpDict list_Combine
+  make_Bool make_List cons_List make_OpDict list_Combine
   CxTemplate
 );
 use NXCL::Utils qw(uncons flatten raw panic);
@@ -18,12 +18,12 @@ method is_active => sub ($self, $) {
   JUST make_Bool defined(raw($self));
 };
 
-wrap method return_to => sub ($self, $args) {
+wrap method return => sub ($self, $args) {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   LCTX $cx, (uncons($args))[0];
 };
 
-wrap method on_leave => sub ($self, $args) {
+wrap method defer => sub ($self, $args) {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my ($cb) = uncons($args);
   unshift @{$cx->[4]}, $cb;
@@ -65,10 +65,10 @@ wrap method call => sub ($self, $args) {
   $eval->($self, make_List(list_Combine($args)));
 };
 
-method derive => sub ($self, $args) {
+wrap method derive => sub ($self, $args) {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   return (
-    CALL(derive => make_List($cx->[2])),
+    CALL(derive => cons_List($cx->[2], $args)),
     SNOC(make_List(make_OpDict $cx->[1])),
     CONS(CxTemplate),
     CALL('new'),

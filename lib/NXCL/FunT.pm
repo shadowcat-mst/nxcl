@@ -6,7 +6,6 @@ use NXCL::TypeFunctions qw(
   make_String make_Name make_Bool
 );
 use NXCL::ReprTypes qw(DictR);
-use NXCL::MethodUtils qw($DOT_F);
 use NXCL::TypePackage;
 
 sub make ($scope, $argspec, $body, $is_opv = make_Bool(0)) {
@@ -43,20 +42,18 @@ method COMBINE => sub ($self, $args) {
     ($is_opv ? (GCTX(), OVER(1, 'JUST')) : ()),
     DOCTX $self, $is_opv, undef, [
 
-      # Setup args and grab context
+      # Setup args
 
       ($is_opv ? SNOC($args) : EVAL($args)),
-      OVER(12, 'JUST'),
-      GCTX(),
+      OVER(19, 'JUST'),
 
-      # Create execution scope and setup return target
+      # Setup return and defer dynamics
 
-      DUP2(3, 'CONS'),
-      LIST(make_Name('return_to')),
-      CMB9($DOT_F),
-      LIST(make_String('return-target')),
-      CALL('set_dynamic_value'),
-      DROP(),
+      DYNREG('return'),
+      DYNREG('defer'),
+
+      # Create execution scope
+
       CALL('derive', make_List($me{scope})),
       DUP2(8, 'JUST'),
 

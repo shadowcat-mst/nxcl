@@ -89,11 +89,23 @@ our $Store = make_OpDict do {
                CALL(new => make_List(Fun, flatten($args), make_Bool(1)))
              })),
     return => make_Apv(make_Native(set_subname "return" =>
-      sub ($args) { # dynamic('return-target')(arg0)
+      sub ($args) { # dynamic('return')(arg0)
         my ($ret) = uncons($args);
         return (
           GCTX(),
-          SNOC(make_List(make_String('return-target'))),
+          SNOC(make_List(make_String('return'))),
+          CALL('get_dynamic_value'),
+          SNOC(make_List($ret)),
+          CALL('COMBINE'),
+        );
+      }
+    )),
+    defer => make_Apv(make_Native(set_subname "defer" =>
+      sub ($args) { # dynamic('return')(arg0)
+        my ($ret) = uncons($args);
+        return (
+          GCTX(),
+          SNOC(make_List(make_String('defer'))),
           CALL('get_dynamic_value'),
           SNOC(make_List($ret)),
           CALL('COMBINE'),

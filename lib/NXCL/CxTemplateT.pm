@@ -3,7 +3,7 @@ package NXCL::CxTemplateT;
 use Scalar::Util qw(weaken);
 use NXCL::ReprTypes qw(DictR);
 use NXCL::TypeFunctions qw(
-  make_Bool make_List make_OpDict list_Combine
+  make_Bool make_List cons_List make_OpDict list_Combine
   CxTemplate
 );
 use NXCL::Utils qw(uncons flatten raw panic);
@@ -27,12 +27,12 @@ method is_active => sub ($self, $) {
   JUST make_Bool 0;
 };
 
-method return_to => sub ($self, $args) {
+method return => sub ($self, $args) {
   panic "Can't return from a CxTemplate";
 };
 
-method on_leave => sub ($self, $args) {
-  panic "Can't register leave callbacks on a CxTemplate";
+method defer => sub ($self, $args) {
+  panic "Can't register defer callbacks on a CxTemplate";
 };
 
 wrap method get_dynamic_value => sub ($self, $args) {
@@ -70,10 +70,10 @@ wrap method call => sub ($self, $args) {
   $eval->($self, make_List(list_Combine($args)));
 };
 
-method derive => sub ($self, $args) {
+wrap method derive => sub ($self, $args) {
   my ($scope, $dyn_dict) = @{raw($self)}{qw(scope dynamics)};
   return (
-    CALL(derive => make_List($scope)),
+    CALL(derive => cons_List($scope, $args)),
     SNOC(make_List($dyn_dict)),
     CONS(CxTemplate),
     CALL('new')
