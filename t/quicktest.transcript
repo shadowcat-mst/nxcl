@@ -58,6 +58,8 @@ $ let f = do { let x = 3; fun (y) { x + y } }; f 7
 = 10
 $ let f = fun (x) { x.ifelse do{ return 1 } 2; 3 }; f false
 = 3
+$ let x = 4; let y = x; y
+= 4
 $ let f = fun (x) { x.ifelse do{ return 1 } 2; 3 }; f true
 = 1
 $ var x = 1;
