@@ -17,7 +17,7 @@ method EVALUATE => sub ($self, $args) {
   );
 };
 
-wrap method ASSIGN_VALUE => sub ($self, $args) {
+method ASSIGN_VALUE => sub ($self, $args) {
   my ($call, $call_args) = uncons $self;
   return (
     EVAL($call),

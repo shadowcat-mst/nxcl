@@ -196,3 +196,18 @@ $ let dynrecv = fun () { ^dyn-name }
   }
   dynsend()
 = 3
+$ let -^- = LvalueFun.new(
+    fexpr (cx, name) { cx.get_dynamic_value name },
+    fexpr (cx, targp, value) {
+      let name = targp.first();
+      cx.set_dynamic_value name value
+    },
+  );
+  let dynrecv = fun () { -^-dyn-name }
+  let dynmid = fun () { dynrecv() }
+  let dynsend = fun () {
+    -^-dyn-name = 3;
+    dynmid()
+  }
+  dynsend()
+= 3
