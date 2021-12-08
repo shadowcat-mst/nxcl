@@ -1,0 +1,23 @@
+let main = %(:foo 1, :bar 2);
+let fallback = %(:bar 0, :baz 3);
+
+let casc = Cascade.new main fallback;
+
+casc.'foo' # 1
+casc.'bar' # 2
+casc.'baz' # 3
+
+let Cascade = type :repr(cons) {
+  static NEW (main, fallback) {
+    _make main fallback
+  }
+  method at (at) {
+    _car.at(at) // _cdr.at(at);
+  }
+  method concat (stuff) {
+    _make _car.concat(stuff) _cdr;
+  }
+  method derive (new) {
+    _make new self;
+  }
+}
