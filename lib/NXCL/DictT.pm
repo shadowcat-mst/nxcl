@@ -2,11 +2,11 @@ package NXCL::DictT;
 
 use NXCL::Utils qw(panic raw uncons flatten);
 use NXCL::ReprTypes qw(DictR);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => sub ($hash) { _make DictR ,=> $hash };
+export make ($hash) { _make DictR ,=> $hash }
 
-wrap static new => sub ($self, $args) {
+static new {
   my @pairs = flatten $args;
   my %setup;
   foreach my $p (@pairs) {
@@ -17,7 +17,7 @@ wrap static new => sub ($self, $args) {
   return JUST _make DictR, => \%setup;
 };
 
-wrap method COMBINE => sub ($self, $args) {
+method COMBINE {
   my $key = raw((uncons($args))[0]);
   my $value = raw($self)->{$key};
   panic unless $value;

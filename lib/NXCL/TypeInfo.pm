@@ -16,18 +16,35 @@ ro 'name';
 lazy exports => sub { {} };
 
 sub add_export ($self, $name, $code) {
+  set_subname
+    +(subname($code) =~ s/::__ANON__$/::Export_${name}/r),
+      $code;
   $self->exports->{"${name}_${\$self->name}"} = $code;
 }
 
 lazy methods => sub { {} };
 
-sub add_method ($self, $name, $code) {
+sub add_method_apv ($self, $name, $code) {
+  $self->add_method_opv($name, $code)->[1]{wrap} = 1;
+}
+
+sub add_method_opv ($self, $name, $code) {
+  set_subname
+    +(subname($code) =~ s/::__ANON__$/::Method_${name}/r),
+      $code;
   $self->methods->{$name} = [ $code ];
 }
 
 lazy statics => sub { {} };
 
-sub add_static ($self, $name, $code) {
+sub add_static_apv ($self, $name, $code) {
+  $self->add_static_opv($name, $code)->[1]{wrap} = 1;
+}
+
+sub add_static_opv ($self, $name, $code) {
+  set_subname
+    +(subname($code) =~ s/::__ANON__$/::Static_${name}/r),
+      $code;
   $self->statics->{$name} = [ $code ];
 }
 
@@ -45,9 +62,6 @@ sub _mset_of ($self, $mset_type, $proto) {
   my %mset;
   foreach my $name (keys %$proto) {
     my $info = $proto->{$name};
-    set_subname
-      +(subname($info->[0]) =~ s/::__ANON__$/::Inst_${name}/r),
-      $info->[0];
     my $native = make_Native(NXCL::TypeMethod->new(code => $info->[0]));
     $mset{$name} = $info->[1]{wrap}
       ? make_ApMeth($native)

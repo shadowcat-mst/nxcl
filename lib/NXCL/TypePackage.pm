@@ -18,8 +18,8 @@ sub import {
   no strict 'refs';
   *{"${targ}::_make"} = $info->curry::make;
   *{"${targ}::export"} = $info->curry::add_export;
-  *{"${targ}::method"} = $info->curry::add_method;
-  *{"${targ}::static"} = $info->curry::add_static;
+  *{"${targ}::method"} = $info->curry::add_method_opv;
+  *{"${targ}::static"} = $info->curry::add_static_opv;
   *{"${targ}::wrap"} = $info->curry::mark_wrapped;
 }
 
