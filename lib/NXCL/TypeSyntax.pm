@@ -32,6 +32,16 @@ sub import {
       \$Type_Info->add_static_apv($name => sub (\$self, \$args) $body);
     };
   }
+  keyword staticx (Ident $name, Block $body) {
+    return qq{
+      \$Type_Info->add_static_opv($name => sub (\$self, \$args) $body);
+    };
+  }
+  keyword methodx (Ident $name, Block $body) {
+    return qq{
+      \$Type_Info->add_method_opv($name => sub (\$self, \$args) $body);
+    };
+  }
   keyword method (Ident $name, Block $body) {
     return qq{
       \$Type_Info->add_method_apv($name => sub (\$self, \$args) $body);
