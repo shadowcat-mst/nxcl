@@ -6,9 +6,9 @@ use NXCL::TypeFunctions qw(
   make_String make_Name make_Bool
 );
 use NXCL::ReprTypes qw(DictR);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-sub make ($scope, $argspec, $body, $is_opv = make_Bool(0)) {
+export make ($scope, $argspec, $body, $is_opv = make_Bool(0)) {
   _make DictR ,=> {
     scope => $scope,
     argspec => $argspec,
@@ -17,9 +17,7 @@ sub make ($scope, $argspec, $body, $is_opv = make_Bool(0)) {
   };
 }
 
-export make => \&make;
-
-static new => sub ($self, $args) {
+staticx new {
   return (
     GCTX(),
     LIST(),
@@ -28,14 +26,14 @@ static new => sub ($self, $args) {
     CONS($self),
     CALL('_new')
   );
-};
+}
 
-static _new => sub ($self, $args) {
+staticx _new {
   my ($scope, $argspec, $body, $is_opv) = flatten $args;
   return JUST make $scope, $argspec, $body, $is_opv;
-};
+}
 
-method COMBINE => sub ($self, $args) {
+methodx COMBINE {
   my %me = %{raw($self)};
   my $is_opv = 0+!!raw($me{is_opv});
   return (
@@ -76,6 +74,6 @@ method COMBINE => sub ($self, $args) {
       ]),
     ]
   );
-};
+}
 
 1;
