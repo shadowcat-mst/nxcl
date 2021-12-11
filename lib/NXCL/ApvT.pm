@@ -2,15 +2,15 @@ package NXCL::ApvT;
 
 use NXCL::Utils qw(raw);
 use NXCL::ReprTypes qw(ValR);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => sub ($opv) { _make ValR ,=> $opv };
+export make ($opv) { _make ValR ,=> $opv }
 
-method COMBINE => sub ($self, $args) {
+methodx COMBINE {
   return (
     EVAL($args),
     CMB9(raw($self)),
   );
-};
+}
 
 1;

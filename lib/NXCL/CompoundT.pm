@@ -3,22 +3,20 @@ package NXCL::CompoundT;
 use NXCL::Utils qw(flatten object_is);
 use NXCL::TypeFunctions qw(List_Inst make_List cons_List);
 use NXCL::ReprTypes qw(ConsR);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => sub ($first, @rest) {
-  _make ConsR ,=> $first, make_List(@rest);
-};
+export make ($first, @rest) { _make ConsR ,=> $first, make_List(@rest) }
 
-method EVALUATE => sub ($self, $args) {
+methodx EVALUATE {
   my ($first, @rest) = flatten $self;
   my @exp_rest = map +(object_is($_, List_Inst) ? $_ : make_List($_)), @rest;
   return (
     EVAL($first),
     map CMB6($_), @exp_rest
   );
-};
+}
 
-method ASSIGN_VALUE => sub ($self, $args) {
+methodx ASSIGN_VALUE {
   my ($first, @rest) = flatten $self;
   my @exp_rest = map +(object_is($_, List_Inst) ? $_ : make_List($_)), @rest;
   my $call_args = pop @exp_rest;
@@ -28,6 +26,6 @@ method ASSIGN_VALUE => sub ($self, $args) {
     SNOC(cons_List($call_args, $args)),
     CALL('ASSIGN_VIA_CALL'),
   );
-};
+}
 
 1;

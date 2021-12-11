@@ -37,14 +37,24 @@ sub import {
       \$Type_Info->add_static_opv($name => sub (\$self, \$args) $body);
     };
   }
-  keyword methodx (Ident $name, Block $body) {
+  keyword staticn (Ident $name, Block $body) {
     return qq{
-      \$Type_Info->add_method_opv($name => sub (\$self, \$args) $body);
+      \$Type_Info->add_static_opv($name => sub (\$self, \$) $body);
     };
   }
   keyword method (Ident $name, Block $body) {
     return qq{
       \$Type_Info->add_method_apv($name => sub (\$self, \$args) $body);
+    };
+  }
+  keyword methodx (Ident $name, Block $body) {
+    return qq{
+      \$Type_Info->add_method_opv($name => sub (\$self, \$args) $body);
+    };
+  }
+  keyword methodn (Ident $name, Block $body) {
+    return qq{
+      \$Type_Info->add_method_opv($name => sub (\$self, \$) $body);
     };
   }
 }

@@ -2,11 +2,11 @@ package NXCL::BlockT;
 
 use NXCL::ReprTypes qw(ValR);
 use NXCL::Utils qw(raw);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => sub ($call) { _make ValR ,=> $call };
+export make ($call) { _make ValR ,=> $call }
 
-method COMBINE => sub ($self, $args) {
+methodn COMBINE {
  return(
     GCTX(),
     LIST(),
@@ -18,6 +18,6 @@ method COMBINE => sub ($self, $args) {
       EVAL(raw($self)),
     ])
   );
-};
+}
 
 1;
