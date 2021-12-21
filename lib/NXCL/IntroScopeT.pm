@@ -6,24 +6,22 @@ use NXCL::TypeFunctions qw(
   cons_List empty_List
   make_Dict Dict_Inst
 );
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-sub make ($scope, $intro_as) {
+export make ($scope, $intro_as) {
   _make DictR ,=> {
     scope => $scope,
     intro_as => $intro_as,
   };
 }
 
-export make => \&make;
-
-method get_value_for_name => sub ($self, $args) {
+methodx get_value_for_name {
   return CALL(get_value_for_name
     => cons_List(raw($self)->{scope}, $args)
   );
-};
+}
 
-method set_value_for_name => sub ($self, $args) {
+methodx set_value_for_name {
   my ($namep, $vlist) = uncons($args);
   my $intro_as = raw($self)->{intro_as};
   return (
@@ -33,12 +31,12 @@ method set_value_for_name => sub ($self, $args) {
     DROP(),
     JUST((uncons($vlist))[0])
   );
-};
+}
 
-method set_cell_for_name => sub ($self, $args) {
+methodx set_cell_for_name {
   return CALL(set_cell_for_name
     => cons_List(raw($self)->{scope}, $args)
   );
-};
+}
 
 1;
