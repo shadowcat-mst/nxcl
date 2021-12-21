@@ -4,49 +4,71 @@ use List::Util qw(reduce);
 use NXCL::Utils qw(flatten raw panic mset object_is);
 use NXCL::ReprTypes qw(IntR);
 use NXCL::TypeFunctions qw(make_Bool make_String);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => \&make;
+export make ($int) { _make IntR, => $int }
 
-sub make ($int) { _make IntR, => $int }
-
-method to_xcl_string => sub ($self, $) {
+methodn to_xcl_string {
   return JUST make_String(''.raw($self));
-};
+}
 
-wrap method eq => sub ($self, $args) {
+method eq {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be ints' unless object_is $r, $mset;
   return JUST make_Bool(raw($self) == raw($r));
-};
+}
 
-wrap method gt => sub ($self, $args) {
+method gt {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be ints' unless object_is $r, $mset;
   return JUST make_Bool(raw($self) > raw($r));
-};
+}
 
-wrap method quotient => sub ($self, $args) {
+method lt {
+  my ($r, @too_many) = flatten $args;
+  panic 'Too many args' if @too_many;
+  my $mset = mset($self);
+  panic 'Must be ints' unless object_is $r, $mset;
+  return JUST make_Bool(raw($self) < raw($r));
+}
+
+method ge {
+  my ($r, @too_many) = flatten $args;
+  panic 'Too many args' if @too_many;
+  my $mset = mset($self);
+  panic 'Must be ints' unless object_is $r, $mset;
+  return JUST make_Bool(raw($self) >= raw($r));
+}
+
+method le {
+  my ($r, @too_many) = flatten $args;
+  panic 'Too many args' if @too_many;
+  my $mset = mset($self);
+  panic 'Must be ints' unless object_is $r, $mset;
+  return JUST make_Bool(raw($self) <= raw($r));
+}
+
+method quotient {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be ints' unless object_is $r, $mset;
   return JUST make int(raw($self) / raw($r));
-};
+}
 
-wrap method remainder => sub ($self, $args) {
+method remainder {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be ints' unless object_is $r, $mset;
   return JUST make(raw($self) % raw($r));
-};
+}
 
-wrap method minus => sub ($self, $args) {
+method minus {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   unless ($r) {
@@ -55,20 +77,20 @@ wrap method minus => sub ($self, $args) {
   my $mset = mset($self);
   panic 'Must be ints' unless object_is $r, $mset;
   return JUST make(raw($self) - raw($r));
-};
+}
 
-wrap method times => sub ($self, $args) {
+method times {
   my @ints = flatten $args;
   my $mset = mset($self);
   panic 'Must be ints' for grep !object_is($_, $mset), @ints;
   return JUST make reduce { $a * $b } map raw($_), $self, @ints;
-};
+}
 
-wrap method plus => sub ($self, $args) {
+method plus {
   my @ints = flatten $args;
   my $mset = mset($self);
   panic 'Must be ints' for grep !object_is($_, $mset), @ints;
   return JUST make reduce { $a + $b } map raw($_), $self, @ints;
-};
+}
 
 1;
