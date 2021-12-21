@@ -3,55 +3,55 @@ package NXCL::CxRefT;
 use Scalar::Util qw(weaken);
 use NXCL::ReprTypes qw(NativeR);
 use NXCL::TypeFunctions qw(
-  make_Bool make_List cons_List make_Dict list_Combine
+  make_Bool make_List cons_List make_Dict cons_Combine
   CxTemplate
 );
 use NXCL::Utils qw(uncons flatten raw panic);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => sub ($cx) {
+export make ($cx) {
   weaken($cx);
   _make NativeR ,=> $cx;
-};
+}
 
-method is_active => sub ($self, $) {
+methodn is_active {
   JUST make_Bool defined(raw($self));
-};
+}
 
-wrap method return => sub ($self, $args) {
+method return {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   LCTX $cx, (uncons($args))[0];
-};
+}
 
-wrap method defer => sub ($self, $args) {
+method defer {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my ($cb) = uncons($args);
   unshift @{$cx->[4]}, $cb;
   JUST $self;
-};
+}
 
-wrap method get_dynamic_value => sub ($self, $args) {
+method get_dynamic_value {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my $name = raw((uncons($args))[0]);
   panic "No dynamic value for ${name}"
     unless my $value = raw($self)->[1]{$name};
   return JUST $value;
-};
+}
 
-wrap method set_dynamic_value => sub ($self, $args) {
+method set_dynamic_value {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my ($namep, $value) = flatten($args);
   my $name = raw($namep);
   $_ = { %{$_}, $name => $value } for raw($self)->[1];
   return JUST $value;
-};
+}
 
-method scope => sub ($self, $args) {
+method scope {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   return JUST raw($self)->[2];
-};
+}
 
-wrap method eval => my $eval = sub ($self, $args) {
+method eval {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my ($expr) = uncons($args);
   return (
@@ -59,13 +59,13 @@ wrap method eval => my $eval = sub ($self, $args) {
     EVAL($expr),
     LCTX(undef),
   );
-};
+}
 
-wrap method call => sub ($self, $args) {
-  $eval->($self, make_List(list_Combine($args)));
-};
+method call {
+  CALL(eval => cons_Combine($self, $args));
+}
 
-wrap method derive => sub ($self, $args) {
+method derive {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   return (
     CALL(derive => cons_List($cx->[2], $args)),
@@ -73,6 +73,6 @@ wrap method derive => sub ($self, $args) {
     CONS(CxTemplate),
     CALL('new'),
   );
-};
+}
 
 1;
