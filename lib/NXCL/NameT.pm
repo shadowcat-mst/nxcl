@@ -5,24 +5,22 @@ use NXCL::ReprTypes qw(CharsR);
 use NXCL::TypeFunctions qw(
   make_String make_List cons_List empty_List
 );
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => \&make;
+export make ($name) { _make CharsR ,=> $name }
 
-sub make ($name) { _make CharsR ,=> $name }
-
-method EVALUATE => sub ($self, $args) {
+methodn EVALUATE {
   return GETN($self);
-};
+}
 
-method ASSIGN_VALUE => sub ($self, $args) {
+methodx ASSIGN_VALUE {
   return JUST empty_List if raw($self) eq '$';
   my ($new_value) = uncons($args);
   return SETN($self, $new_value);
-};
+}
 
-method to_xcl_string => sub ($self, $args) {
+methodn to_xcl_string {
   return JUST make_String raw $self;
-};
+}
 
 1;
