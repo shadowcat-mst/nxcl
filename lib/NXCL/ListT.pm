@@ -5,15 +5,11 @@ use NXCL::Utils qw(
 );
 use NXCL::ReprTypes qw(ConsR NilR);
 use NXCL::TypeFunctions qw(make_String make_Native);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => \&make;
+export make (@members) { cons(@members, _make(NilR)) }
 
-sub make (@members) { cons(@members, _make(NilR)) };
-
-export cons => \&cons;
-
-sub cons (@members) {
+export cons (@members) {
   panic unless my $ret = pop @members;
   foreach my $m (reverse @members) {
     $ret = _make ConsR ,=> $m, $ret;
@@ -21,16 +17,15 @@ sub cons (@members) {
   return $ret;
 }
 
-sub empty { _make(NilR) };
+export empty { _make(NilR) }
 
-export empty => \&empty;
-static new_empty => sub { return JUST empty };
+staticn new_empty { return JUST empty }
 
-method to_xcl_string => sub ($self, $) {
-  return CALL '_to_xcl_string' => make($self);
-};
+methodn to_xcl_string {
+  CALL(_to_xcl_string => make($self))
+}
 
-method _to_xcl_string => sub ($self, $args) {
+methodx _to_xcl_string {
   if (rnilp($self)) {
     return JUST make_String(
       '('.join(', ', map raw($_), reverse flatten $args).')'
@@ -43,21 +38,21 @@ method _to_xcl_string => sub ($self, $args) {
     CONS($cdr),
     CALL('_to_xcl_string'),
   );
-};
+}
 
-method first => sub ($self, $args) {
+methodn first {
   panic unless rconsp $self;
   my ($first) = uncons $self;
   return JUST $first;
-};
+}
 
-method rest => sub ($self, $args) {
+methodn rest {
   panic unless rconsp $self;
   my (undef, $rest) = uncons $self;
   return JUST $rest;
-};
+}
 
-method EVALUATE => sub ($self, $args) {
+methodn EVALUATE {
   if (rnilp $self) {
     return JUST $self;
   }
@@ -66,14 +61,14 @@ method EVALUATE => sub ($self, $args) {
     EVAL($car),
     ECDR($cdr),
   );
-};
+}
 
-wrap method concat => sub ($self, $args) {
+method concat {
   my ($concat) = uncons($args);
   return JUST cons(flatten($self), $concat);
-};
+}
 
-wrap method COMBINE => sub ($self, $args) {
+method COMBINE {
   panic "List.COMBINE called without an index" if rnilp($args);
   my $idx = raw((uncons($args))[0]);
   my $value = $self;
@@ -81,7 +76,7 @@ wrap method COMBINE => sub ($self, $args) {
   my ($car) = uncons($value);
   panic unless $car;
   return JUST $car;
-};
+}
 
 sub map_continue ($args, $flat = undef) {
   my ($func, $argcdr) = uncons($args);
@@ -115,9 +110,8 @@ sub map_body ($self, $args, $continue = $map_continue) {
   );
 };
 
-wrap method map => \&map_body;
-
-wrap method lmap => sub { map_body(@_, $lmap_continue) };
+method map { map_body($self, $args) }
+method lmap { map_body($self, $args, $lmap_continue) }
 
 my $each_continue = make_Native sub {
   map_continue(@_, sub ($v) {
@@ -125,9 +119,9 @@ my $each_continue = make_Native sub {
   });
 };
 
-wrap method each => sub { map_body(@_, $each_continue) };
+method each { map_body($self, $args, $each_continue) }
 
-method ASSIGN_VALUE => sub ($self, $args) {
+methodx ASSIGN_VALUE {
   return JUST($self) if rnilp($self);
   my ($scar, $scdr) = uncons($self);
   my ($arg) = uncons($args);
@@ -138,6 +132,6 @@ method ASSIGN_VALUE => sub ($self, $args) {
     DROP(),
     CALL(ASSIGN_VALUE => make($scdr, $acdr)),
   );
-};
+}
 
 1;
