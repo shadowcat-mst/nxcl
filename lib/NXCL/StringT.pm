@@ -3,43 +3,41 @@ package NXCL::StringT;
 use NXCL::Utils qw(panic flatten raw mset object_is);
 use NXCL::ReprTypes qw(CharsR);
 use NXCL::TypeFunctions qw(make_Bool);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => \&make;
+export make ($string) { _make CharsR, => $string }
 
-sub make ($string) { _make CharsR, => $string }
-
-method to_xcl_string => sub ($self, $) {
+methodn to_xcl_string {
   # this is wrong
   return JUST make("'".raw($self)."'");
 };
 
-wrap method eq => sub ($self, $args) {
+method eq {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be strings' unless object_is $r, $mset;
   return JUST make_Bool(raw($self) eq raw($r));
-};
+}
 
-wrap method gt => sub ($self, $args) {
+method gt {
   my ($r, @too_many) = flatten $args;
   panic 'Too many args' if @too_many;
   my $mset = mset($self);
   panic 'Must be strings' unless object_is $r, $mset;
   return JUST make_Bool(raw($self) gt raw($r));
-};
+}
 
-wrap method concat => sub ($self, $args) {
+method concat {
   my @string = flatten $args;
   my $mset = mset($self);
   panic 'Must be strings' for grep !object_is($_, $mset), @string;
   return JUST make(join '', map raw($_), $self, @string);
-};
+}
 
-wrap method sprintf => sub ($self, $args) {
+method sprintf {
   # This should have some validation
   return JUST make(sprintf raw($self), map raw($_), flatten($args))
-};
+}
 
 1;
