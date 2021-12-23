@@ -7,17 +7,15 @@ use NXCL::TypeFunctions qw(
   make_String make_List cons_List empty_List
   make_IntroScope
 );
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-sub make ($store) {
+export make ($store) {
   _make DictR ,=> {
     store => $store,
   };
 }
 
-export make => \&make;
-
-method get_value_for_name => sub ($self, $args) {
+methodx get_value_for_name {
   my ($namep) = uncons($args);
   my $name = raw($namep);
   my $store = raw($self)->{store};
@@ -33,9 +31,9 @@ method get_value_for_name => sub ($self, $args) {
     CMB9($store => make_List make_String $name),
     CMB6(empty_List),
   );
-};
+}
 
-method set_value_for_name => sub ($self, $args) {
+methodx set_value_for_name {
   my ($callargs, $vlist) = uncons $args;
   my ($namep) = uncons($callargs);
   # I am not convinced this conditional is a good idea
@@ -49,9 +47,9 @@ method set_value_for_name => sub ($self, $args) {
     panic "No value for ${name} in current scope";
   }
   panic "NYI";
-};
+}
 
-method set_cell_for_name => sub ($self, $args) {
+methodx set_cell_for_name {
   my ($namep, $cell) = flatten($args);
   my $store = raw($self)->{store};
   panic "NYI" unless object_is($store, Dict_Inst);
@@ -59,17 +57,17 @@ method set_cell_for_name => sub ($self, $args) {
   my $new_store = make_Dict({ %{raw($store)}, raw($namep) => $cell });
   raw($self)->{store} = $new_store;
   return JUST $cell;
-};
+}
 
-method derive => sub ($self, $args) {
+methodx derive {
   panic "NYI" unless rnilp $args; # should accept extra value pairs
   return JUST make raw($self)->{store};
-};
+}
 
-method introscope => sub ($self, $args) {
+methodx introscope {
   my ($type) = uncons($args);
   return JUST make_IntroScope($self, $type);
-};
+}
 
 # COMBINE() should do eval-in-scope
 # ASSIGN_VIA_CALL() should pass through to eval-in-scope where possible

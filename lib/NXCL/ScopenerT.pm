@@ -4,13 +4,11 @@ use NXCL::Utils qw(uncons raw panic rnilp flatten);
 use NXCL::OpUtils;
 use NXCL::ReprTypes qw(ValR);
 use NXCL::TypeFunctions qw(make_List make_IntroScope);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => \&make;
+export make ($type) { _make ValR ,=> $type }
 
-sub make ($type) { _make ValR ,=> $type }
-
-method ASSIGN_VIA_CALL => sub ($self, $args) {
+methodx ASSIGN_VIA_CALL {
   my ($targetp, $value) = flatten($args);
   my ($target) = uncons($targetp);
   my $type = raw($self);
@@ -25,6 +23,6 @@ method ASSIGN_VIA_CALL => sub ($self, $args) {
       CALL('ASSIGN_VALUE'),
     ])
   );
-};
+}
 
 1;

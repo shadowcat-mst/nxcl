@@ -2,26 +2,23 @@ package NXCL::VarT;
 
 use NXCL::Utils qw(rnilp raw panic uncons);
 use NXCL::ReprTypes qw(VarR);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-sub make ($val) { _make VarR ,=> $val };
+export make ($val) { _make VarR ,=> $val }
 
-export make => \&make;
-
-static new => sub ($self, $args) {
+staticx new {
   return JUST make((uncons $args)[0]);
-};
+}
 
-method COMBINE => sub ($self, $args) {
-  panic unless rnilp $args;
+methodn COMBINE {
   return JUST raw($self);
-};
+}
 
-method ASSIGN_VIA_CALL => sub ($self, $args) {
+methodx ASSIGN_VIA_CALL {
   my ($call_args, $assign) = uncons($args);
   my ($new_value) = uncons($assign);
   raw($self) = $new_value;
   return JUST $new_value;
-};
+}
 
 1;

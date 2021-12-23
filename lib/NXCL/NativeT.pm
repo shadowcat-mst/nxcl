@@ -4,19 +4,17 @@ use NXCL::Utils qw(raw);
 use NXCL::ReprTypes qw(NativeR);
 use NXCL::TypeFunctions qw(make_String);
 use Sub::Util qw(subname);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => \&make;
+export make ($sub) { _make NativeR ,=> $sub }
 
-sub make ($sub) { _make NativeR ,=> $sub }
-
-method to_xcl_string => sub ($self, $) {
+methodn to_xcl_string {
   # should indirect via Combine maybe?
   return JUST make_String("Native('".subname(\&{raw($self)})."')");
-};
+}
 
-method COMBINE => sub ($self, $args) {
+methodx COMBINE {
   raw($self)->($self, $args);
-};
+}
 
 1;

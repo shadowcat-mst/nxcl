@@ -3,15 +3,13 @@ package NXCL::NumericT;
 use NXCL::Utils qw(raw);
 use NXCL::ReprTypes qw(CharsR);
 use NXCL::TypeFunctions qw(make_Bool);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => \&make;
+export make ($string) { _make CharsR, => $string }
 
-sub make ($string) { _make CharsR, => $string }
-
-method to_xcl_string => sub ($self, $) {
+methodn to_xcl_string {
   # this is wrong
   return JUST make("N'".raw($self)."'");
-};
+}
 
 1;

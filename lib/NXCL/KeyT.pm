@@ -3,18 +3,18 @@ package NXCL::KeyT;
 use NXCL::Utils qw(uncons raw);
 use NXCL::TypeFunctions qw(make_Pair);
 use NXCL::ReprTypes qw(ValR);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-export make => sub ($val) { _make ValR ,=> $val };
+export make ($val) { _make ValR ,=> $val }
 
-wrap static new => sub ($self, $args) {
+static new {
   my ($key) = uncons($args);
   return JUST _make ValR ,=> $key;
-};
+}
 
-wrap method COMBINE => sub ($self, $args) {
+method COMBINE {
   my ($value) = uncons($args);
   return JUST make_Pair(raw($self), $value);
-};
+}
 
 1;

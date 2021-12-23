@@ -2,19 +2,16 @@ package NXCL::ValT;
 
 use NXCL::Utils qw(rnilp raw panic uncons);
 use NXCL::ReprTypes qw(ValR);
-use NXCL::TypePackage;
+use NXCL::TypeSyntax;
 
-sub make ($val) { _make ValR ,=> $val };
+export make ($val) { _make ValR ,=> $val }
 
-export make => \&make;
-
-static new => sub ($self, $args) {
+staticx new {
   return JUST make((uncons $args)[0]);
-};
+}
 
-method COMBINE => sub ($self, $args) {
-  panic unless rnilp $args;
+methodn COMBINE {
   return JUST raw($self);
-};
+}
 
 1;
