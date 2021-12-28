@@ -5,7 +5,9 @@ use NXCL::Utils qw(mkv uncons);
 use NXCL::OpUtils qw(JUST);
 use NXCL::ReprTypes qw(ValR);
 use Sub::Util qw(subname set_subname);
-use NXCL::TypeFunctions qw(make_Dict make_ApMeth make_Native);
+use NXCL::TypeFunctions qw(
+  make_Dict make_ApMeth make_Native make_String
+);
 use NXCL::TypeMethod;
 use curry;
 
@@ -73,8 +75,18 @@ sub _mset_of ($self, $mset_type, $proto) {
       $NXCL::ExprUtils::ESCAPE;
     };
   };
-  my $mset_v = make_Dict(\%mset);
   my $mset_name = $self->name.($mset_type eq 'Type' ? 'T' : '');
+  $mset{to_xcl_string} ||= make_Native(NXCL::TypeMethod->new(
+    code => sub ($self, $) {
+      # use ['0x...'] since a string isn't actually combinable so eval-ing
+      # this will throw an exception - roundtrippability would be preferable
+      # but this will do as a fallback for now
+      return JUST make_String(
+        "${mset_name}['0x".sprintf("%x", Scalar::Util::refaddr $self)."']"
+      )
+    }
+  ));
+  my $mset_v = make_Dict(\%mset);
   $NXCL::TypeRegistry::Mset{$mset_v} = $mset_name;
   return $mset_v;
 }
