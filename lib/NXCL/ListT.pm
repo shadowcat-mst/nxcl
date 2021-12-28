@@ -4,7 +4,7 @@ use NXCL::Utils qw(
   uncons flatten rconsp rnilp panic rtype raw
 );
 use NXCL::ReprTypes qw(ConsR NilR);
-use NXCL::TypeFunctions qw(make_String make_Native);
+use NXCL::TypeFunctions qw(make_String make_Native make_Int);
 use NXCL::TypeSyntax;
 
 export make (@members) { cons(@members, _make(NilR)) }
@@ -21,20 +21,25 @@ export empty { _make(NilR) }
 
 staticn new_empty { return JUST empty }
 
-methodn to_xcl_string {
-  CALL(_to_xcl_string => make($self))
+method to_xcl_string {
+  my ($depthp) = uncons($args);
+  my $depth = $depthp ? raw($depthp) : 3;
+  return JUST make_String('(...)') unless $depth > 0;
+  CALL(_to_xcl_string => make($self, make_Int($depth-1)))
 }
 
 methodx _to_xcl_string {
+  my ($depth, $data) = uncons $args;
   if (rnilp($self)) {
     return JUST make_String(
-      '('.join(', ', map raw($_), reverse flatten $args).')'
+      '('.join(', ', map raw($_), reverse flatten $data).')'
     );
   }
   my ($car, $cdr) = uncons($self);
   return (
-    CALL('to_xcl_string' => make($car)),
-    SNOC($args),
+    CALL('to_xcl_string' => make($car, $depth)),
+    SNOC($data),
+    CONS($depth),
     CONS($cdr),
     CALL('_to_xcl_string'),
   );
