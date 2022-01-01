@@ -62,7 +62,7 @@ method eval {
 }
 
 method call {
-  CALL(eval => cons_Combine($self, $args));
+  CALL(eval => make_List($self, cons_Combine(uncons($args))));
 }
 
 method derive {
