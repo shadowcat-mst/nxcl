@@ -22,35 +22,38 @@ sub add_export ($self, $name, $code) {
     +(subname($code) =~ s/::__ANON__$/::Export_${name}/r),
       $code;
   $self->exports->{"${name}_${\$self->name}"} = $code;
+  return;
+}
+
+sub _add ($self, $type, $name, $code, $opts) {
+  my $type_store = "${type}s";
+  my $type_prefix = ucfirst($type);
+  set_subname
+    +(subname($code) =~ s/::__ANON__$/::${type_prefix}_${name}/r),
+      $code;
+  $self->$type_store->{$name} = [ $code, $opts ];
+  return;
 }
 
 lazy methods => sub { {} };
 
 sub add_method_apv ($self, $name, $code) {
-  $self->add_method_opv($name, $code)->[1]{wrap} = 1;
+  $self->_add(method => $name, $code, { wrap => 1 });
 }
 
 sub add_method_opv ($self, $name, $code) {
-  set_subname
-    +(subname($code) =~ s/::__ANON__$/::Method_${name}/r),
-      $code;
-  $self->methods->{$name} = [ $code ];
+  $self->_add(method => $name, $code, {});
 }
 
 lazy statics => sub { {} };
 
 sub add_static_apv ($self, $name, $code) {
-  $self->add_static_opv($name, $code)->[1]{wrap} = 1;
+  $self->_add(static => $name, $code, { wrap => 1 });
 }
 
 sub add_static_opv ($self, $name, $code) {
-  set_subname
-    +(subname($code) =~ s/::__ANON__$/::Static_${name}/r),
-      $code;
-  $self->statics->{$name} = [ $code ];
+  $self->_add(static => $name, $code, {});
 }
-
-sub mark_wrapped ($self, $info) { $info->[1]{wrap} = 1; $info }
 
 lazy inst_mset => sub ($self) { $self->_mset_of(Inst => $self->methods) };
 
