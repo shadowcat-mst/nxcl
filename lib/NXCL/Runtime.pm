@@ -134,13 +134,14 @@ sub take_step ($cxs, $ops) {
 }
 
 sub run_til_host ($cxs, $ops, $trace_cb) {
-  while ($ops->[-1][0] ne 'HOST') {
+  while (1) {
     $trace_cb->($cxs, $ops) if $trace_cb;
+    if ($ops->[-1][0] eq 'HOST') {
+      my (undef, $host) = @{pop @$ops};
+      return $host;
+    }
     take_step($cxs, $ops);
   }
-  $trace_cb->($cxs, $ops) if $trace_cb;
-  my (undef, $host) = @{pop @$ops};
-  return $host;
 }
 
 1;
