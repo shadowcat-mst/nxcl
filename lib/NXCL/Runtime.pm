@@ -136,7 +136,7 @@ sub run_til_host ($cxs, $ops, $trace_cb) {
   while (1) {
     $trace_cb->($cxs, $ops) if $trace_cb;
     my ($op, @v) = @{pop @$ops};
-    return $v[0] if $op eq 'HOST';
+    return @v if $op eq 'HOST';
     take_step($cxs, $ops, $op, @v);
   }
 }
