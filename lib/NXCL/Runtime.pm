@@ -125,6 +125,8 @@ our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
   @NXCL::OpUtils::OPNAMES;
 
 sub take_step ($cxs, $ops) {
+  die "EMPTY CX STACK" unless @$cxs;
+  die "EMPTY OP STACK" unless @$ops;
   my ($op, @v) = @{pop @$ops};
   die "Unkown op type $op" unless my $step_func = $step_func{$op};
   $step_func->($cxs, $ops, @v);
@@ -135,8 +137,6 @@ sub run_til_host ($cxs, $ops, $trace_cb) {
   while ($ops->[-1][0] ne 'HOST') {
     $trace_cb->($cxs, $ops) if $trace_cb;
     take_step($cxs, $ops);
-    die "EMPTY CX STACK" unless @$cxs;
-    die "EMPTY OP STACK" unless @$ops;
   }
   $trace_cb->($cxs, $ops) if $trace_cb;
   my (undef, $host) = @{pop @$ops};
