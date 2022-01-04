@@ -131,14 +131,14 @@ sub take_step ($cxs, $ops) {
   return;
 }
 
-sub run_til_host ($cxs, $ops) {
+sub run_til_host ($cxs, $ops, $trace_cb) {
   while ($ops->[-1][0] ne 'HOST') {
-    DEBUG and DEBUG_WARN($cxs, $ops);
+    $trace_cb->($cxs, $ops) if $trace_cb;
     take_step($cxs, $ops);
-    DEBUG and die "EMPTY CX STACK" unless @$cxs;
-    DEBUG and die "EMPTY OP STACK" unless @$ops;
+    die "EMPTY CX STACK" unless @$cxs;
+    die "EMPTY OP STACK" unless @$ops;
   }
-  DEBUG and DEBUG_WARN($cxs, $ops);
+  $trace_cb->($cxs, $ops) if $trace_cb;
   my (undef, $host) = @{pop @$ops};
   return $host;
 }

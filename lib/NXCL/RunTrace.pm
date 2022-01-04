@@ -8,11 +8,10 @@ our $Count = 0;
 our $Show_OpQ = 0;
 our $Max;
 
-sub import { $Max = $_[1] if defined $_[1] }
-
-{
-  use warnings FATAL => 'redefine';
-  sub NXCL::Runtime::DEBUG :prototype() { 1 }
+sub import {
+  $Max = $_[1] if defined $_[1];
+  require NXCL::Environment;
+  $NXCL::Environment::DEFAULT_TRACE_CB = \&DEBUG_WARN;
 }
 
 use NXCL::ScopeT;
@@ -74,7 +73,7 @@ sub jsonify ($v) {
   return nxcl2json($v);
 }
 
-sub NXCL::Runtime::DEBUG_WARN ($cxs, $ops) {
+sub DEBUG_WARN ($cxs, $ops) {
   if (my $origin = $op_origins{$ops->[-1]}) {
     warn join(' ', '#', @{$origin}{qw(callsub sub filename line)})."\n";
   }

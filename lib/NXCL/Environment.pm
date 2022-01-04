@@ -14,6 +14,8 @@ lazy expander => nxcl_require_and_call('NXCL::Expander', 'new');
 
 lazy weaver => nxcl_require_and_call('NXCL::Weaver', 'new');
 
+lazy trace_cb => sub { our $DEFAULT_TRACE_CB };
+
 sub eval_string ($self, $string) {
   $self->eval_string_in($self->scope, $string);
 }
@@ -29,6 +31,7 @@ sub eval_in ($self, $scope, $value) {
   my $return_value = run_til_host(
     [ [ [ make_List($value) ], {}, $scope, 0, [], {} ] ],
     [ HOST(), EVAL($value) ],
+    $self->trace_cb,
   );
   return NXCL::RV->new(
     xcl_value => $return_value,
