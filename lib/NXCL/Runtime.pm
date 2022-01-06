@@ -127,7 +127,7 @@ our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
 sub take_step ($cxs, $ops, $op, @v) {
   die "EMPTY CX STACK" unless @$cxs;
   die "EMPTY OP STACK" unless @$ops;
-  die "Unkown op type $op" unless my $step_func = $step_func{$op};
+  die "Unknown op type $op" unless my $step_func = $step_func{$op};
   $step_func->($cxs, $ops, @v);
   return;
 }
