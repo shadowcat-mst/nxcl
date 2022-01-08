@@ -1,13 +1,27 @@
 package NXCL::CombineT;
 
-use NXCL::Utils qw(uncons);
+use NXCL::Utils qw(uncons flatten);
 use NXCL::ReprTypes qw(ConsR);
-use NXCL::TypeFunctions qw(make_List cons_List);
+use NXCL::TypeFunctions qw(make_List cons_List make_String);
 use NXCL::TypeSyntax;
 
 export make ($call, @args) { _make ConsR ,=> $call, make_List @args }
 export cons ($call, $args) { _make ConsR ,=> $call, $args }
 export list ($list) { _make ConsR ,=> uncons($list) }
+
+methodn to_xcl_string {
+  state $fmt = make_String('%s%s');
+  my ($call, $args) = uncons($self);
+  return (
+    CALL('to_xcl_string' => make_List($call)),
+    SETL('call'),
+    CALL('to_xcl_string'
+      => make_List(make_List(flatten($args)))),
+    USEL('call', 'LIST'),
+    CONS($fmt),
+    CALL('sprintf'),
+  );
+}
 
 methodx EVALUATE {
   my ($call, $call_args) = uncons $self;
