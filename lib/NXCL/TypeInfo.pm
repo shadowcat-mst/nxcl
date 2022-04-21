@@ -63,6 +63,13 @@ sub make ($self, @v) { mkv($self->inst_mset, @v) }
 
 lazy type => sub ($self) { mkv($self->type_mset, ValR ,=> $self->inst_mset) };
 
+sub _IDENTITY {
+  state $id = do {
+    require NXCL::ExprUtils;
+    $NXCL::ExprUtils::ESCAPE;
+  };
+}
+
 sub _mset_of ($self, $mset_type, $proto) {
   my %mset;
   foreach my $name (keys %$proto) {
@@ -72,12 +79,7 @@ sub _mset_of ($self, $mset_type, $proto) {
       ? make_ApMeth($native)
       : $native;
   }
-  $mset{EVALUATE} ||= do {
-    state $eval = do {
-      require NXCL::ExprUtils;
-      $NXCL::ExprUtils::ESCAPE;
-    };
-  };
+  $mset{EVALUATE} ||= _IDENTITY;
   my $mset_name = $self->name.($mset_type eq 'Type' ? 'T' : '');
   $mset{to_xcl_string} ||= make_Native(NXCL::TypeMethod->new(
     code => sub ($self, $) {
