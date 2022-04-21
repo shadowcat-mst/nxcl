@@ -83,11 +83,12 @@ sub _mset_of ($self, $mset_type, $proto) {
   my $mset_name = $self->name.($mset_type eq 'Type' ? 'T' : '');
   $mset{to_xcl_string} ||= make_Native(NXCL::TypeMethod->new(
     code => sub ($self, $) {
-      # use ['0x...'] since a string isn't actually combinable so eval-ing
-      # this will throw an exception - roundtrippability would be preferable
-      # but this will do as a fallback for now
+      # use .hydrate('0x...') to indicate the requirement for in-band
+      # hydration of the value during any round-trip attempt
       return JUST make_String(
-        "${mset_name}['0x".sprintf("%x", Scalar::Util::refaddr $self)."']"
+        "${mset_name}.hydrate("
+          .sprintf("'0x%x'", Scalar::Util::refaddr $self)
+        .")"
       )
     }
   ));
