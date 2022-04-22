@@ -8,6 +8,10 @@ use NXCL::TypeSyntax;
 
 export make ($sub) { _make NativeR ,=> $sub }
 
+export method ($name) {
+  make sub ($args) { CALL($name => $args) }
+}
+
 methodn AS_PLAIN_EXPR {
   return JUST make_Compound(
     make_Name('Native'),

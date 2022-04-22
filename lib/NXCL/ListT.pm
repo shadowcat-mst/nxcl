@@ -4,7 +4,9 @@ use NXCL::Utils qw(
   uncons flatten rconsp rnilp panic rtype raw
 );
 use NXCL::ReprTypes qw(ConsR NilR);
-use NXCL::TypeFunctions qw(make_String make_Native make_Int);
+use NXCL::TypeFunctions qw(
+  make_String make_Native method_Native make_Int
+);
 use NXCL::TypeSyntax;
 
 export make (@members) { cons(@members, _make(NilR)) }
@@ -115,12 +117,8 @@ methodx ASSIGN_VALUE {
   );
 }
 
-my $plain_mapper = make_Native sub ($args) {
-  return CALL(AS_PLAIN_EXPR => $args);
-};
-
 methodn AS_PLAIN_EXPR {
-  return CALL(map => make($self, $plain_mapper));
+  return CALL(map => make($self, method_Native('AS_PLAIN_EXPR')));
 }
 
 1;
