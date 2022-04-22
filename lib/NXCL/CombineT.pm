@@ -16,20 +16,6 @@ methodn AS_PLAIN_EXPR {
   );
 }
 
-methodn to_xcl_string {
-  state $fmt = make_String('%s%s');
-  my ($call, $args) = uncons($self);
-  return (
-    CALL('to_xcl_string' => make_List($call)),
-    SETL('call'),
-    CALL('to_xcl_string'
-      => make_List(make_List(flatten($args)))),
-    USEL('call', 'LIST'),
-    CONS($fmt),
-    CALL('sprintf'),
-  );
-}
-
 methodx EVALUATE {
   my ($call, $call_args) = uncons $self;
   return (
