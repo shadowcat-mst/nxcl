@@ -4,17 +4,17 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our @EXPORT = qw(nxcl_require nxcl_require_and_call);
+our @EXPORT = qw(load_module load_and_call_cb);
 
-sub nxcl_require {
+sub load_module {
   my $pkg = shift;
   require join('/', split '::', $pkg).'.pm';
   $pkg;
 }
 
-sub nxcl_require_and_call {
+sub load_and_call_cb {
   my ($pkg, $call, @args) = @_;
-  sub { nxcl_require($pkg)->$call(@args) };
+  sub { load_module($pkg)->$call(@args) };
 }
 
 1;

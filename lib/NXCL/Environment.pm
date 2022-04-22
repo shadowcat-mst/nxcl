@@ -6,13 +6,13 @@ use NXCL::TypeFunctions qw(make_List);
 use NXCL::OpUtils;
 use NXCL::RV;
 
-lazy scope => nxcl_require_and_call('NXCL::BaseScope', 'scope');
+lazy scope => load_and_call_cb('NXCL::BaseScope', 'scope');
 
-lazy reader => nxcl_require_and_call('NXCL::Reader', 'new');
+lazy reader => load_and_call_cb('NXCL::Reader', 'new');
 
-lazy expander => nxcl_require_and_call('NXCL::Expander', 'new');
+lazy expander => load_and_call_cb('NXCL::Expander', 'new');
 
-lazy weaver => nxcl_require_and_call('NXCL::Weaver', 'new');
+lazy weaver => load_and_call_cb('NXCL::Weaver', 'new');
 
 lazy trace_cb => sub { our $DEFAULT_TRACE_CB };
 

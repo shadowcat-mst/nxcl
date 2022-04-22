@@ -2,7 +2,7 @@ package NXCL::Expander;
 
 use NXCL::Class;
 
-lazy maker => nxcl_require_and_call('NXCL::TypeMaker', can => 'make_value');
+lazy maker => load_and_call_cb('NXCL::TypeMaker', can => 'make_value');
 
 sub make ($self, @v) { $self->maker->(@v) }
 
