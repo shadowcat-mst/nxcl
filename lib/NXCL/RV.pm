@@ -14,7 +14,7 @@ sub AUTOCAN {
   my (undef, $method) = @_;
   return undef unless $method =~ s/^value_//;
   return sub ($self) {
-    my $mcall = Cmb( Call($method, $self->xcl_value) );
+    my $mcall = Cmb( MCall($method, $self->xcl_value) );
     $self->xcl_environment->eval($mcall)
   };
 }

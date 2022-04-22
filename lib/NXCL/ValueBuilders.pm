@@ -17,7 +17,7 @@ our @EXPORT = qw(
   I
   L
   S
-  Call
+  MCall
 );
 
 sub Cmb (@args) { make_Combine(@args) }
@@ -32,6 +32,6 @@ sub S :prototype($) ($v) { make_String($v) }
 
 sub L (@v) { make_List(@v) }
 
-sub Call ($name, @rest) { Cmb( Cmb(N('dot_f'), N($name)), @rest) }
+sub MCall ($name, @rest) { Cmb( Cmb(N('dot_f'), N($name)), @rest) }
 
 1;

@@ -15,7 +15,7 @@ sub DEBUG_WARN ($cxs, $ops) {
   warn join(' ',
     map +(
       ref()
-        ? $Trace_Env->eval(Cmb Call to_xcl_string => $_)->xcl_raw_value
+        ? $Trace_Env->eval(Cmb MCall to_xcl_string => $_)->xcl_raw_value
         : $_//'NULL'
     ), @$next_op
   )."\n";
