@@ -2,15 +2,19 @@ package NXCL::NativeT;
 
 use NXCL::Utils qw(raw);
 use NXCL::ReprTypes qw(NativeR);
-use NXCL::TypeFunctions qw(make_String);
+use NXCL::TypeFunctions qw(make_String make_Compound make_Name make_List);
 use Sub::Util qw(subname);
 use NXCL::TypeSyntax;
 
 export make ($sub) { _make NativeR ,=> $sub }
 
-methodn to_xcl_string {
-  # should indirect via Combine maybe?
-  return JUST make_String("Native('".subname(\&{raw($self)})."')");
+methodn AS_PLAIN_EXPR {
+  return JUST make_Compound(
+    make_Name('Native'),
+    make_Name('.'),
+    make_Name('FROM'),
+    make_List(make_String(subname(\&{raw($self)}))),
+  );
 }
 
 methodx COMBINE {

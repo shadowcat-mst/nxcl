@@ -7,6 +7,8 @@ use NXCL::TypeSyntax;
 
 export make ($first, @rest) { _make ConsR ,=> $first, make_List(@rest) }
 
+methodn AS_PLAIN_EXPR { return JUST $self }
+
 methodn EVALUATE {
   my ($first, @rest) = flatten $self;
   my @exp_rest = map +(object_is($_, List_Inst) ? $_ : make_List($_)), @rest;

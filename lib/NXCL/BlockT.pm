@@ -6,6 +6,8 @@ use NXCL::TypeSyntax;
 
 export make ($call) { _make ValR ,=> $call }
 
+methodn AS_PLAIN_EXPR { return JUST $self }
+
 methodn COMBINE {
  return(
     GCTX(),
