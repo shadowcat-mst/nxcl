@@ -120,7 +120,7 @@ sub parse_word ($self) {
 }
 
 sub parse_symbol ($self) {
-  [ symbol => $self->extract_re(qr"[${SYMBOL_CHARS}]+") ]
+  [ symbol => $self->extract_re(qr"[\Q${SYMBOL_CHARS}\E]+") ]
 }
 
 sub parse_numeric ($self) {
