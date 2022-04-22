@@ -12,6 +12,10 @@ export method ($name) {
   make sub ($args) { CALL($name => $args) }
 }
 
+export just ($sub) {
+  make sub ($args) { JUST($sub->($args)) }
+}
+
 methodn AS_PLAIN_EXPR {
   return JUST make_Compound(
     make_Name('Native'),
@@ -22,6 +26,7 @@ methodn AS_PLAIN_EXPR {
 }
 
 methodx COMBINE {
+  # this is arguably correct but everything else is handling just ($args)
   raw($self)->($self, $args);
 }
 

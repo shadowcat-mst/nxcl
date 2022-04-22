@@ -29,8 +29,7 @@ sub _write_type_Compound ($self, $v) {
 }
 
 sub _write_type_Combine ($self, $v) {
-  my ($cmb, $args) = uncons $v;
-  $self->write($cmb).$self->write($args);
+  join(' ', map $self->write($_), flatten $v);
 }
 
 sub _write_type_Call ($self, $v) {

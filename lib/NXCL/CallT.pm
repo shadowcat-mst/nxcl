@@ -1,15 +1,21 @@
 package NXCL::CallT;
 
 use NXCL::Utils qw(panic raw uncons rnilp);
-use NXCL::TypeFunctions qw(make_List);
+use NXCL::TypeFunctions qw(make_List just_Native);
 use NXCL::ReprTypes qw(ValR);
 use NXCL::TypeSyntax;
 
-export of_list ($list) { _make ValR ,=> $list }
+export list ($list) { _make ValR ,=> $list }
 
-export make (@parts) { of_list(make_List @parts) }
+export make (@parts) { list(make_List @parts) }
 
-methodn AS_PLAIN_EXPR { return JUST $self }
+methodn AS_PLAIN_EXPR {
+  my $list = raw($self);
+  return (
+    CALL(AS_PLAIN_EXPR => make_List $list),
+    CMB9(just_Native \&list),
+  );
+}
 
 methodx EVALUATE {
   my $call_list = raw($self);
@@ -19,7 +25,7 @@ methodx EVALUATE {
     EVAL($first),
     (rnilp($rest)
       ? ()
-      : (DROP(), EVAL(of_list($rest)))
+      : (DROP(), EVAL(list($rest)))
     )
   );
 }
