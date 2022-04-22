@@ -1,0 +1,45 @@
+
+foo [ bar 1 2 ] 3;
+
+Combine(Call(Name('bar'), Numeric('0'), Numeric('2')), Numeric('3'))
+
+let foo = (x, y) => { x + y };
+
+FunT -> (x, y) -> { x + y }
+
+foo.to_xcl_struct()
+
+Combine(Name('let'), Name('foo'), Name('='), List(Name('x'), Name('y'),
+  Name('=>'), Block(Name('x'), Name('+'), Name('y'))))
+
+Combine(
+  List(Name('x'), Name('y'),
+  Name('=>'),
+  Block(Combine(Name('x'), Name('+'), Name('y'))))
+)
+
+Combine(Name('+'), Name('x'), Name('y'))
+
+foo.to_xcl_struct(3)
+
+(1, (2, 3), (4, (5, 6, (7, 8))))
+
+(1, (2, 3), (4, (...)))
+
+(...) is List(Name('...'))
+
+
+let cmb = Combine.new(Name.new('+'), Name.new('x'), Name.new('y'));
+
+let cmb = \[ x + y ];
+
+let res = cmb();
+
+# Native('NXCL::BaseScope::do')
+
+Native.hydrate('NXCL::BaseScope::do')
+
+Compound(
+  Name('Native'), Name('.'), Name('hydrate'),
+  List(String('NXCL::BaseScope::do'))
+)
