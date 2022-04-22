@@ -29,7 +29,7 @@ sub _write_type_Compound ($self, $v) {
 }
 
 sub _write_type_Combine ($self, $v) {
-  join(' ', map $self->write($_), flatten $v);
+  join(' ', map $self->_write_expr($_), flatten $v);
 }
 
 sub _write_type_Call ($self, $v) {
@@ -42,6 +42,14 @@ sub _write_type_Block ($self, $v) {
 
 sub _write_callseq ($self, $v) {
   join('; ', map $self->write($_), flatten $v);
+}
+
+sub _write_expr ($self, $v) {
+  my $mset_name = mset_name mset $v;
+  if ($mset_name eq 'Combine') {
+    return '[ '.$self->_write_type_Combine($v).' ]';
+  }
+  return $self->write($v);
 }
 
 1;
