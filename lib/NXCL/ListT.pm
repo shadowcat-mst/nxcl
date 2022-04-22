@@ -116,8 +116,7 @@ methodx ASSIGN_VALUE {
 }
 
 my $plain_mapper = make_Native sub ($args) {
-  my ($val) = uncons $args;
-  return CALL(AS_PLAIN_EXPR => make($val));
+  return CALL(AS_PLAIN_EXPR => $args);
 };
 
 methodn AS_PLAIN_EXPR {
