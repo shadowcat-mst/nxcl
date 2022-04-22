@@ -10,12 +10,8 @@ export cons ($call, $args) { _make ConsR ,=> $call, $args }
 export list ($list) { _make ConsR ,=> uncons($list) }
 
 methodn AS_PLAIN_EXPR {
-  my ($call, $args) = uncons($self);
   return (
-    CALL(AS_PLAIN_EXPR => make_List $call),
-    SETL('call'),
-    CALL(AS_PLAIN_EXPR => make_List $args),
-    USEL('call', 'CONS'),
+    CALL(AS_PLAIN_EXPR => make_List make_List flatten $self),
     CMB9(just_Native \&list),
   );
 }

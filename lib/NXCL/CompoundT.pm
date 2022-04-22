@@ -1,13 +1,19 @@
 package NXCL::CompoundT;
 
-use NXCL::Utils qw(flatten object_is);
-use NXCL::TypeFunctions qw(List_Inst make_List cons_List);
+use NXCL::Utils qw(flatten object_is uncons);
+use NXCL::TypeFunctions qw(List_Inst make_List cons_List just_Native);
 use NXCL::ReprTypes qw(ConsR);
 use NXCL::TypeSyntax;
 
 export make ($first, @rest) { _make ConsR ,=> $first, make_List(@rest) }
+export list ($list) { _make ConsR ,=> uncons($list) }
 
-methodn AS_PLAIN_EXPR { return JUST $self }
+methodn AS_PLAIN_EXPR {
+  return (
+    CALL(AS_PLAIN_EXPR => make_List make_List flatten $self),
+    CMB9(just_Native \&list),
+  );
+}
 
 methodn EVALUATE {
   my ($first, @rest) = flatten $self;
