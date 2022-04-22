@@ -1,12 +1,13 @@
 use NXCL::Package;
 use NXCL::Environment;
+use NXCL::Writer;
 
 my $env = NXCL::Environment->new;
 
 my $string = $ARGV[0] // do { local $/; <STDIN> };
 
-my $rv = $env->eval_string(
+my $ret = $env->eval_string(
   $string
-)->value_to_xcl_string;
+)->value_AS_PLAIN_EXPR;
 
-say $rv->xcl_raw_value;
+say NXCL::Writer->new->write($ret->xcl_value);

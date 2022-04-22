@@ -7,10 +7,9 @@ use NXCL::TypeSyntax;
 
 export make ($string) { _make CharsR, => $string }
 
-methodn to_xcl_string {
-  # this is wrong
-  return JUST make("'".raw($self)."'");
-};
+methodn AS_PLAIN_EXPR {
+  return JUST $self
+}
 
 method eq {
   my ($r, @too_many) = flatten $args;

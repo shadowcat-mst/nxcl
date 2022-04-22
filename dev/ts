@@ -1,5 +1,6 @@
 use NXCL::Package;
 use NXCL::Environment;
+use NXCL::Writer;
 
 my $fh = do {
   if (my $file = $ARGV[0]) {
@@ -12,11 +13,13 @@ my $fh = do {
 
 my $data = do { local $/; <$fh> };
 
+my $writer = NXCL::Writer->new;
+
 while ($data =~ m/^(\$ .*\n(?:  .*\n)*)/mg) {
   my $env = NXCL::Environment->new;
   my $orig = $1;
   my $expr = $orig =~ s/^..//mgr;
-  my $rv = $env->eval_string($expr)->value_to_xcl_string;
+  my $ret = $env->eval_string($expr)->value_AS_PLAIN_EXPR;
   print $orig;
-  say '= '.$rv->xcl_raw_value;
+  say '= '.$writer->write($ret->xcl_value);
 }

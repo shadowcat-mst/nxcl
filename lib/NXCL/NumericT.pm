@@ -7,9 +7,6 @@ use NXCL::TypeSyntax;
 
 export make ($string) { _make CharsR, => $string }
 
-methodn to_xcl_string {
-  # this is wrong
-  return JUST make("N'".raw($self)."'");
-}
+method AS_PLAIN_EXPR { JUST $self }
 
 1;

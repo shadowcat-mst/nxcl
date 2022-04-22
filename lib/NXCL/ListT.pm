@@ -21,30 +21,6 @@ export empty { _make(NilR) }
 
 staticn new_empty { return JUST empty }
 
-method to_xcl_string {
-  my ($depthp) = uncons($args);
-  my $depth = $depthp ? raw($depthp) : 3;
-  return JUST make_String('(...)') unless $depth > 0;
-  CALL(_to_xcl_string => make($self, make_Int($depth-1)))
-}
-
-methodx _to_xcl_string {
-  my ($depth, $data) = uncons $args;
-  if (rnilp($self)) {
-    return JUST make_String(
-      '('.join(', ', map raw($_), reverse flatten $data).')'
-    );
-  }
-  my ($car, $cdr) = uncons($self);
-  return (
-    CALL('to_xcl_string' => make($car, $depth)),
-    SNOC($data),
-    CONS($depth),
-    CONS($cdr),
-    CALL('_to_xcl_string'),
-  );
-}
-
 methodn first {
   panic unless rconsp $self;
   my ($first) = uncons $self;
@@ -137,6 +113,15 @@ methodx ASSIGN_VALUE {
     DROP(),
     CALL(ASSIGN_VALUE => make($scdr, $acdr)),
   );
+}
+
+my $plain_mapper = make_Native sub ($args) {
+  my ($val) = uncons $args;
+  return CALL(AS_PLAIN_EXPR => make($val));
+};
+
+methodn AS_PLAIN_EXPR {
+  return CALL(map => make($self, $plain_mapper));
 }
 
 1;

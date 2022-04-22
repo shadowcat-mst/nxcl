@@ -7,6 +7,7 @@ use NXCL::ReprTypes qw(ValR);
 use Sub::Util qw(subname set_subname);
 use NXCL::TypeFunctions qw(
   make_Dict make_ApMeth make_Native make_String
+  make_Compound make_Combine make_Name make_List
 );
 use NXCL::TypeMethod;
 use curry;
@@ -70,6 +71,23 @@ sub _IDENTITY {
   };
 }
 
+sub _WAS ($mset_name) {
+  make_Native(NXCL::TypeMethod->new(
+    code => sub ($self, $) {
+      # use .was('0x...') to indicate that the underlying data may or may
+      # not be still available
+      return JUST make_Compound(
+        make_Name($mset_name),
+        make_Name('.'),
+        make_Name('WAS'),
+        make_List(
+          make_String '0x'.sprintf('%x', Scalar::Util::refaddr $self)
+        ),
+      )
+    }
+  ));
+}
+
 sub _mset_of ($self, $mset_type, $proto) {
   my %mset;
   foreach my $name (keys %$proto) {
@@ -81,17 +99,7 @@ sub _mset_of ($self, $mset_type, $proto) {
   }
   $mset{EVALUATE} ||= _IDENTITY;
   my $mset_name = $self->name.($mset_type eq 'Type' ? 'T' : '');
-  $mset{to_xcl_string} ||= make_Native(NXCL::TypeMethod->new(
-    code => sub ($self, $) {
-      # use .hydrate('0x...') to indicate the requirement for in-band
-      # hydration of the value during any round-trip attempt
-      return JUST make_String(
-        "${mset_name}.hydrate("
-          .sprintf("'0x%x'", Scalar::Util::refaddr $self)
-        .")"
-      )
-    }
-  ));
+  $mset{AS_PLAIN_EXPR} ||= _WAS($mset_name);
   my $mset_v = make_Dict(\%mset);
   $NXCL::TypeRegistry::Mset{$mset_v} = $mset_name;
   return $mset_v;

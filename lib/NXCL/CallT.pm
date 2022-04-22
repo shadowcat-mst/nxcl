@@ -9,6 +9,8 @@ export of_list ($list) { _make ValR ,=> $list }
 
 export make (@parts) { of_list(make_List @parts) }
 
+methodn AS_PLAIN_EXPR { return JUST $self }
+
 methodx EVALUATE {
   my $call_list = raw($self);
   panic "Empty call list" if rnilp($call_list);

@@ -3,13 +3,13 @@ package NXCL::IntT;
 use List::Util qw(reduce);
 use NXCL::Utils qw(flatten raw panic mset object_is);
 use NXCL::ReprTypes qw(IntR);
-use NXCL::TypeFunctions qw(make_Bool make_String);
+use NXCL::TypeFunctions qw(make_Bool make_Numeric);
 use NXCL::TypeSyntax;
 
 export make ($int) { _make IntR, => $int }
 
-methodn to_xcl_string {
-  return JUST make_String(''.raw($self));
+methodn AS_PLAIN_EXPR {
+  return JUST make_Numeric raw($self);
 }
 
 method eq {

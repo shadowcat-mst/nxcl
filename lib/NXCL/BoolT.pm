@@ -2,13 +2,13 @@ package NXCL::BoolT;
 
 use NXCL::Utils qw(mset object_is panic raw flatten);
 use NXCL::ReprTypes qw(BoolR);
-use NXCL::TypeFunctions qw(make_String);
+use NXCL::TypeFunctions qw(make_Name);
 use NXCL::TypeSyntax;
 
 export make ($val) { _make BoolR ,=> 0+!!$val }
 
-methodn to_xcl_string {
-  return JUST make_String(!!(raw($self)) ? 'true' : 'false');
+methodn AS_PLAIN_EXPR {
+  return JUST make_Name(!!(raw($self)) ? 'true' : 'false')
 }
 
 method eq {
