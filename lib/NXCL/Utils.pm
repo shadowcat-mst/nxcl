@@ -2,6 +2,7 @@ package NXCL::Utils;
 
 use NXCL::Exporter;
 use Sub::Util qw(set_subname);
+use Scalar::Util qw(blessed);
 use NXCL::ReprTypes;
 
 our @EXPORT_OK = qw(
@@ -10,6 +11,7 @@ our @EXPORT_OK = qw(
   mset rtype object_is
   rboolp rcharsp rbytesp rnilp rintp rvalp rvarp rconsp rdictp rnativep
   raw uncons flatten
+  raw_meta with_meta
 );
 
 sub panic {
@@ -67,5 +69,9 @@ sub flatten ($cons) {
   }
   return @ret;
 }
+
+sub raw_meta ($v) { $_->[2] }
+
+sub with_meta ($v, %meta) { [ @$v[0,1], { %{$v->[2]||{}}, %meta } ] }
 
 1;
