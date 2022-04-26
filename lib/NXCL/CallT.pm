@@ -17,7 +17,7 @@ methodn AS_PLAIN_EXPR {
   );
 }
 
-methodx EVALUATE {
+methodn EVALUATE {
   my $call_list = raw($self);
   panic "Empty call list" if rnilp($call_list);
   my ($first, $rest) = uncons($call_list);
