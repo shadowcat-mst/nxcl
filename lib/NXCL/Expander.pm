@@ -67,4 +67,8 @@ sub expand_expr ($self, @v) {
   $self->make(Combine => @exp);
 }
 
+sub expand_qqstring ($self, @v) {
+  $self->make(QQString => map $self->expand($_), @v);
+}
+
 1;

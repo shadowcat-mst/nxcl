@@ -19,7 +19,7 @@ our %START = (
   ')' => 'list_end',
   '}' => 'block_end',
   '#' => 'comment',
-  # '"' => 'qqstring',
+  '"' => 'qqstring',
   # '`' => 'blockstring',
 );
 
@@ -27,12 +27,17 @@ our %IS_FLUFF = (ws => 1, comment => 1);
 
 our %IS_ATOMSTART = (
   map +($_ => 1),
-    qw(qstring numeric word symbol list block call)
+    qw(qstring qqstring numeric word symbol list block call)
 );
 
 use NXCL::Class;
 
 lazy str => sub { die "WHAT" };
+
+sub peek_type ($self) {
+  return unless length($self->str);
+  $START{substr($self->str,0,1)} // die "WHAT: ".$self->str;
+}
 
 sub extract_char ($self, $char) {
   die "WHAT" unless substr($self->str, 0, 1) eq $char;
@@ -149,10 +154,19 @@ sub parse_delimited_sequence ($self, $type, $enter, $leave, $sep) {
   push @contents, [ "leave_${type}" => $self->extract_char($leave) ];
   return [ $type => @contents ];
 }
-  
-sub peek_type ($self) {
-  return unless length($self->str);
-  $START{substr($self->str,0,1)} // die "WHAT: ".$self->str;
+
+sub parse_qqstring ($self) {
+  $self->extract_char('"');
+  my @parts;
+  while (1) {
+    die "WHAT" unless $self->{str} =~ s/^((?:.+?(?<!\\))?(?:\\\\)*)(\$|")//;
+    my ($string_part, $next) = ($1, $2);
+    push @parts, [ qstring => $string_part ];
+    return [ qqstring => @parts ] if $next eq '"';
+    my $type = $self->peek_type;
+    die "WHAT" unless $type eq 'call' or $type eq 'block';
+    push @parts, $self->${\"parse_${type}"};
+  }
 }
 
 1;
