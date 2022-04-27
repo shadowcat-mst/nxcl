@@ -12,6 +12,10 @@ export list ($list) { _make ValR ,=> $list }
 
 export make (@parts) { list(make_List @parts) }
 
+methodn AS_PLAIN_EXPR {
+  return JUST $self
+}
+
 my $qqeval = make_Native sub ($args) {
   my ($thing) = uncons($args);
   if (object_is $thing, String_Inst) {

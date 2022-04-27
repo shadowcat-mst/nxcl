@@ -16,7 +16,7 @@ sub _write_type_Name ($self, $v) { raw($v) }
 sub _write_type_Numeric ($self, $v) { raw($v) }
 
 sub _write_type_String ($self, $v) {
-  # this is wrong
+  # escaping required, but worry about this later
   "'".raw($v)."'";
 }
 
@@ -38,6 +38,21 @@ sub _write_type_Call ($self, $v) {
 
 sub _write_type_Block ($self, $v) {
   '{ '.$self->_write_callseq(raw raw $v).' }'
+}
+
+sub _write_type_QQString ($self, $v) {
+  # escaping required, but worry about this later
+  my @parts = map {
+    my $mset_name = mset_name mset $_;
+    if ($mset_name eq 'String') {
+      raw($_);
+    } elsif ($mset_name eq 'Call' or $mset_name eq 'Block') {
+      '$'.$self->${\"_write_type_${mset_name}"}($_)
+    } else {
+      die "Invalid QQString value of type ${mset_name}";
+    }
+  } flatten raw $v;
+  '"'.join('', @parts).'"';
 }
 
 sub _write_callseq ($self, $v) {
