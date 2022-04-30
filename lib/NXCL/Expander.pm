@@ -7,7 +7,7 @@ lazy maker => load_and_call_cb('NXCL::TypeMaker', can => 'make_value');
 sub make ($self, @v) { $self->maker->(@v) }
 
 sub expand ($self, $v) {
-  my ($tok_type, @payload) = @$v; # later also $meta
+  my ($tok_type, $meta, @payload) = @$v; # later also $meta
   $self->${\"expand_${tok_type}"}(@payload);
 }
 

@@ -72,7 +72,7 @@ sub parse ($self, $type, $str) {
 }
 
 sub parse_script ($self) {
-  [ script => $self->extract_expr_seq('semicolon') ];
+  [ script => {}, $self->extract_expr_seq('semicolon') ];
 }
 
 sub parse_expr ($self, $autoterm) {
@@ -81,7 +81,7 @@ sub parse_expr ($self, $autoterm) {
   while (my $type = $self->peek_type) {
     if ($IS_FLUFF{$type}) {
       push @expr, $self->${\"parse_${type}"};
-      last if $autoterm and $was_block and $expr[-1][1] =~ /\n/;
+      last if $autoterm and $was_block and $expr[-1][2] =~ /\n/;
     } elsif ($IS_ATOMSTART{$type}) {
       $was_block = 0+($type eq 'block');
       push @expr, $self->parse_compound;
@@ -89,7 +89,7 @@ sub parse_expr ($self, $autoterm) {
       last;
     }
   }
-  [ expr => @expr ];
+  [ expr => {}, @expr ];
 }
 
 sub parse_compound ($self) {
@@ -101,39 +101,39 @@ sub parse_compound ($self) {
       last;
     }
   }
-  return [ compound => @compound ];
+  return [ compound => {}, @compound ];
 }
 
 sub parse_ws ($self) {
-  [ ws => $self->extract_re(qr/\s+/) ]
+  [ ws => {}, $self->extract_re(qr/\s+/) ]
 }
 
 sub parse_comment ($self) {
-  [ comment => $self->extract_re(qr{#.*?\n}) ]
+  [ comment => {}, $self->extract_re(qr{#.*?\n}) ]
 }
 
 sub parse_semicolon ($self) {
-  [ semicolon => $self->extract_char(';') ]
+  [ semicolon => {}, $self->extract_char(';') ]
 }
 
 sub parse_comma ($self) {
-  [ comma => $self->extract_char(',') ]
+  [ comma => {}, $self->extract_char(',') ]
 }
 
 sub parse_word ($self) {
-  [ word => $self->extract_re(qr/[A-Za-z_][A-Za-z_0-9-]*/) ]
+  [ word => {}, $self->extract_re(qr/[A-Za-z_][A-Za-z_0-9-]*/) ]
 }
 
 sub parse_symbol ($self) {
-  [ symbol => $self->extract_re(qr"[\Q${SYMBOL_CHARS}\E]+") ]
+  [ symbol => {}, $self->extract_re(qr"[\Q${SYMBOL_CHARS}\E]+") ]
 }
 
 sub parse_numeric ($self) {
-  [ numeric => $self->extract_re(qr/[0-9]+(?:\.[0-9]+)?/) ]
+  [ numeric => {}, $self->extract_re(qr/[0-9]+(?:\.[0-9]+)?/) ]
 }
 
 sub parse_qstring ($self) {
-  [ qstring => $self->extract_re(qr/'(.*?(?<=[^\\])(?:\\\\)*)'/) ]
+  [ qstring => {}, $self->extract_re(qr/'(.*?(?<=[^\\])(?:\\\\)*)'/) ]
 }
 
 sub parse_call ($self) {
@@ -149,10 +149,10 @@ sub parse_list ($self) {
 }
 
 sub parse_delimited_sequence ($self, $type, $enter, $leave, $sep) {
-  my @contents = ([ "enter_${type}" => $self->extract_char($enter) ]);
+  my @contents = ([ "enter_${type}" => {}, $self->extract_char($enter) ]);
   push @contents, $self->extract_expr_seq($sep);
-  push @contents, [ "leave_${type}" => $self->extract_char($leave) ];
-  return [ $type => @contents ];
+  push @contents, [ "leave_${type}" => {}, $self->extract_char($leave) ];
+  return [ $type => {}, @contents ];
 }
 
 sub parse_qqstring ($self) {
@@ -161,8 +161,8 @@ sub parse_qqstring ($self) {
   while (1) {
     die "WHAT" unless $self->{str} =~ s/^((?:.+?(?<!\\))?(?:\\\\)*)(\$|")//;
     my ($string_part, $next) = ($1, $2);
-    push @parts, [ qstring => $string_part ];
-    return [ qqstring => @parts ] if $next eq '"';
+    push @parts, [ qstring => {}, $string_part ];
+    return [ qqstring => {}, @parts ] if $next eq '"';
     my $type = $self->peek_type;
     die "WHAT" unless $type eq 'call' or $type eq 'block';
     push @parts, $self->${\"parse_${type}"};
