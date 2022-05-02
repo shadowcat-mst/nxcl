@@ -32,15 +32,13 @@ our %IS_ATOMSTART = (
 
 use NXCL::Class;
 
-lazy str => sub { die "WHAT" };
-
 sub _peek_type ($self) {
-  return unless length($self->str);
-  $START{substr($self->str,0,1)} // die "WHAT: ".$self->str;
+  return unless length($self->{str});
+  $START{substr($self->{str},0,1)} // die "WHAT: ".$self->{str};
 }
 
 sub _extract_char ($self, $char) {
-  die "WHAT" unless substr($self->str, 0, 1) eq $char;
+  die "WHAT" unless substr($self->{str}, 0, 1) eq $char;
   substr($self->{str}, 0, 1) = '';
   return $char;
 }
@@ -72,7 +70,10 @@ sub parse ($self, $type, $str) {
 }
 
 sub _parse ($self, $type, @args) {
-  [ $type, {}, $self->${\"_parse_${type}"}(@args) ];
+  my $orig_str = $self->{str};
+  my @parsed = $self->${\"_parse_${type}"}(@args);
+  my $consumed = substr($orig_str, length($self->{str}) - length($orig_str));
+  [ $type, { string => $consumed }, @parsed ];
 }
 
 sub _parse_script ($self) {
