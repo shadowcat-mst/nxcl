@@ -22,7 +22,7 @@ sub eval_string ($self, $string) {
 
 sub eval_string_in ($self, $scope, $string) {
   my $parse = $self->reader->parse(script => $string);
-  my ($exp) = $self->expander->expand($parse);
+  my $exp = $self->expander->expand($parse);
   my $script = $self->weaver->weave($exp);
   $self->eval_in($scope, $script);
 }
