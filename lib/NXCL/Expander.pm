@@ -1,14 +1,16 @@
 package NXCL::Expander;
 
 use NXCL::Class;
+use NXCL::Utils qw(with_meta);
 
 lazy maker => load_and_call_cb('NXCL::TypeMaker', can => 'make_value');
 
 sub make ($self, @v) { $self->maker->(@v) }
 
 sub expand ($self, $v) {
-  my ($tok_type, $meta, @payload) = @$v; # later also $meta
-  $self->${\"expand_${tok_type}"}(@payload);
+  my ($tok_type, $reader_meta, @payload) = @$v;
+  map with_meta($_, { reader => $reader_meta }),
+    $self->${\"expand_${tok_type}"}(@payload);
 }
 
 sub expand_ws { () }

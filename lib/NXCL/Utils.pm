@@ -72,6 +72,6 @@ sub flatten ($cons) {
 
 sub raw_meta ($v) { $_->[2] }
 
-sub with_meta ($v, %meta) { [ @$v[0,1], { %{$v->[2]||{}}, %meta } ] }
+sub with_meta ($v, $meta) { [ @$v[0,1], { %{$v->[2]||{}}, %$meta } ] }
 
 1;
