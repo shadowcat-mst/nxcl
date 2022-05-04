@@ -64,16 +64,28 @@ sub _extract_re ($self, $re) {
   return $&;
 }
 
-sub parse ($self, $type, $str) {
-  local $self->{str} = $str;
+our $ANON = 'A000';
+
+sub parse ($self, $type, $str, $file = 'anon:'.++$ANON) {
+  local $self->{str} = local $self->{full_str} = $str;
+  local $self->{file} = $file;
+  local $self->{start} = 0;
   $self->_parse($type);
 }
 
 sub _parse ($self, $type, @args) {
+  local $self->{outer_start} = my $start = $self->{start};
   my $orig_str = $self->{str};
   my @parsed = $self->${\"_parse_${type}"}(@args);
-  my $consumed = substr($orig_str, length($self->{str}) - length($orig_str));
-  [ $type, { string => $consumed }, @parsed ];
+  my $consumed = length($orig_str) - length($self->{str});
+  my $meta = {
+    file => $self->{file},
+    contents => $self->{full_str},
+    start => $self->{outer_start},
+    end => $start += $consumed,
+  };
+  $self->{start} = $start;
+  [ $type, $meta, @parsed ];
 }
 
 sub _parse_script ($self) {
