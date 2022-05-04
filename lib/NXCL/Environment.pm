@@ -1,7 +1,6 @@
 package NXCL::Environment;
 
 use NXCL::Class;
-use NXCL::Runtime qw(run_til_host);
 use NXCL::TypeFunctions qw(make_List);
 use NXCL::OpUtils;
 use NXCL::RV;
@@ -16,6 +15,8 @@ lazy weaver => load_and_call_cb('NXCL::Weaver', 'new');
 
 lazy trace_cb => sub { our $DEFAULT_TRACE_CB };
 
+lazy strand => load_and_call_cb('NXCL::Strand', 'new');
+
 sub eval_string ($self, $string) {
   $self->eval_string_in($self->scope, $string);
 }
@@ -28,7 +29,7 @@ sub eval_string_in ($self, $scope, $string) {
 }
 
 sub eval_in ($self, $scope, $value) {
-  my (undef, $return_value) = run_til_host(
+  my (undef, $return_value) = $self->strand->run_til_host(
     [ [ [ make_List($value) ], {}, $scope, 0, [], {} ] ],
     [ HOST('value'), EVAL($value) ],
     $self->trace_cb,

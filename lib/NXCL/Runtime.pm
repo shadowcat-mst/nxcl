@@ -7,9 +7,8 @@ use NXCL::OpUtils;
 use NXCL::TypeFunctions qw(
   Native_Inst make_List cons_List empty_List make_CxRef
 );
-use if !__PACKAGE__->can('DEBUG'), constant => DEBUG => 0;
 
-our @EXPORT_OK = qw(run_til_host);
+our @EXPORT_OK = qw(%STEP_FUNC);
 
 sub retops ($ops, @ret) { push @$ops, reverse @ret }
 sub retval ($ops, $val) { push @{$ops->[-1]}, $val }
@@ -121,24 +120,7 @@ sub take_step_GETL ($cxs, $ops, $name, $type, @rest) {
   retval $ops, [ $type => $cxs->[-1][5]{$name}[-1], @rest ];
 }
 
-our %step_func = map +($_ => __PACKAGE__->can("take_step_${_}")),
+our %STEP_FUNC = map +($_ => __PACKAGE__->can("take_step_${_}")),
   @NXCL::OpUtils::OPNAMES;
-
-sub take_step ($cxs, $ops, $op, @v) {
-  die "EMPTY CX STACK" unless @$cxs;
-  die "EMPTY OP STACK" unless @$ops;
-  die "Unknown op type $op" unless my $step_func = $step_func{$op};
-  $step_func->($cxs, $ops, @v);
-  return;
-}
-
-sub run_til_host ($cxs, $ops, $trace_cb) {
-  while (1) {
-    $trace_cb->($cxs, $ops) if $trace_cb;
-    my ($op, @v) = @{pop @$ops};
-    return @v if $op eq 'HOST';
-    take_step($cxs, $ops, $op, @v);
-  }
-}
 
 1;
