@@ -12,6 +12,7 @@ sub take_step ($self, $cxs, $ops, $op, @v) {
 }
 
 sub run_til_host ($self, $cxs, $ops, $trace_cb) {
+  #local our $CURRENT_CXS = $cxs;
   while (1) {
     $trace_cb->($cxs, $ops) if $trace_cb;
     my ($op, @v) = @{pop @$ops};
