@@ -1,16 +1,16 @@
 use NXCL::Package;
 use NXCL::Reader;
 use NXCL::Expander;
-use NXCL::YDump;
+use Data::Dumper::Compact qw(ddc);
 
 my $r = NXCL::Reader->new;
 
 my $e = NXCL::Expander->new(
-  maker => sub { [ @_ ] },
+  maker => sub { [ shift, \@_ ] },
 );
 
 my $struct = $e->expand(
   $r->parse(script => $ARGV[0]//die "No argument given")
 );
 
-print ydump($struct);
+print ddc($struct);
