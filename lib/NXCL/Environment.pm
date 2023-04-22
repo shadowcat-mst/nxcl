@@ -30,7 +30,7 @@ sub eval_string_in ($self, $scope, $string) {
 
 sub eval_in ($self, $scope, $value) {
   my (undef, $return_value) = $self->strand->run_til_host(
-    [ [ [ make_List($value) ], {}, $scope, 0, [], {} ] ],
+    [ [ make_List($value), {}, $scope, 0, [], {} ] ],
     [ HOST('value'), EVAL($value) ],
     $self->trace_cb,
   );
