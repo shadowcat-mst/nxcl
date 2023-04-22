@@ -45,8 +45,8 @@ sub take_step_JUST ($cxs, $ops, $val) {
   retval $ops, $val;
 }
 
-sub take_step_CONS ($cxs, $ops, @cons) {
-  retval $ops, cons_List(@cons);
+sub take_step_CONS ($cxs, $ops, $car, $cdr) {
+  retval $ops, cons_List($car, $cdr);
 }
 
 sub take_step_SNOC ($cxs, $ops, $cdr, $car) {
