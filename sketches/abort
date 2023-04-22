@@ -1,0 +1,279 @@
+
+x = (1, 2, 3)
+
+y = cons 4 x -> (4, 1, 2, 3)
+
+(1 . (2 . (3 . ())))
+
+struct cons {
+  car item
+  cdr cons|nil
+}
+
+struct List {
+  first Item
+  rest List | Nil
+}
+
+List == Pair( Value, List | Nil )
+
+my $x = [ 1, [ 2, [ 3, $NIL ] ] ];
+
+my $y = [ 4, [ 1, [ 2, [ 3, $NIL ] ] ] ];
+
+EVAL($thing);
+
+CALL($thing, 'EVALUATE', empty_List);
+
+EVAL -> evaluate
+CALL -> method call
+CMB[96] -> apply
+CONS
+SNOC
+JUST
+LIST
+DROP
+
+ECDR -> eval-cdr-of-list
+
+ECTX -> enter context
+LCTX -> leave context
+GCTX -> get context
+
+GETN -> get lexical variable
+SETN -> set lexical variable
+
+# VM internal locals
+
+DUPL -> set local and return value
+USEL -> fetch (destructively) local and return value
+
+SETL -> DUPL + DROP
+GETL -> USEL + DUPL # lie
+
+DBUG
+
+DBUG 'foo'; # warn 'foo'
+
+DUPL 'local-name', 'foo';
+DBUG; # warn 'foo'
+USEL 'local-name';
+DBUG; # warn 'foo'
+
+DYNREG('return')
+
+#let return = current-ctx.return;
+
+let return = fun (@args) { ^return @args }
+
+let thing = fun (...) {
+  if [ x == 3 ] {
+    return "three!"
+  }
+  return "not three"
+}
+
+let thing = fun (x) {
+  defer { log "outer" }
+  if [ x == 3 ] {
+    defer { log "inner" }
+    return "three!"
+  }
+  return "not three"
+}
+
+log thing(2) -> "outer", "not three"
+log thing(3) -> "inner", "outer", "three!"
+
+let handle-headers = fun (sock) {
+  # read headers and return data
+}
+
+let handle-conn = fun (conn, ret) {
+  while [ let req = conn.read_request() ] {
+    if [ req.type() == 'close' ] {
+      ret();
+    }
+    # otherwise, process request
+  }
+}
+
+let handle-sock = fun (sock) {
+  let headers = handle-headers sock;
+  let conn = Connection.new %(headers sock);
+  handle-conn conn ^return;
+  log 'Unexpected exit from handle-conn';
+}
+
+let main-loop = fun (spec) {
+  let acceptor = listen(spec);
+  while [ let sock = acceptor.accept() ] {
+    handle-sock sock;
+  }
+}
+
+...
+
+let quiet-abort-uuid = make-uuid();
+
+let with-quiet-aborter = fun (tag, block) {
+  let return-from-here = ^return;
+  let quiet-aborter = fun (reason) {
+    return-from-here "${tag}: ${reason}"
+  }
+  ^($quiet-abort-uuid) = quiet-aborter;
+  block();
+}
+
+let do-quiet-abort = fun (reason) { ^($quiet-abort-uuid) reason }
+
+let main-loop = fun (spec) {
+  let acceptor = listen(spec);
+  while [ let sock = acceptor.accept() ] {
+    with-quiet-aborter "Connection" { handle-sock sock }
+  }
+}
+
+let handle-sock = fun (sock) {
+  ...
+  do-quiet-abort 'Some reason goes here';
+  ...
+}
+
+# ^^ 'Connection: Some reason goes here'
+
+let main-loop = fun (spec) {
+  let acceptor = listen(spec);
+  acceptor.connections().each (sock) => {
+    with-quiet-aborter "Connection" { handle-sock sock }
+  }
+}
+
+let main-loop = fun (spec) {
+  let acceptor = listen(spec);
+  acceptor.connections().each (sock) => {
+    start with-quiet-aborter "Connection" { handle-sock sock }
+  }
+}
+
+let main-loop = fun (spec) {
+  let acceptor = listen(spec);
+  acceptor.connections().each (sock) => {
+    fork {
+      with-quiet-aborter "Connection" { handle-sock sock }
+    }
+    retain sock;
+  }
+}
+
+let main-loop = fun (spec) {
+  let acceptor = listen(spec);
+  while [ local sock = acceptor.accept() ] {
+    with-quiet-aborter "Connection" { handle-sock sock }
+  }
+}
+
+let parse-csv-line = fun (line) { line.split ',' } # lolfail
+
+let read-csv = fun (filename) {
+  local fh = fs.openr filename;
+  fh.lines().map parse-csv-line;
+}
+
+let connect-websocket = fun (addr) {
+  local sock = connect addr;
+  start-websocket sock;
+  return retain sock;
+}
+
+{
+  let websocket = connect-websocket addr;
+
+  <use websocket here>
+
+  release websocket;
+}
+
+{
+  local websocket = connect-websocket addr;
+
+  <use websocket here>
+}
+
+...
+
+let debug_info = %();
+
+{
+  local fh = fs.openr filename;
+  debug_info.'fh' = fh;
+  let data = fh.slurp();
+  do-something-with data;
+} # fh.close() happens here
+
+log "Read file: ${debug_info.'fh'.filename()}";
+
+<expr>.EVALUATE()
+
+let x = 3;
+
+current-scope.set-name 'x' 3.EVALUATE();
+
+foo(1, 2)
+
+foo.COMBINE 1 2;
+
+CMB9 <thing> <args> -> CALL COMBINE cons(<thing>, <args>)
+CMB6 <args> <thing> -> CALL COMBINE cons(<thing>, <args>)
+
+EVAL <thing> -> CALL EVALUATE list(<thing>)
+
+CMB9($thing, $args) -> CALL COMBINE ($thing, @$args)
+
+$thing->COMBINE(@$args)
+
+$thing(@args) -> CMB9 <thing> <args>
+
+let release = fun (o) { o.RELEASE(); return o }
+
+local thing = <expr>;
+
+let thing = <expr>; defer { release thing }
+
+use File::Open qw(fopen);
+
+my $data = do {
+  my $fh = fopen $filename;
+  local $/;
+  <$fh>
+};
+
+use fs;
+
+let data = do {
+  local fh = fs.openr filename;
+  fh.slurp();
+};
+
+CONS $first @rest -> ($first, @rest)
+SNOC @rest $first -> ($first, @rest)
+
+JUST $thing -> ($thing)
+DROP $thing -> ()
+
+CMB9 $plus_one, (4) -> (5)
+
+JUST 4 -> (4)
+LIST -> ((4))
+CMB9 $plus_one -> (5)
+
+JUST $plus_one
+CMB6 (4) -> (5)
+
+
+JUST 4 -> (4)
+LIST -> ((4))
+CONS 3 -> ((3, 4))
+CMB9 $sum -> (7)
+
+
