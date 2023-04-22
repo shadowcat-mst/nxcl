@@ -1,6 +1,6 @@
 package NXCL::Weaver;
 
-use NXCL::Utils qw(mset object_is flatten raw);
+use NXCL::Utils qw(mset object_is flatten raw meta_dict with_meta);
 use NXCL::TypeRegistry qw(mset_name);
 use NXCL::TypeMaker;
 use NXCL::TypeFunctions qw(
@@ -34,7 +34,7 @@ sub expand_binop_list ($self, @op_list) {
 sub weave ($self, $v) {
   my $mset_name = mset_name mset $v;
   if (my $weaver = $self->can("_weave_type_${mset_name}")) {
-    return $self->$weaver($v);
+    return with_meta $self->$weaver($v), meta_dict $v;
   }
   return $v;
 }
