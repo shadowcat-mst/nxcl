@@ -11,7 +11,7 @@ our @EXPORT_OK = qw(
   mset rtype object_is
   rboolp rcharsp rbytesp rnilp rintp rvalp rvarp rconsp rdictp rnativep
   raw uncons flatten
-  raw_meta with_meta
+  meta_dict with_meta
 );
 
 sub panic {
@@ -70,8 +70,8 @@ sub flatten ($cons) {
   return @ret;
 }
 
-sub raw_meta ($v) { $_->[2] }
+sub meta_dict ($v) { $v->[2] }
 
-sub with_meta ($v, $meta) { [ @$v[0,1], { %{$v->[2]||{}}, %$meta } ] }
+sub with_meta ($v, $meta) { [ @$v[0,1], $meta ] }
 
 1;

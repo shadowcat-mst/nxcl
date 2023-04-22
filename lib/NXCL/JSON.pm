@@ -1,7 +1,7 @@
 package NXCL::JSON;
 
 use JSON::PP ();
-use NXCL::Utils qw(mset object_is rtype raw uncons flatten);
+use NXCL::Utils qw(mset object_is rtype raw meta_dict uncons flatten);
 use NXCL::TypeRegistry;
 use NXCL::TypeFunctions qw(List_Inst);
 use NXCL::ReprTypes;
@@ -14,6 +14,11 @@ our @EXPORT = qw(nxcl2json json2nxcl);
 sub json2nxcl { die "NYI" }
 
 sub nxcl2json ($v) {
+  my ($type, @rest) = @{_nxcl2json($v)//return undef};
+  return [ $type, nxcl2json(meta_dict $v), @rest ];
+}
+
+sub _nxcl2json ($v) {
   return undef unless defined $v;
   my $mset_name = mset_name mset $v;
   my $rtype = rtype($v);

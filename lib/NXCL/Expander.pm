@@ -11,8 +11,22 @@ sub expand ($self, $v) { ($self->_expand($v))[0] }
 
 sub _expand ($self, $v) {
   my ($tok_type, $reader_meta, @payload) = @$v;
-  map with_meta($_, { reader => $reader_meta }),
-    $self->${\"_expand_${tok_type}"}(@payload);
+
+  # start/end list/etc. tokens don't come with reader meta currently
+  # but also don't expand to anything so we can skip trying (failing)
+  # to construct a proper metadata dict for those
+
+  return () unless my @exp = $self->${\"_expand_${tok_type}"}(@payload);
+
+  my $xmeta = $self->_make(Dict => {
+    reader => $self->_make(Dict => {
+      contents => $self->_make(String => $reader_meta->{contents}),
+      file => $self->_make(String => $reader_meta->{file}),
+      length => $self->_make(Int => $reader_meta->{length}),
+      start => $self->_make(Int => $reader_meta->{start}),
+    }),
+  });
+  return map with_meta($_, $xmeta), @exp;
 }
 
 sub _expand_ws { () }
