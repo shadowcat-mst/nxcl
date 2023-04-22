@@ -15,7 +15,7 @@ sub _cook ($type = '+++ EMPTY +++', @parts) {
     } elsif (ref($_) eq 'HASH') {
       my %h = %{$_};
       +{ map +(
-        $_ => __SUB__->(ref($h{$_}) ? @{$h{$_}} : $h{$_})
+        $_ => __SUB__->(ref($h{$_}) eq 'ARRAY' ? @{$h{$_}} : $h{$_})
       ), sort keys %h }
     } else {
       $_
