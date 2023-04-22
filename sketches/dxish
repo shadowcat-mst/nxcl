@@ -1,0 +1,28 @@
+let h = (name) => { Host.new name }
+
+letop but (l, r) { l.merge(r) }
+
+let default_spec = %(:memory 2Gb, :disk 1Tb);
+
+let db_servers = (h'db1', h'db2').map .with_spec default_spec;
+
+let web_servers = (h'web1', h'web2', h'web3').map
+  .with_spec [ default_spec but %(:disk 256Mb) ];
+
+system {
+  db_servers.each .up();
+  web_servers.each .up();
+}
+
+system {
+  let db_instances = db_servers.map .up();
+  web_servers.map(.with_spec :db_ips(db_instances.map .'ip')).each .up();
+}
+
+system {
+  db_servers.each .up();
+  web_servers.each {
+    $.db_ips(db_servers.map '.ip');
+    $.up();
+  }
+}
