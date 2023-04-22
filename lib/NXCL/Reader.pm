@@ -30,6 +30,7 @@ our %IS_ATOMSTART = (
     qw(qstring qqstring numeric word symbol list block call)
 );
 
+use Digest::SHA qw(sha1_base64);
 use NXCL::Class;
 
 sub _peek_type ($self) {
@@ -64,27 +65,29 @@ sub _extract_re ($self, $re) {
   return $&;
 }
 
-our $ANON = 'A000';
-
-sub parse ($self, $type, $str, $file = 'anon:'.++$ANON) {
+sub parse ($self, $type, $str, $file = undef) {
   local $self->{str} = local $self->{full_str} = $str;
-  local $self->{file} = $file;
+  local $self->{file} = $file // do {
+    'anon:'.substr(sha1_base64($str), 0, 12) =~ tr!+/!-_!r;
+  };
   local $self->{start} = 0;
   $self->_parse($type);
 }
 
 sub _parse ($self, $type, @args) {
-  local $self->{outer_start} = my $start = $self->{start};
   my $orig_str = $self->{str};
-  my @parsed = $self->${\"_parse_${type}"}(@args);
+  my @parsed = do {
+    local $self->{start} = $self->{start};
+    $self->${\"_parse_${type}"}(@args);
+  };
   my $consumed = length($orig_str) - length($self->{str});
   my $meta = {
     file => $self->{file},
     contents => $self->{full_str},
-    start => $self->{outer_start},
-    end => $start += $consumed,
+    start => $self->{start},
+    length => $consumed,
   };
-  $self->{start} = $start;
+  $self->{start} += $consumed;
   [ $type, $meta, @parsed ];
 }
 
