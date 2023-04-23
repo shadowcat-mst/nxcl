@@ -79,7 +79,7 @@ my $lmap_continue = make_Native sub {
   });
 };
 
-sub map_body ($self, $args, $continue = $map_continue) {
+sub map_body ($self, $args, $continue) {
   if (rnilp($self)) {
     return JUST $self;
   }
@@ -93,7 +93,7 @@ sub map_body ($self, $args, $continue = $map_continue) {
   );
 };
 
-method map { map_body($self, $args) }
+method map { map_body($self, $args, $map_continue) }
 method lmap { map_body($self, $args, $lmap_continue) }
 
 my $each_continue = make_Native sub {
