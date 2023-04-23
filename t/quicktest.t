@@ -2,7 +2,7 @@ use NXCL::Test;
 use Capture::Tiny qw(capture_stdout);
 use Text::Diff;
 
-my $file = $0 =~ s/\.t$/.transcript/r;
+my $file = $0 =~ s/\.t$/.ts/r;
 
 my $result = capture_stdout {
   system(perl => 'dev/ts' => $file)
@@ -15,7 +15,7 @@ if (@ARGV and $ARGV[0] eq '--rewrite') {
   exit 0;
 }
 
-my $diff = diff 't/quicktest.transcript', \$result;
+my $diff = diff $file, \$result;
 
 is $diff, '', 'No diffs';
 
