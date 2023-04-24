@@ -17,6 +17,11 @@ if (@ARGV and $ARGV[0] eq '--rewrite') {
 
 my $diff = diff $file, \$result;
 
-is $diff, '', 'No diffs';
+if ($diff) {
+  diag "\n".$diff =~ s/^/  /mgr."\n";
+  fail 'No diffs';
+} else {
+  pass 'No diffs';
+}
 
 done_testing;
