@@ -18,9 +18,31 @@ methodn is_active {
   JUST make_Bool defined(raw($self));
 }
 
+methodn expr_stack {
+  panic "Inactive CxRef" unless defined(my $cx = raw($self));
+  return JUST $cx->[0];
+}
+
+methodn dynamic_values {
+  panic "Inactive CxRef" unless defined(my $cx = raw($self));
+  return JUST make_Dict({ %{$cx->[1]} });
+}
+
+methodn scope {
+  panic "Inactive CxRef" unless defined(my $cx = raw($self));
+  return JUST $cx->[2];
+}
+
+# 3 -> opdepth, 5 -> locals, 6 -> cache of this CxRef
+
+methodn deferred_thunks {
+  panic "Inactive CxRef" unless defined(my $cx = raw($self));
+  return JUST make_List(@{$cx->[4]});
+}
+
 method return {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
-  LCTX $cx, (uncons($args))[0];
+  return LCTX $cx, (uncons($args))[0];
 }
 
 method defer {
@@ -34,7 +56,7 @@ method get_dynamic_value {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my $name = raw((uncons($args))[0]);
   panic "No dynamic value for ${name}"
-    unless my $value = raw($self)->[1]{$name};
+    unless my $value = $cx->[1]{$name};
   return JUST $value;
 }
 
@@ -42,13 +64,8 @@ method set_dynamic_value {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my ($namep, $value) = flatten($args);
   my $name = raw($namep);
-  $_ = { %{$_}, $name => $value } for raw($self)->[1];
+  $_ = { %{$_}, $name => $value } for $cx->[1];
   return JUST $value;
-}
-
-method scope {
-  panic "Inactive CxRef" unless defined(my $cx = raw($self));
-  return JUST raw($self)->[2];
 }
 
 method eval {
