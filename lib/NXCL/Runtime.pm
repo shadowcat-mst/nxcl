@@ -59,16 +59,17 @@ sub take_step_LIST ($cxs, $ops, @list) {
 
 sub take_step_DROP { }
 
-sub take_step_ECTX ($cxs, $ops, $thing, $dynv, $count, $scope) {
+sub take_step_ECTX ($cxs, $ops, $thing, $dynv, $count, $scope, $val = undef) {
   my ($top_thing, $top_dynv, $top_scope) = @{$cxs->[-1]};
   push @$cxs, [
-     cons_List($thing, $top_thing),
+     defined($thing) ? cons_List($thing, $top_thing) : $top_thing,
      ($dynv // $top_dynv),
      ($scope // $top_scope),
      scalar(@$ops) - $count,
      [],
      { %{$cxs->[-1][5]} },
   ];
+  retval $ops, $val if defined $val;
 }
 
 sub take_step_LCTX ($cxs, $ops, $cx, $val) {

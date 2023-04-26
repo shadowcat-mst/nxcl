@@ -37,12 +37,12 @@ methodx COMBINE {
   my %me = %{raw($self)};
   my $is_opv = 0+!!raw($me{is_opv});
   return (
-    ($is_opv ? (GCTX(), SETL('cx')) : ()),
+    ($is_opv ? GCTX() : ()),
     DOCTX $self, undef, [
 
       # Setup args
 
-      ($is_opv ? (USEL('cx', 'JUST'), SNOC($args)) : EVAL($args)),
+      ($is_opv ? SNOC($args) : EVAL($args)),
       SETL('args'),
 
       # Setup return and defer dynamics
@@ -59,7 +59,7 @@ methodx COMBINE {
 
       SNOC(make_List(Val)),
       CALL('introscope'),
-      DOCTX($self, [
+      DOCTX(undef, [
         USEL('args','JUST'),
         LIST($me{argspec}),
         CALL('ASSIGN_VALUE'),
@@ -69,7 +69,7 @@ methodx COMBINE {
       # Execute function body
 
       USEL('scope','JUST'),
-      DOCTX($self, [
+      DOCTX(undef, [
         CMB9($me{body}, empty_List),
       ]),
     ]
