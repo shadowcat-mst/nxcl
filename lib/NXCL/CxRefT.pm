@@ -64,7 +64,7 @@ method set_dynamic_value {
   panic "Inactive CxRef" unless defined(my $cx = raw($self));
   my ($namep, $value) = flatten($args);
   my $name = raw($namep);
-  $_ = { %{$_}, $name => $value } for $cx->[1];
+  $cx->[1]{$name} = $value;
   return JUST $value;
 }
 
