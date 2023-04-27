@@ -4,6 +4,7 @@ use NXCL::Utils qw(flatten raw);
 use NXCL::TypeFunctions qw(
   make_List empty_List Val
   make_String make_Name make_Bool
+  just_Native list_Combine
 );
 use NXCL::ReprTypes qw(DictR);
 use NXCL::TypeSyntax;
@@ -31,6 +32,20 @@ staticx new {
 staticx _new {
   my ($scope, $argspec, $body, $is_opv) = flatten $args;
   return JUST make $scope, $argspec, $body, $is_opv;
+}
+
+methodn AS_PLAIN_EXPR {
+  my %me = %{raw($self)};
+  my $is_opv = 0+!!raw($me{is_opv});
+  my $name = make_Name($is_opv ? 'fexpr' : 'fun');
+  return (
+    CALL(AS_PLAIN_EXPR => make_List $me{argspec}),
+    SETL('argspec'),
+    CALL(AS_PLAIN_EXPR => make_List $me{body}),
+    USEL('argspec', 'LIST'),
+    CONS($name),
+    CMB9(just_Native \&list_Combine),
+  );
 }
 
 methodx COMBINE {
