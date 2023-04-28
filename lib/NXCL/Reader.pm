@@ -153,7 +153,7 @@ sub _parse_numeric ($self) {
 }
 
 sub _parse_qstring ($self) {
-  $self->_extract_re(qr/'(.*?(?<=[^\\])(?:\\\\)*)'/)
+  $self->_extract_re(qr/'(.*?(?<=[^\\])(?:\\\\)*)'/s)
 }
 
 sub _parse_call ($self) {
