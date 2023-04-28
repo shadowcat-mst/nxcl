@@ -59,10 +59,24 @@ sub take_step_LIST ($cxs, $ops, @list) {
 
 sub take_step_DROP { }
 
-sub take_step_ECTX ($cxs, $ops, $thing, $dynv, $count, $scope, $val = undef) {
-  my ($top_thing, $top_dynv, $top_scope) = @{$cxs->[-1]};
+sub take_step_EXPR ($cxs, $ops, $expr, $val = undef) {
+  my ($top_estack, $top_dynv, $top_scope) = @{$cxs->[-1]};
+  my @cx = @{$cxs->[-1]};
+  my $estack = cons_List($expr, $top_estack);
+  push @$cxs, [ $estack, @cx[1,2], undef, @cx[4,5] ];
+  retval $ops, $val if defined $val;
+}
+
+sub take_step_LXPR ($cxs, $ops, $val = undef) {
+  my $left = pop @$cxs;
+  die "Top cx is not an EXPR cx" if defined $left->[3];
+  retval $ops, $val if defined $val;
+}
+
+sub take_step_ECTX ($cxs, $ops, $expr, $dynv, $count, $scope, $val = undef) {
+  my ($top_estack, $top_dynv, $top_scope) = @{$cxs->[-1]};
   push @$cxs, [
-     defined($thing) ? cons_List($thing, $top_thing) : $top_thing,
+     defined($expr) ? cons_List($expr, $top_estack) : $top_estack,
      { %{$dynv // $top_dynv} },
      ($scope // $top_scope),
      scalar(@$ops) - $count,
@@ -73,6 +87,11 @@ sub take_step_ECTX ($cxs, $ops, $thing, $dynv, $count, $scope, $val = undef) {
 }
 
 sub take_step_LCTX ($cxs, $ops, $cx, $val) {
+  # skip EXPR cx entries
+  while (not defined $cxs->[-1][3]) {
+    pop @$cxs;
+    die "cx stack exhausted" unless @$cxs;
+  }
   $#$ops = $cxs->[-1][3] - 1;
   if (my @leave_cb = @{$cxs->[-1][4]}) {
     $cxs->[-1][4] = [];
@@ -81,7 +100,7 @@ sub take_step_LCTX ($cxs, $ops, $cx, $val) {
       LCTX($cx, $val),
     );
   }
-  my $left = pop @$cxs;
+  die "CX stack exhausted" unless my $left = pop @$cxs;
   if ($cx and $cx != $left) {
     retops $ops, LCTX($cx, $val);
   } else {

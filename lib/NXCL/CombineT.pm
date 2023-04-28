@@ -19,8 +19,10 @@ methodn AS_PLAIN_EXPR {
 methodx EVALUATE {
   my ($call, $call_args) = uncons $self;
   return (
+    EXPR($self),
     EVAL($call),
     CMB6($call_args),
+    LXPR(),
   );
 }
 

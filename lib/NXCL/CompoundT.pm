@@ -19,8 +19,10 @@ methodn EVALUATE {
   my ($first, @rest) = flatten $self;
   my @exp_rest = map +(object_is($_, List_Inst) ? $_ : make_List($_)), @rest;
   return (
+    EXPR($self),
     EVAL($first),
-    map CMB6($_), @exp_rest
+    (map CMB6($_), @exp_rest),
+    LXPR(),
   );
 }
 

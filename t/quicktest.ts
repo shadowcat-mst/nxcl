@@ -217,3 +217,9 @@ $ \[ x(1); y    2 ]
 = [ x(1); y 2 ]
 $ { let y = 4; x = x + y }
 = { = [ let y ] 4; = x [ + x y ] }
+$ let foo = fexpr (cx) {
+    cx.expr_stack()
+  }
+  let bar = fun () { foo() }
+  bar()
+= (foo(), { foo() }, fun () { foo() }, bar(), [ = [ let foo ] [ fexpr (cx) { [ . cx expr_stack ] } ]; = [ let bar ] [ fun () { foo() } ]; bar() ])

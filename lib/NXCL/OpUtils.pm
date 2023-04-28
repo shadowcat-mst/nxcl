@@ -16,6 +16,8 @@ our @EXPORT
       LIST
       JUST
       DROP
+      EXPR
+      LXPR
       HOST
       ECTX
       LCTX
