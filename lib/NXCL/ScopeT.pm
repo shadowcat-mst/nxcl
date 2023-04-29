@@ -56,7 +56,7 @@ methodx set_cell_for_name {
   # this probably *could* mutate the hashref directly but meh
   my $new_store = make_Dict({ %{raw($store)}, raw($namep) => $cell });
   raw($self)->{store} = $new_store;
-  return JUST $cell;
+  return JUST $self;
 }
 
 methodx derive {

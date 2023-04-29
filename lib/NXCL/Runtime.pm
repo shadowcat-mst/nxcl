@@ -137,7 +137,7 @@ sub take_step_USEL ($cxs, $ops, $name, $type, @rest) {
 }
 
 sub take_step_GETL ($cxs, $ops, $name, $type, @rest) {
-  retval $ops, [ $type => $cxs->[-1][5]{$name}, @rest ];
+  retops $ops, [ $type => $cxs->[-1][5]{$name}, @rest ];
 }
 
 our %STEP_FUNC = map +($_ => __PACKAGE__->can("take_step_${_}")),
