@@ -75,7 +75,7 @@ my $map_continue = make_Native \&map_continue;
 my $lmap_continue = make_Native sub {
   map_continue(@_, sub ($v) {
     panic "lmap_continue given non-list" unless rconsp($v);
-    return (lmap => flatten($v));
+    return (lmap => reverse flatten($v));
   });
 };
 
