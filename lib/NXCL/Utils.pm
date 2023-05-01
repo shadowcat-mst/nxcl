@@ -60,14 +60,15 @@ sub raw :lvalue ($v) { $v->[1][1] }
 
 sub uncons ($cons) { @{$cons->[1]}[1,2] }
 
-sub flatten ($cons) {
-  my @ret;
-  while ($cons->[1][0] == ConsR) {
+sub flatten ($cons, $max = 'Inf') {
+  my ($i, @ret);
+  while (++$i <= $max) {
+    return @ret unless $cons->[1][0] == ConsR;
     my ($car, $cdr) = @{$cons->[1]}[1,2];
     push @ret, $car;
     $cons = $cdr;
   }
-  return @ret;
+  return (@ret, $cons);
 }
 
 sub meta_dict ($v) { $v->[2] }

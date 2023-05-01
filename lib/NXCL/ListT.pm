@@ -61,17 +61,19 @@ method COMBINE {
   return JUST $car;
 }
 
-sub map_continue ($args, $flat = undef) {
-  my ($func, $argcdr) = uncons($args);
-  my ($val, $rest) = uncons($argcdr);
-  my ($mapname, @vals) = ($flat ? $flat->($val) : (map => $val));
+sub map_continue ($args, $cb) {
+  my ($func, $val, $rest) = flatten($args, 2);
+  my ($mapname, @vals) = $cb->($val);
   return (
     CALL($mapname => make($rest, $func)),
     (map CONS($_), @vals),
   );
 }
 
-my $map_continue = make_Native \&map_continue;
+my $map_continue = make_Native sub {
+  map_continue(@_, sub ($v) { (map => $v) });
+};
+
 my $lmap_continue = make_Native sub {
   map_continue(@_, sub ($v) {
     panic "lmap_continue given non-list" unless rconsp($v);
