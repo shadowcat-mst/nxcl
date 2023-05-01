@@ -2,7 +2,7 @@ package NXCL::JSON;
 
 use JSON::PP ();
 use NXCL::Utils qw(mset object_is rtype raw meta_dict uncons flatten);
-use NXCL::TypeRegistry;
+use NXCL::TypeRegistry qw(mset_name);
 use NXCL::TypeFunctions qw(List_Inst);
 use NXCL::ReprTypes;
 use Sub::Util qw(subname);
