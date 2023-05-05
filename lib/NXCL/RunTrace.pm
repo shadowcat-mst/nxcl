@@ -2,6 +2,7 @@ package NXCL::RunTrace;
 
 use NXCL::Package;
 use NXCL::YDump;
+use NXCL::Writer;
 use NXCL::OpUtils;
 
 our $Count = 0;
@@ -59,7 +60,9 @@ BEGIN {
   *NXCL::OpUtils::make_op = $wrapped;
 }
 use NXCL::Utils qw(uncons object_is raw flatten);
-use NXCL::TypeFunctions qw(Scope_Inst make_String);
+use NXCL::TypeFunctions qw(
+  Scope_Inst make_String make_Compound make_Name make_Int name_of_Native
+);
 use NXCL::JSON;
 
 sub jsonify ($v) {
@@ -70,7 +73,17 @@ sub jsonify ($v) {
   # Not an infite loop, we still call the nxcl2json we imported earlier
   no warnings 'redefine';
   local *NXCL::JSON::nxcl2json = \&jsonify;
-  return nxcl2json($v);
+  return NXCL::JSON::_nxcl2json($v);
+}
+
+sub _wrap_perl_value ($v) {
+  make_Compound(
+    make_Name('<'),
+    (defined($v)
+      ? ($v =~ /^\d+$/ ? make_Int($v) : make_String($v))
+      : make_Name('undef')),
+    make_Name('>'),
+  );
 }
 
 sub DEBUG_WARN ($cxs, $ops) {
@@ -78,18 +91,33 @@ sub DEBUG_WARN ($cxs, $ops) {
     warn join(' ', '#', @{$origin}{qw(callsub sub filename line)})."\n";
   }
   eval {
-    my ($pst, @stst) = map {
-      my ($op, @v) = @$_;
-      [ $op => map jsonify(ref() ? $_ : make_String($_//'NULL')), @v ];
-    } ($Show_OpQ ? reverse @$ops : $ops->[-1]);
-    warn join('',
-      ydump($pst) =~ s/^/  /mgr,
-      map ydump($_) =~ s/^/+ /mgr, @stst
-    )."\n";
+#    my ($pst, @stst) = map {
+#      my ($op, @v) = @$_;
+#      [ $op => map jsonify(ref() ? $_ : make_String($_//'NULL')), @v ];
+#    } ($Show_OpQ ? reverse @$ops : $ops->[-1]);
+#    warn join('',
+#      ydump($pst) =~ s/^/  /mgr,
+#      map ydump($_) =~ s/^/+ /mgr, @stst
+#    )."\n";
+
+    state $w = NXCL::Writer->new;
+
+    local *NXCL::Writer::_write_type_Native = sub ($self, $v) {
+      '<'.name_of_Native($v).'>'
+    };
+
+    local *NXCL::Writer::_write_type_Scope = sub ($self, $v) {
+      'S_'.$scopes{$v}
+    };
+
+    my ($op, @v) = @{$ops->[-1]};
+
+    my @wv = map $w->write(ref() ? $_ : _wrap_perl_value $_), @v;
+    warn join(' ', $op, @wv)."\n";
+
     1;
   } or do {
-    warn ydump([ debug_render_error => $@ ]);
-    warn "aborting from DEBUG_WARN\n";
+    warn "aborting from DEBUG_WARN: $@\n";
     exit 255;
   };
   if (defined $Max) {

@@ -16,12 +16,14 @@ export just ($sub) {
   make sub ($args) { JUST($sub->($args)) }
 }
 
+export name_of ($native) { subname(\&{raw($native)}) }
+
 methodn AS_PLAIN_EXPR {
   return JUST make_Compound(
     make_Name('Native'),
     make_Name('.'),
     make_Name('FROM'),
-    make_List(make_String(subname(\&{raw($self)}))),
+    make_List(make_String name_of $self),
   );
 }
 

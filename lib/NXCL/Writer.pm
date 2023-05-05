@@ -9,9 +9,11 @@ sub write ($self, $v) {
   if (my $writer = $self->can("_write_type_${mset_name}")) {
     return $self->$writer($v);
   }
-  die "No writer for ${mset_name}";
+  my $addr = '0x'.sprintf('%x', Scalar::Util::refaddr $v);
+  return "${mset_name}.WAS('${addr}')";
 }
 
+sub _write_type_Int ($self, $v) { raw($v) }
 sub _write_type_Name ($self, $v) { raw($v) }
 sub _write_type_Numeric ($self, $v) { raw($v) }
 

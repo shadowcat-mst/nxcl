@@ -1,6 +1,6 @@
 package NXCL::TypeRegistry;
 
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(weaken refaddr);
 use NXCL::Exporter;
 
 our @EXPORT = qw(%TypeInfo %Mset mset_name);
@@ -32,6 +32,6 @@ unless (our $Loading) {
   weaken($_->[0]) for values %{$native_info->inst_mset->[1][1]};
 }
 
-sub mset_name ($mset) { $Mset{$mset}||'ANON_'.$mset }
+sub mset_name ($mset) { $Mset{$mset}||'ANON_0x'.sprintf("%x", refaddr $mset) }
 
 1;

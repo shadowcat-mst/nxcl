@@ -7,7 +7,7 @@ sub import ($class, @args) {
   my $targ = caller;
   foreach my $export (@args) {
     my ($type_name) = grep defined,
-      $export =~ /^(?:[a-z]+_(\w+)|(\w+?)(?:_Inst)?)$/;
+      $export =~ /^(?:[a-z_]+_(\w+)|(\w+?)(?:_Inst)?)$/;
     die "Can't parse ${export}" unless $type_name;
     # Only export if not already present
     unless ($targ->can($export)) {
