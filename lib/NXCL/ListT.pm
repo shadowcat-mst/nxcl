@@ -5,8 +5,9 @@ use NXCL::Utils qw(
 );
 use NXCL::ReprTypes qw(ConsR NilR);
 use NXCL::TypeFunctions qw(
-  make_String make_Native method_Native make_Int
+  make_String make_Native method_Native make_Combine
 );
+use NXCL::ExprUtils qw($ESCAPE);
 use NXCL::TypeSyntax;
 
 export make (@members) { cons(@members, _make(NilR)) }
@@ -88,7 +89,9 @@ sub map_body ($self, $args, $continue) {
   my ($car, $cdr) = uncons($self);
   my ($func) = uncons($args);
   return (
-    CMB9($func => make($car)),
+    # This is messy but seems to currently be the least worst way to avoid
+    # the list element getting evaluated on the way into the function call.
+    CMB9($func => make(make_Combine($ESCAPE, $car))),
     SNOC($cdr),
     CONS($func),
     CMB9($continue),
