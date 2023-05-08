@@ -1,8 +1,8 @@
-package NXCL::PairT;
+package NXCL::KVPairT;
 
 use NXCL::ReprTypes qw(ConsR);
 use NXCL::TypeSyntax;
 
-export make ($l, $r) { _make ConsR ,=> $l, $r }
+export make ($k, $v) { _make ConsR ,=> $k, $v }
 
 1;

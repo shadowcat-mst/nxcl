@@ -24,7 +24,7 @@ use NXCL::TypeFunctions (
     Native
     Numeric
     Dict
-    Pair
+    KVPair
     Scope
     IntroScope
     String
