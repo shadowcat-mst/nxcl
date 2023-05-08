@@ -39,4 +39,9 @@ method sprintf {
   return JUST make(sprintf raw($self), map raw($_), flatten($args))
 }
 
+method substr {
+  my ($start, $length) = flatten $args, 2;
+  return JUST make substr(raw($self), raw($start), raw($length));
+}
+
 1;

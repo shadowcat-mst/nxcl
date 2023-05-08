@@ -225,3 +225,5 @@ $ let foo = fexpr (cx) {
 = (foo(), { foo() }, fun () { foo() }, bar(), [ = [ let foo ] [ fexpr (cx) { [ . cx expr_stack ] } ]; = [ let bar ] [ fun () { foo() } ]; bar() ])
 $ (\[ 1 + 3 ]).map { this }
 = ([ + 1 3 ])
+$ 'foo bar baz'.substr(4,3)
+= 'bar'
