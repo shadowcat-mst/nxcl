@@ -34,7 +34,7 @@ staticx _new {
   return JUST make $scope, $argspec, $body, $is_opv;
 }
 
-methodn AS_PLAIN_EXPR {
+methodx AS_PLAIN_EXPR {
   my %me = %{raw($self)};
   my $is_opv = 0+!!raw($me{is_opv});
   my $name = make_Name($is_opv ? 'fexpr' : 'fun');

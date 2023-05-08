@@ -8,7 +8,7 @@ use NXCL::TypeSyntax;
 
 export make ($int) { _make IntR, => $int }
 
-methodn AS_PLAIN_EXPR {
+methodx AS_PLAIN_EXPR {
   return JUST make_Numeric raw($self);
 }
 

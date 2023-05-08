@@ -122,7 +122,7 @@ methodx ASSIGN_VALUE {
   );
 }
 
-methodn AS_PLAIN_EXPR {
+methodx AS_PLAIN_EXPR {
   return CALL(map => make($self, method_Native('AS_PLAIN_EXPR')));
 }
 

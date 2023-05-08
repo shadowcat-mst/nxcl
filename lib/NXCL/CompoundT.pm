@@ -8,7 +8,7 @@ use NXCL::TypeSyntax;
 export make ($first, @rest) { _make ConsR ,=> $first, make_List(@rest) }
 export list ($list) { _make ConsR ,=> uncons($list) }
 
-methodn AS_PLAIN_EXPR {
+methodx AS_PLAIN_EXPR {
   return (
     CALL(AS_PLAIN_EXPR => make_List make_List flatten $self),
     CMB9(just_Native \&list),

@@ -7,7 +7,7 @@ use NXCL::TypeSyntax;
 
 export make ($string) { _make CharsR, => $string }
 
-methodn AS_PLAIN_EXPR {
+methodx AS_PLAIN_EXPR {
   return JUST $self
 }
 

@@ -7,7 +7,7 @@ use NXCL::TypeSyntax;
 
 export make ($call) { _make ValR ,=> $call }
 
-methodn AS_PLAIN_EXPR {
+methodx AS_PLAIN_EXPR {
   return (
     CALL(AS_PLAIN_EXPR => make_List raw($self)),
     CMB9(just_Native \&make),

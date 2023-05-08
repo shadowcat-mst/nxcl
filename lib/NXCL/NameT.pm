@@ -17,6 +17,6 @@ methodx ASSIGN_VALUE {
   return SETN($self, $new_value);
 }
 
-methodn AS_PLAIN_EXPR { return JUST $self }
+methodx AS_PLAIN_EXPR { return JUST $self }
 
 1;

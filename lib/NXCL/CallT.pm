@@ -9,7 +9,7 @@ export list ($list) { _make ValR ,=> $list }
 
 export make (@parts) { list(make_List @parts) }
 
-methodn AS_PLAIN_EXPR {
+methodx AS_PLAIN_EXPR {
   my $list = raw($self);
   return (
     CALL(AS_PLAIN_EXPR => make_List $list),

@@ -25,7 +25,7 @@ export just ($sub) {
 
 export name_of ($native) { subname(\&{raw($native)}) }
 
-methodn AS_PLAIN_EXPR {
+methodx AS_PLAIN_EXPR {
   return JUST make_Compound(
     make_Name('Native'),
     make_Name('.'),

@@ -9,7 +9,7 @@ export make ($call, @args) { _make ConsR ,=> $call, make_List @args }
 export cons ($call, $args) { _make ConsR ,=> $call, $args }
 export list ($list) { _make ConsR ,=> uncons($list) }
 
-methodn AS_PLAIN_EXPR {
+methodx AS_PLAIN_EXPR {
   return (
     CALL(AS_PLAIN_EXPR => make_List make_List flatten $self),
     CMB9(just_Native \&list),

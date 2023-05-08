@@ -7,7 +7,7 @@ use NXCL::TypeSyntax;
 
 export make ($val) { _make BoolR ,=> 0+!!$val }
 
-methodn AS_PLAIN_EXPR {
+methodx AS_PLAIN_EXPR {
   return JUST make_Name(!!(raw($self)) ? 'true' : 'false')
 }
 
