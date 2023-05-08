@@ -1,0 +1,46 @@
+$ let foo = fexpr (cx) {
+    'foo'
+  }
+  foo()
+= 'foo'
+$ (3, 2, 1).first()
+= 3
+$ (3, 2, 1).rest()
+= (2, 1)
+$ let foo = fexpr (cx) {
+    cx.expr_stack().first()
+  }
+  foo()
+= foo()
+$ let foo = fexpr (cx) {
+    cx.expr_stack()
+  }
+  let bar = fun () { foo() }
+  bar()
+= (foo(), { foo() }, fun () { foo() }, bar(), [ = [ let foo ] [ fexpr (cx) { [ . cx expr_stack ] } ]; = [ let bar ] [ fun () { foo() } ]; bar() ])
+$ 'foo
+  ' ++ 'bar'
+= 'foo
+  bar'
+$ let src = (1, 2, 3);
+  ('') ++ src.lmap { (this, '
+    ') }
+= ('', 1, '
+    ', 2, '
+    ', 3, '
+    ')
+$ let foo = fexpr (cx) {
+    let es = cx.expr_stack();
+    ('') ++ es.lmap [fun (this) { (this, '
+    ') }];
+  }
+  let bar = fun () { foo() }
+  #0;
+  bar();
+= ('', foo(), '
+    ', { foo() }, '
+    ', fun () { foo() }, '
+    ', bar(), '
+    ', [ = [ let foo ] [ fexpr (cx) { = [ let es ] [ [ . cx expr_stack ] ]; ++ ('') [ [ . es lmap ] [ fun (this) { (this, '
+    ') } ] ] } ]; = [ let bar ] [ fun () { foo() } ]; bar() ], '
+    ')
