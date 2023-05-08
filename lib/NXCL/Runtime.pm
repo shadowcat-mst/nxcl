@@ -81,7 +81,7 @@ sub take_step_ECTX ($cxs, $ops, $expr, $dynv, $count, $scope, $val = undef) {
      ($scope // $top_scope),
      scalar(@$ops) - $count,
      [],
-     { %{$cxs->[-1][5]} },
+     defined($expr) ? {} : $cxs->[-1][5],
   ];
   retval $ops, $val if defined $val;
 }
