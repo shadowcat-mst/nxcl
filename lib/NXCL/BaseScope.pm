@@ -1,7 +1,7 @@
 package NXCL::BaseScope;
 
 use NXCL::Package;
-use NXCL::Utils qw(uncons flatten raw);
+use NXCL::Utils qw(uncons flatten raw meta_dict);
 use NXCL::MethodUtils;
 use NXCL::ExprUtils;
 use NXCL::OpUtils;
@@ -131,6 +131,10 @@ our $Store = make_Dict do {
         );
       }),
     ),
+    'meta-dict-of' => make_Native(set_subname "meta_dict_of" => sub ($args) {
+      my ($of) = uncons $args;
+      return JUST meta_dict $of;
+    }),
     apply => make_Apv(make_Native(set_subname apply => sub ($args) {
       my ($call, $call_args) = uncons $args;
       return (
