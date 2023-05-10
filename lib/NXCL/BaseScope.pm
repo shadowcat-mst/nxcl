@@ -37,7 +37,7 @@ use NXCL::TypeFunctions (
   )),
   qw(make_Val make_Scope make_Scopener make_Native make_Dict),
   qw(make_ApMeth make_Apv make_String make_List make_Bool),
-  qw(cons_List make_LvalueFun),
+  qw(cons_List make_LvalueFun make_Key),
 );
 use NXCL::BaseOps qw(%OP_MAP);
 
@@ -88,6 +88,13 @@ our $Store = make_Dict do {
     fexpr => make_ApMeth(make_Native(set_subname "fexpr" => sub ($args) {
                CALL(new => make_List(Fun, flatten($args), make_Bool(1)))
              })),
+    ':' => make_Native(sub ($args) {
+      my ($key) = uncons $args;
+      return JUST make_Key $key;
+    }),
+    '%' => make_Native(sub ($args) {
+      return CALL(new => cons_List(Dict, $args));
+    }),
     return => make_Apv(make_Native(set_subname "return" =>
       sub ($args) { # dynamic('return')(arg0)
         my ($ret) = uncons($args);

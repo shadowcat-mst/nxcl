@@ -227,3 +227,5 @@ $ (\[ 1 + 3 ]).map { this }
 = ([ + 1 3 ])
 $ 'foo bar baz'.substr(4,3)
 = 'bar'
+$ %(:foo 'bar', :'baz'('quux'))
+= %(:'baz' 'quux', :'foo' 'bar')

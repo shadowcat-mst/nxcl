@@ -4,7 +4,8 @@ use NXCL::Utils qw(panic raw uncons flatten);
 use NXCL::ReprTypes qw(DictR);
 use NXCL::TypeSyntax;
 use NXCL::TypeFunctions qw(
-  make_KVPair make_String make_List
+  make_KVPair make_String make_List make_Name method_Native
+  just_Native list_Compound
 );
 
 export make ($hash) { _make DictR ,=> $hash }
@@ -33,6 +34,16 @@ methodx pairs {
     make_KVPair(make_String($_), $hr->{$_})
   } sort keys %$hr;
   return JUST make_List @pairs;
+}
+
+methodx AS_PLAIN_EXPR {
+  return (
+    CALL(pairs => make_List($self)),
+    SNOC(make_List method_Native 'AS_PLAIN_EXPR'),
+    CALL('map'),
+    LIST(make_Name('%')),
+    CMB9(just_Native \&list_Compound),
+  );
 }
 
 1;
