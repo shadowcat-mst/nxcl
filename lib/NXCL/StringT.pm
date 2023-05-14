@@ -44,4 +44,6 @@ method substr {
   return JUST make substr(raw($self), raw($start), raw($length));
 }
 
+methodn trim { JUST make raw($self) =~ s/^\s+//r =~ s/\s+$//r }
+
 1;
