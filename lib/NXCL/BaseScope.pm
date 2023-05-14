@@ -138,10 +138,12 @@ our $Store = make_Dict do {
         );
       }),
     ),
-    'meta-dict-of' => make_Native(set_subname "meta_dict_of" => sub ($args) {
-      my ($of) = uncons $args;
-      return JUST meta_dict $of;
-    }),
+    'meta-dict-of' => make_Apv(
+      make_Native(set_subname "meta_dict_of" => sub ($args) {
+        my ($of) = uncons $args;
+        return JUST meta_dict($of) // make_Dict({});
+      })
+    ),
     apply => make_Apv(make_Native(set_subname apply => sub ($args) {
       my ($call, $call_args) = uncons $args;
       return (
