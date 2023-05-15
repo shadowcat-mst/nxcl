@@ -1,0 +1,30 @@
+$ let foo = fexpr (cx) {
+    cx.expr_stack().map {
+      let md = meta-dict-of this;
+      md.has('reader').ifelse
+        do{
+          let rd = md.'reader';
+          let contents = rd.'contents';
+          let file = rd.'file';
+          file.concat ' ' contents.substr(rd.'start', rd.'length').trim()
+        }
+        this;
+    }
+  }
+  let bar = fun () { foo() }
+  bar()
+= ('anon:k1JgxhaJ6P59 foo()', 'anon:k1JgxhaJ6P59 { foo() }', fun () { foo() }, 'anon:k1JgxhaJ6P59 bar()', 'anon:k1JgxhaJ6P59 let foo = fexpr (cx) {
+    cx.expr_stack().map {
+      let md = meta-dict-of this;
+      md.has('reader').ifelse
+        do{
+          let rd = md.'reader';
+          let contents = rd.'contents';
+          let file = rd.'file';
+          file.concat ' ' contents.substr(rd.'start', rd.'length').trim()
+        }
+        this;
+    }
+  }
+  let bar = fun () { foo() }
+  bar()')
