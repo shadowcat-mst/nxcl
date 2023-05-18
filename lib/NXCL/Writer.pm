@@ -27,7 +27,7 @@ sub _write_type_List ($self, $v) {
 }
 
 sub _write_type_Compound ($self, $v) {
-  join('', map $self->write($_), flatten $v);
+  join('', map $self->_write_expr($_), flatten $v);
 }
 
 sub _write_type_Combine ($self, $v) {
