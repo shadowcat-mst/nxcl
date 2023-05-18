@@ -13,6 +13,7 @@ use NXCL::TypeFunctions qw(
   Name_Inst
   Combine_Inst
   Compound_Inst
+  List_Inst
 );
 use NXCL::BaseOps qw(@WEAVE_OPS);
 use List::UtilsBy qw(max_by);
@@ -99,16 +100,24 @@ sub _weave_op_tight ($self, $make, $op, $pre, $post) {
 sub _weave_op_dot ($self, $make, $op, $pre, $post) {
   my @pre = @$pre;
   my @post = @$post;
+
+  # x.foo(3)<...> -> [ [ . x foo ] 3 ]<...>
+  # x . foo(3)    -> [ . x foo ] 3 ]
+  # _             -> <render ala tight op>
+
   my $dot = do {
-    if ($make == \&make_Compound and @post > 1) {
+    if ($make == \&make_Compound and
+      @post > 1 and object_is($post[1], List_Inst)
+    ) {
       cons_Combine(
         make_Combine($op, pop(@pre), shift(@post)),
         shift(@post)
       );
     } elsif ($make == \&make_Combine and object_is($post[0], Compound_Inst)) {
-      my ($name, $args, @rest) = flatten shift(@post);
-      unshift(@post, make_Compound(@rest));
-      make_Combine(
+      my ($name, $args, @more) = flatten shift(@post);
+      die if @more;
+      die unless object_is($args, List_Inst);
+      cons_Combine(
         make_Combine($op, pop(@pre), $name),
         $args
       );
@@ -116,6 +125,7 @@ sub _weave_op_dot ($self, $make, $op, $pre, $post) {
       make_Combine($op, pop(@pre), shift(@post));
     }
   };
+
   return $dot unless @pre or @post;
   return $self->weave($make->(@pre, $dot, @post));
 }
