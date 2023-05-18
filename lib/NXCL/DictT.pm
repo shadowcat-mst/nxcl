@@ -5,7 +5,7 @@ use NXCL::ReprTypes qw(DictR);
 use NXCL::TypeSyntax;
 use NXCL::TypeFunctions qw(
   make_KVPair make_String make_List make_Name method_Native
-  just_Native list_Compound
+  just_Native list_Compound make_Bool
 );
 
 export make ($hash) { _make DictR ,=> $hash }
@@ -27,6 +27,11 @@ method COMBINE {
   panic unless $value;
   return JUST $value;
 };
+
+method has {
+  my $key = raw((uncons($args))[0]);
+  return JUST make_Bool(exists raw($self)->{$key});
+}
 
 methodx pairs {
   my $hr = raw($self);
