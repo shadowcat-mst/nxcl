@@ -15,7 +15,7 @@ const TOK_TYPES = {
   ws: " \t\n",
   symbol: SYMBOL_CHARS,
   word: WORD_START,
-  number: DIGITS,
+  digits: DIGITS,
   qstring: "'",
   comma: ',',
   semicolon: ';',
@@ -51,12 +51,14 @@ const TOK_MATCH = {
   qstring: /'(.*?(?<=[^\\])(?:\\\\)*)'/s,
 };
 
-const ATOM_TYPES = [
-  'number', 'word', 'symbol', 'qstring', 'call', 'list', 'block'
-];
+const ATOM_TYPES = Object.from_entries(
+  [ 'digits', 'word', 'symbol', 'qstring', 'call', 'list', 'block' ].map(
+    v => [ v, v ]
+  )
+);
 
-const IS_DELIMITED = Object.from_entries(
-  [ 'call', 'list', 'block' ].map(v => [ v, true ])
+const DELIMITED_TYPES = Object.from_entries(
+  [ 'call', 'list', 'block' ].map(v => [ v, v ])
 )
 
 const SEQ_SEP = {
@@ -101,11 +103,11 @@ class ReadState {
     }
     let end = { pos, line, linepos };
     Object.assign(this, { ...end, string });
-    return { type, value, start, end };
+    return { type, value, source, start, end };
   }
 
   extractAtom () {
-    if (IS_DELIMITED[this.peekType()]) {
+    if (DELIMITED_TYPES[this.peekType()]) {
       return this.extractDelimited();
     }
     return this.extractToken();
