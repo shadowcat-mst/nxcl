@@ -51,14 +51,19 @@ const TOK_MATCH = {
   qstring: /'(.*?(?<=[^\\])(?:\\\\)*)'/s,
 };
 
-const ATOM_TYPES = Object.from_entries(
-  [ 'digits', 'word', 'symbol', 'qstring', 'call', 'list', 'block' ].map(
-    v => [ v, v ]
-  )
+const IS_MATERIAL = Object.from_entries(
+  [ 'digits', 'word', 'symbol', 'qstring', 'call', 'list', 'block' ]
+    .map(v => [ v, v ])
 );
 
-const DELIMITED_TYPES = Object.from_entries(
-  [ 'call', 'list', 'block' ].map(v => [ v, v ])
+const IS_INTERSTITIAL = Object.from_entries(
+  [ 'ws', 'comment', 'semicolon' ]
+    .map(v => [ v, v ])
+);
+
+const IS_DELIMITED = Object.from_entries(
+  [ 'call', 'list', 'block' ]
+    .map(v => [ v, v ])
 )
 
 const SEQ_SEP = {
@@ -86,6 +91,10 @@ class ReadState {
     return TOK_START[this.peekChar()];
   }
 
+  position () {
+    return { pos: this.pos, line: this.line, linepos: this.linepos };
+  }
+
   extractToken () {
     let { pos. line, linepos, string, source } = this;
     let start = { pos. line, linepos };
@@ -107,14 +116,14 @@ class ReadState {
   }
 
   extractAtom () {
-    if (DELIMITED_TYPES[this.peekType()]) {
+    if (IS_DELIMITED[this.peekType()]) {
       return this.extractDelimited();
     }
     return this.extractToken();
   }
 
   extractMaybeCompound () {
-    let found = this.extractSequenceOf(ATOM_TYPES);
+    let found = this.extractSequenceOf(IS_MATERIAL);
     if (!found.length) {
       throw "WHAT";
     }
@@ -129,14 +138,9 @@ class ReadState {
     };
   }
 
-  extractSequenceOf (allowedTypes) {
-    let isAllowed = Object.from_entries(allowedTypes.map(t => [t, t]));
+  extractSequenceOf (isAllowed) {
     let found = [];
-    let nextType;
-    while (nextType = this.peekType()) {
-      if (!nextType in allowedTypes) {
-        break;
-      }
+    while (isAllowed[this.peekType()]) {
       found.push(this.extractAtom());
     }
     return found;
@@ -147,7 +151,7 @@ class ReadState {
     let delimiter_start = this.extractToken();
     let { start } = delimiter_start;
     let allowedTypes = [
-      ...ATOM_TYPES, 'ws', SEQ_SEP[type],
+      ...IS_MATERIAL, 'ws', SEQ_SEP[type],
     ];
     let found = this.extractSequenceOf(allowedTypes);
     if (this.peekType() != type + '_end') {
@@ -162,6 +166,50 @@ class ReadState {
       delimiter_start,
       delimiter_end,
       value,
+      start,
+      end,
+    };
+  }
+
+  extractInterstitials () {
+    this.extractSequenceOf(IS_INTERSTITIAL);
+  }
+
+  extractMaybeExprSeq () {
+    let start = this.position();
+    let is_before = this.extractInterstitials();
+    let part = [];
+    let seq = [ part ];
+    while (IS_MATERIAL[this.peekType()]) {
+      let next = this.extractMaybeCompound();
+      let is_after = this.extractInterstitials();
+      Object.assign(next, { is_before, is_after });
+      part.push(next);
+      if (is_after.some(is => {
+        if (is.type == 'semicolon') {
+          return true;
+        }
+        if (is.type == 'ws' && next.type == 'block') {
+          if (is.value.includes("\n")) {
+            return true;
+          }
+        }
+        return false;
+      })) {
+        part = [];
+        seq.push(part);
+      }
+      is_before = is_after;
+    }
+    if (seq.length == 1) {
+      return seq[0];
+    }
+    let end = this.position();
+    return {
+      type: 'eseq',
+      value: seq,
+      is_before: seq.at(0).is_before,
+      is_after: seq.at(-1).is_after,
       start,
       end,
     };
