@@ -105,12 +105,22 @@ class ReadState {
     }
     let end = { pos, line, linepos };
     Object.assign(this, { ...end, string });
-    return { type, value, source, start, end };
+    return {
+      type,
+      start,
+      end,
+      value,
+      source,
+    };
   }
 
   extractOne () {
-    if (IS_OPEN[this.peekType()]) {
+    let nextType = this.peekType();
+    if (IS_OPEN[nextType]) {
       return this.extractDelimited();
+    }
+    if (nextType == 'qstring') {
+      return this.extractQString();
     }
     return this.extractToken();
   }
@@ -125,17 +135,66 @@ class ReadState {
       contents.push(this.extractOne());
     }
     if (closeType != type) {
+      // later we should pass down the stack of opens currently in play so
+      // we can report the start of what we think we just saw the end of
       throw `Expected end of ${type}, saw end of ${closeType} instead`;
     }
     let delimiter_end = this.extractToken();
     let { end } = delimiter_end;
+    let { source } = this;
     return {
       type,
       delimiter_start,
       delimiter_end,
-      contents,
       start,
       end,
+      contents,
+      source,
+    };
+  }
+
+  extractQString () {
+    let tok = this.extractToken();
+    let delimiter_start, delimiter_end, contents;
+    {
+      let type = 'quote';
+      let value = "'";
+      let c_start, c_end;
+      {
+        let { pos, line, linepos } = tok.start;
+        pos++; linepos++;
+        delimiter_start = {
+          type, value,
+          start: tok.start,
+          end: c_start = { pos, line, linepos },
+        };
+      }
+      {
+        let { pos, line, linepos } = tok.end;
+        pos--; linepos--;
+        delimiter_end = {
+          type, value,
+          start: c_end = { pos, line, linepos },
+          end: tok.end,
+        };
+      }
+      contents = [ {
+        type: 'qchars',
+        start: c_start,
+        end: c_end,
+        value: tok.value,
+      } ];
+    }
+    let { start, end, type } = tok;
+    let { source } = this;
+    return {
+      type,
+      delimiter_start,
+      delimiter_end,
+      start,
+      end,
+      contents,
+      source,
     };
   }
 
