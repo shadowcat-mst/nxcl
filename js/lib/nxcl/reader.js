@@ -1,3 +1,4 @@
+'use strict';
 
 const SYMBOL_CHARS = '.!$%&:<=>@\\^|~?*/+-';
 
@@ -51,26 +52,15 @@ const TOK_MATCH = {
   qstring: /'(.*?(?<=[^\\])(?:\\\\)*)'/s,
 };
 
-const IS_MATERIAL = Object.from_entries(
-  [ 'digits', 'word', 'symbol', 'qstring', 'call', 'list', 'block' ]
-    .map(v => [ v, v ])
-);
-
-const IS_INTERSTITIAL = Object.from_entries(
-  [ 'ws', 'comment', 'semicolon' ]
-    .map(v => [ v, v ])
-);
-
-const IS_DELIMITED = Object.from_entries(
+const IS_OPEN = Object.from_entries(
   [ 'call', 'list', 'block' ]
     .map(v => [ v, v ])
 )
 
-const SEQ_SEP = {
-  list: 'comma',
-  call: 'semicolon',
-  block: 'semicolon',
-};
+const IS_CLOSE = Object.from_entries(
+  [ 'call', 'list', 'block' ]
+    .map(v => [ `${v}_end`, v ])
+)
 
 class ReadState {
 
@@ -91,7 +81,7 @@ class ReadState {
     return TOK_START[this.peekChar()];
   }
 
-  position () {
+  currentPosition () {
     return { pos: this.pos, line: this.line, linepos: this.linepos };
   }
 
@@ -99,6 +89,9 @@ class ReadState {
     let { pos. line, linepos, string, source } = this;
     let start = { pos. line, linepos };
     let type = this.peekType();
+    if (!type) {
+      throw `Unexpected ${this.peekChar()||'end of input'}`;
+    }
     let value, length;
     string = string.replace(
       TOK_MATCH[type], (m, t) => { value = t; length = m.length; return '' }
@@ -115,104 +108,43 @@ class ReadState {
     return { type, value, source, start, end };
   }
 
-  extractAtom () {
-    if (IS_DELIMITED[this.peekType()]) {
+  extractOne () {
+    if (IS_OPEN[this.peekType()]) {
       return this.extractDelimited();
     }
     return this.extractToken();
-  }
-
-  extractMaybeCompound () {
-    let found = this.extractSequenceOf(IS_MATERIAL);
-    if (!found.length) {
-      throw "WHAT";
-    }
-    if (found.length == 1) {
-      return found[0];
-    }
-    return {
-      type: 'compound',
-      value: found,
-      start: found.at(0).start,
-      end: found.at(-1).end,
-    };
-  }
-
-  extractSequenceOf (isAllowed) {
-    let found = [];
-    while (isAllowed[this.peekType()]) {
-      found.push(this.extractAtom());
-    }
-    return found;
   }
 
   extractDelimited () {
     let type = this.peekType();
     let delimiter_start = this.extractToken();
     let { start } = delimiter_start;
-    let allowedTypes = [
-      ...IS_MATERIAL, 'ws', SEQ_SEP[type],
-    ];
-    let found = this.extractSequenceOf(allowedTypes);
-    if (this.peekType() != type + '_end') {
-      throw "FAIL";
+    let contents = [];
+    let closeType;
+    while (!(closeType = IS_CLOSE[this.peekType()])) {
+      contents.push(this.extractOne());
+    }
+    if (closeType != type) {
+      throw `Expected end of ${type}, saw end of ${closeType} instead`;
     }
     let delimiter_end = this.extractToken();
     let { end } = delimiter_end;
-    let reducer = (type == 'list' ? 'reduceExprList' : 'reduceMaybeExprSeq');
-    let value = this[reducer](found);
     return {
       type,
       delimiter_start,
       delimiter_end,
-      value,
+      contents,
       start,
       end,
     };
   }
 
-  extractInterstitials () {
-    this.extractSequenceOf(IS_INTERSTITIAL);
-  }
-
-  extractMaybeExprSeq () {
-    let start = this.position();
-    let is_before = this.extractInterstitials();
-    let part = [];
-    let seq = [ part ];
-    while (IS_MATERIAL[this.peekType()]) {
-      let next = this.extractMaybeCompound();
-      let is_after = this.extractInterstitials();
-      Object.assign(next, { is_before, is_after });
-      part.push(next);
-      if (is_after.some(is => {
-        if (is.type == 'semicolon') {
-          return true;
-        }
-        if (is.type == 'ws' && next.type == 'block') {
-          if (is.value.includes("\n")) {
-            return true;
-          }
-        }
-        return false;
-      })) {
-        part = [];
-        seq.push(part);
-      }
-      is_before = is_after;
+  extractAll () {
+    let ret = [];
+    while (this.string) {
+      ret.push(this.extractOne());
     }
-    if (seq.length == 1) {
-      return seq[0];
-    }
-    let end = this.position();
-    return {
-      type: 'eseq',
-      value: seq,
-      is_before: seq.at(0).is_before,
-      is_after: seq.at(-1).is_after,
-      start,
-      end,
-    };
+    return ret;
   }
 }
 
