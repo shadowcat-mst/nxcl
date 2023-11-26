@@ -21,11 +21,15 @@ class ReadState1 {
     this.tokens = tokens;
   }
 
-  peekNode () { this.tokens[0] }
+  peekNode () { return this.tokens[0] }
 
-  peekType () { this.peekNext().type }
+  peekType () { return this.peekNext().type }
 
-  nextNode () { this.tokens.shift() }
+  nextNode () { return this.tokens.shift() }
+
+  subStateFor (node) {
+    return new this.contructor(node.contents);
+  }
 
   extractWhile (cond) {
     let res = [];
@@ -37,6 +41,10 @@ class ReadState1 {
 
   maybeWrap (type, contents) {
     if (contents.length == 1) return contents[0];
+    return this.wrap(type, contents);
+  }
+
+  wrap (type, contents) {
     return {
       type,
       start: contents.at(0).start,
@@ -55,27 +63,66 @@ class ReadState1 {
     let list = this.nextNode();
     return {
       ...list,
-      ...(new this.constructor(list.contents)).extractListBody(),
+      contents: this.subStateFor(list).extractListBody(),
     };
   }
 
+  extractBlock () {
+    let block = this.nextNode();
+    return {
+      ...block,
+      contents: this.subStateFor(block).extractExprSeq(),
+    };
+  }
+
+  extractCall () {
+    let call = this.nextNode();
+    return {
+      ...call,
+      contents: this.subStateFor(call).extractExprSeq();
+    }
+  }
+
   extractListBody () {
+    return this.extractSeparated(
+      is => { if (is.some(IS_SEMICOLON)) throw `Semicolon invalid here` },
+      is => is.some(IS_COMMA),
+    );
+  }
+
+  extractExprSeq () {
+    return this.extractSeparated(
+      is => { if (is.some(IS_COMMA)) throw `Comma invalid here` },
+      (is, last) => {
+        if (is.some(IS_SEMICOLON)) return true;
+        if (last.type != 'block') return false;
+        return is.some(x => (x.type == 'ws' && x.value.includes("\n")));
+      },
+    );
+  }
+
+  extractSeparated (checkIS, hasSeparator) {
     let is_before = this.extractWhile(IS_INTERSTITIAL), is_after;
-    if (is_before.some(IS_SEMICOLON)) throw `Semicolon invalid here`;
+    checkIS(is_before);
     let cur = [], res = [];
     while (this.tokens) {
       let next = this.extractMaybeCompound();
       let is_after = this.extractWhile(IS_INTERSTITIAL);
-      if (is_after.some(IS_SEMICOLON)) throw `Semicolon invalid here`;
+      checkIS(is_after);
       cur.push({ ...next, is_before, is_after });
-      if (is_after.some(IS_COMMA)) {
+      let last = next.type == 'compound' ? next.contents[0] : next;
+      if (hasSeparator(is_after, last)) {
         res.push(cur);
         cur = [];
       }
       is_before = is_after;
     }
     if (cur) res.push(cur);
-    if (!res) return { contents: [], is_inside: is_before };
-    return { contents: res.map(r => this.maybeWrap('call', r)) };
+
+    // Need a replacement for this that I don't hate.
+    //
+    // if (!res) return { contents: [], is_inside: is_before };
+
+    return res.map(r => this.wrap('expr', r));
   }
 }
