@@ -15,6 +15,12 @@ const IS_COMMA = t => t.type == 'comma';
 
 const IS_SEMICOLON = t => t.type == 'semicolon';
 
+const EXTRACTOR_FOR = {
+  list: 'extractList',
+  block: 'extractBlock',
+  call: 'extractCall',
+};
+
 class ReadState1 {
 
   constructor (tokens) {
@@ -29,6 +35,13 @@ class ReadState1 {
 
   subStateFor (node) {
     return new this.contructor(node.contents);
+  }
+
+  extractOne () {
+    if (let extractor = EXTRACTOR_FOR[this.peekType()]) {
+      return this[extractor]();
+    }
+    return this.nextNode();
   }
 
   extractWhile (cond) {
@@ -63,7 +76,9 @@ class ReadState1 {
     let list = this.nextNode();
     return {
       ...list,
-      contents: this.subStateFor(list).extractListBody(),
+      contents: this.subStateFor(list)
+                    .extractListBody()
+                    .map(e => this.maybeWrap('call', e)),
     };
   }
 
@@ -71,16 +86,24 @@ class ReadState1 {
     let block = this.nextNode();
     return {
       ...block,
-      contents: this.subStateFor(block).extractExprSeq(),
+      contents: this.subStateFor(block)
+                    .extractRawExprSeq()
+                    .map(e => this.maybeWrap('call', e)),
     };
   }
 
   extractCall () {
     let call = this.nextNode();
+    let raw = this.subStateFor(call).extractRawExprSeq();
+    let contents = (
+      (raw.length == 1)
+        ? raw[0]
+        : [ this.wrap('eseq', raw.map(e => this.maybeWrap('call', e))) ]
+    );
     return {
       ...call,
-      contents: this.subStateFor(call).extractExprSeq();
-    }
+      contents,
+    };
   }
 
   extractListBody () {
@@ -90,7 +113,7 @@ class ReadState1 {
     );
   }
 
-  extractExprSeq () {
+  extractRawExprSeq () {
     return this.extractSeparated(
       is => { if (is.some(IS_COMMA)) throw `Comma invalid here` },
       (is, last) => {
@@ -98,6 +121,12 @@ class ReadState1 {
         if (last.type != 'block') return false;
         return is.some(x => (x.type == 'ws' && x.value.includes("\n")));
       },
+    );
+  }
+
+  extractExprSeq () {
+    return this.wrap(
+      'eseq', this.extractRawExprSeq().map(e => t.maybeWrap('call', e))
     );
   }
 
@@ -123,6 +152,6 @@ class ReadState1 {
     //
     // if (!res) return { contents: [], is_inside: is_before };
 
-    return res.map(r => this.wrap('expr', r));
+    return res;
   }
 }
