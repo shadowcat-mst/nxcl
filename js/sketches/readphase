@@ -1,0 +1,22 @@
+foo(x, y);
+
+name: foo
+list: (
+  name:   x
+  comma:  ,
+  space: ' '
+  name:    y
+end_list:  )
+semicolon: ;
+
+
+Compound(
+  Name('foo'),
+  List(Name('x'), Name('y'))
+)
+
+
+function = Lookup(Name('foo'))
+
+function.CALL (x, y);
+

@@ -1,0 +1,48 @@
+
+class Counter {
+  ro :var value { 0 }
+
+  method next() { value+1 }
+
+  method inc() { value = $.next() }
+}
+
+let counter = Counter.new();
+
+say counter.value; # 0
+
+counter.inc()
+
+say counter.value; # 1
+
+##
+
+let Counter = struct %(
+  :new ...
+);
+
+let counter = object do {
+  var value = 0;
+  %(
+    :value &value,
+    :inc Val.new () => { value = value+1 },
+  )
+}
+
+let counter = Counter.new :value(3);
+
+fun object :cx (@init) {
+  let obj-dict = rw cx.eval @init;
+  let obj = Object.from_dict obj-dict;
+  obj-dict'self' = obj-dict'this' = Val.new obj;
+  freeze obj-dict;
+  return obj;
+}
+
+let counter = object do {
+  var value = 3;
+  %(
+    :value &value,
+    :inc Val.new () => { value = value+1 },
+  )
+}

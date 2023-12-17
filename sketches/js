@@ -1,0 +1,10 @@
+
+[xObject.COMBINE] (cx, args) {
+  let runargs = this.isApv ? yield* cx.eval(args) : [ cx, ...args ];
+  let runcx = yield* cx.enter(yield* this.scope.derive(), this);
+  yield* runcx.registerDynamic('return');
+  let introscope = yield* runcx.scope.introscope(Val);
+  let icx = yield* runcx.enter(introscope);
+  yield* icx.send(this.argspec, xObject.ASSIGN_VALUE, runargs);
+  return yield* runcx.call(this.body);
+}
