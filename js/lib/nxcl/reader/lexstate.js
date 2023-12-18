@@ -29,7 +29,7 @@ const TOK_TYPES = {
 };
 
 const TOK_START = Object.fromEntries(
-  TOK_TYPES.entries().flatMap(
+  Object.entries(TOK_TYPES).flatMap(
     ([ k, v ]) => v.split('').map(v => [ v, k ])
   )
 );
@@ -46,23 +46,23 @@ const TOK_TYPES_CONTD = {
 };
 
 const TOK_MATCH = {
-  ...TOK_TYPES_CONTD.entries().map(
-    ([ k, v ]) => [ k, new Regexp(`^([${v}])`) ]
+  ...Object.entries(TOK_TYPES_CONTD).map(
+    ([ k, v ]) => [ k, new RegExp(`^([${v}])`) ]
   ),
   qstring: /'(.*?(?<=[^\\])(?:\\\\)*)'/s,
 };
 
-const IS_OPEN = Object.from_entries(
+const IS_OPEN = Object.fromEntries(
   [ 'call', 'list', 'block' ]
     .map(v => [ v, v ])
 )
 
-const IS_CLOSE = Object.from_entries(
+const IS_CLOSE = Object.fromEntries(
   [ 'call', 'list', 'block' ]
     .map(v => [ `${v}_end`, v ])
 )
 
-class ReadState0 {
+export default class LexState {
 
   pos = 0;
   line = 1;
@@ -86,8 +86,8 @@ class ReadState0 {
   }
 
   extractToken () {
-    let { pos. line, linepos, string, source } = this;
-    let start = { pos. line, linepos };
+    let { pos, line, linepos, string, source } = this;
+    let start = { pos, line, linepos };
     let type = this.peekType();
     if (!type) {
       throw `Unexpected ${this.peekChar()||'end of input'}`;
@@ -97,7 +97,8 @@ class ReadState0 {
       TOK_MATCH[type], (m, t) => { value = t; length = m.length; return '' }
     );
     pos += length;
-    if (let m = value.match(/\n([^\n]*)$/)) {
+    let m;
+    if (m = value.match(/\n([^\n]*)$/)) {
       line += value.match(/\n/g).length;
       linepos = m[0].length;
     } else {

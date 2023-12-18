@@ -1,10 +1,9 @@
-import ReadState0 from './reader/readstate0.js';
-
+import LexState from './reader/lexstate.js';
 
 export default class Reader {
 
-  parse (source) {
-    let st = new ReadState0(source);
+  lex (source) {
+    let st = new LexState(source);
     return st.extractAll();
   }
 }
