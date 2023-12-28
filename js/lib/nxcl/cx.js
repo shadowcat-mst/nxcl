@@ -1,11 +1,16 @@
 export class Cx {
+
+  constructor (args) {
+    Object.assign(this, args);
+  }
+
   eval (val) {
-    return val.EVAL(this);
+    return val[proto.core.EVAL](this);
   }
   call (val, args) {
-    return val.CALL(this, args);
+    return val[proto.core.CALL](this, args);
   }
-  send (val, name, args) {
-    return val[name](this, args);
+  send (val, messageId, args) {
+    return val[messageId](this, args);
   }
 }
