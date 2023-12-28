@@ -5,10 +5,9 @@ import { rewriteOps } from "../valuehelpers.js";
 export class Call extends Value {
 
   *[proto.core.CALL] (cx, args) {
-    let call = new this.constructor(
-      [ ...this.data, ...args ],
-      this.metadata,
-    );
+    let call = new this.constructor({
+      ...this, data: [ ...this.data, ...args ],
+    });
     return yield* cx.eval(call);
   }
 

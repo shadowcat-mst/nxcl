@@ -1,7 +1,9 @@
 export class Scope extends Value {
-  constructor ({ proto }, metadata) {
-    this.data = Object.create(proto === undefined ? null : proto);
-    this.metadata
+  constructor (args) {
+    let { proto } = args;
+    delete args.proto;
+    Object.assign(this, args);
+    this.data = Object.create(proto ?? null);
   }
 
   *getValueForName (cx, name) {
