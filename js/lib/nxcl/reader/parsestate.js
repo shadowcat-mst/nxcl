@@ -21,7 +21,7 @@ const EXTRACTOR_FOR = {
   call: 'extractCall',
 };
 
-class ReadState1 {
+class ParseState {
 
   constructor (tokens) {
     this.tokens = tokens;
