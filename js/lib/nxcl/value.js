@@ -5,5 +5,5 @@ export class Value {
     Object.assign(this, args);
   }
 
-  *[proto.core.EVAL] (cx) { return this }
+  *[proto.core.EVAL] () { return this }
 }
