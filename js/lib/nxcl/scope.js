@@ -1,3 +1,5 @@
+import { Value } from "./value.js";
+
 export class Scope extends Value {
   constructor (args) {
     let { proto } = args;
