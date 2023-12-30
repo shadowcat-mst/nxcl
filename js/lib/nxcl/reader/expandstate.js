@@ -1,10 +1,14 @@
+import {
+  Name, String, Digits, List, Block, Call, ESeq
+} from "../valuetypes.js";
+
 let typeMap = {
   word: Name, symbol: Name,
   string: String, digits: Digits,
   list: List, block: Block, call: Call, eseq: ESeq,
 };
 
-class ExpandState {
+export class ExpandState {
 
   constructor (nodes) {
     this.nodes = nodes;
@@ -28,16 +32,16 @@ class ExpandState {
     let node = { ...this.nextNode() };
     let Type = typeMap[node.type];
     delete node.type;
-    let new = { };
+    let next = { };
     if (node.contents) {
-      new.contents = node.contents.map(
+      next.contents = node.contents.map(
         n => this.subStateFor(n).extractAll()
       );
       delete node.contents;
     } else {
-      new.value = node.value;
+      next.value = node.value;
       delete node.value;
     }
-    return new Type({ ...new, readerMeta: node });
+    return new Type({ ...next, readerMeta: node });
   }
 }

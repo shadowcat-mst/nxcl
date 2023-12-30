@@ -1,5 +1,3 @@
-"use strict";
-
 function lazyObject(builder) {
   let obj, proxy = new Proxy({}, {
     get (target, prop, receiver) {

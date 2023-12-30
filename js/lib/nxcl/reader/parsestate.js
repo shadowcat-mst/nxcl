@@ -1,5 +1,5 @@
 function makeTypeTest (typeList) {
-  let types = Object.from_entries(typeList.map(v => [ v, true ]);
+  let types = Object.fromEntries(typeList.map(v => [ v, true ]));
   return x => types[x.type];
 }
 
@@ -21,7 +21,7 @@ const EXTRACTOR_FOR = {
   call: 'extractCall',
 };
 
-class ParseState {
+export class ParseState {
 
   constructor (tokens) {
     this.tokens = tokens;
@@ -38,7 +38,8 @@ class ParseState {
   }
 
   extractOne () {
-    if (let extractor = EXTRACTOR_FOR[this.peekType()]) {
+    let extractor;
+    if (extractor = EXTRACTOR_FOR[this.peekType()]) {
       return this[extractor]();
     }
     return this.nextNode();

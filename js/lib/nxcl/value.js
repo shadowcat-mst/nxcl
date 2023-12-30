@@ -1,4 +1,4 @@
-import { proto } from "constants.js";
+import { proto } from "./constants.js";
 
 export class Value {
   constructor (args) {

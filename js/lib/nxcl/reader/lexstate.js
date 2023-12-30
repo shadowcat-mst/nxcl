@@ -62,7 +62,7 @@ const IS_CLOSE = Object.fromEntries(
     .map(v => [ `${v}_end`, v ])
 )
 
-export default class LexState {
+export class LexState {
 
   pos = 0;
   line = 1;

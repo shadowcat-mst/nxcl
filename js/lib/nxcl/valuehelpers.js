@@ -1,6 +1,5 @@
-import { metaKey } from "./constants.js";
-import { Name } from "value/name.js";
-import { Call } from "value/call.js";
+import { Name } from "./value/name.js";
+import { Call } from "./value/call.js";
 
 export function *rewriteOps (cx, orig) {
   let { data, constructor } = orig;
@@ -13,7 +12,7 @@ export function *rewriteOps (cx, orig) {
     if (el instanceof Name) {
       let val = yield* cx.scope.maybeGetValue(cx, el);
       let opInfo;
-      if (val && (opInfo = val.metadata[metaKey.opInfo])) {
+      if (val && (opInfo = val.metadata['opInfo'])) {
         opCount++;
         if (!bestOp || opInfo.precedence < bestOp.opInfo.precedence) {
           bestOp = { idx, opInfo };

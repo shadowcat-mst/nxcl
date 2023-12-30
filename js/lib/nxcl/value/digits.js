@@ -2,7 +2,7 @@ import { proto } from "../constants.js";
 import { Value } from "../value.js";
 import { Int } from "./int.js";
 
-class Digits extends Value {
+export class Digits extends Value {
 
   *[proto.numeric.plus] (cx, args) {
     let int = yield* cx.send(this, proto.numeric.to_int);

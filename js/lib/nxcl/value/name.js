@@ -1,7 +1,7 @@
 import { proto } from "../constants.js";
 import { Value } from "../value.js";
 
-class Name extends Value {
+export class Name extends Value {
 
   *[proto.core.EVAL] (cx) {
     return yield* cx.scope.getValueForName(cx, this.data);

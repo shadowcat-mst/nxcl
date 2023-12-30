@@ -1,7 +1,7 @@
 import { proto } from "../constants.js";
 import { Value } from "../value.js";
 
-class Int extends Value {
+export class Int extends Value {
 
   *[proto.numeric.plus] (cx, args) {
     let sum = args.reduce((a, b) => a + b.data, this.data);
