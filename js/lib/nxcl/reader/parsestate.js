@@ -29,7 +29,7 @@ export class ParseState {
 
   peekNode () { return this.tokens[0] }
 
-  peekType () { return this.peekNext().type }
+  peekType () { return this.peekNode().type }
 
   nextNode () { return this.tokens.shift() }
 
