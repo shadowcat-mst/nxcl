@@ -47,7 +47,7 @@ export class ParseState {
 
   extractWhile (cond) {
     let res = [];
-    while (cond(this.peekNode())) {
+    while (this.tokens.length && cond(this.peekNode())) {
       res.push(this.extractOne());
     }
     return res;
@@ -135,7 +135,7 @@ export class ParseState {
     let is_before = this.extractWhile(IS_INTERSTITIAL), is_after;
     checkIS(is_before);
     let cur = [], res = [];
-    while (this.tokens) {
+    while (this.tokens.length) {
       let next = this.extractMaybeCompound();
       let is_after = this.extractWhile(IS_INTERSTITIAL);
       checkIS(is_after);
