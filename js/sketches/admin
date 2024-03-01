@@ -1,0 +1,55 @@
+
+mallet3=; ps
+    PID TTY          TIME CMD
+1580401 pts/9    00:00:00 ps
+2058309 pts/9    00:00:01 bash
+mallet3=;
+
+
+xclsh=; ps
+    PID TTY          TIME CMD
+1580401 pts/9    00:00:00 ps
+2058309 pts/9    00:00:01 bash
+
+xclsh=; .table();
+
+xclsh=; ps |> .table();
+
+fun admin-table (raw) {
+  let (cols, @cooked) = table-data raw;
+  # cols = (PID, TTY, TIME, CMD)
+  # cooked = ((1580501, ...), ...)
+  let table-columns = (@cols, 'actions');
+  table
+    :columns(table-columns)
+    cooked.map c => { (@c, button('Kill', { kill -9 c[0] }) }
+}
+
+xclsh=; ps |> admin-table;
+
+
+use commands (netstat, head);
+
+
+let fields = [netstat -rn |> head -1].split '\s+';
+
+fun getstat () {
+  [netstat -rn |> .skip(1)].map .split '\s+';
+}
+
+var data = getstat();
+
+every 5s { data = getstat() }
+
+table :header(fields) data;
+
+
+
+
+
+
+
+
+
+
+
