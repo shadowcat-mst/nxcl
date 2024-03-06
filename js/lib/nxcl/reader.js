@@ -11,9 +11,11 @@ export class Reader {
 
   parse (source) {
     let st = new ParseState(this.lex(source));
-    return st.extractExprSeq();
+    return st.extractMaybeExprSeq();
   }
 
   read (source) {
+    let st = new ExpandState([ this.parse(source) ]);
+    return st.extractAll();
   }
 }

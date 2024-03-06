@@ -125,6 +125,12 @@ export class ParseState {
     );
   }
 
+  extractMaybeExprSeq () {
+    return this.maybeWrap(
+      'eseq', this.extractRawExprSeq().map(e => this.maybeWrap('call', e))
+    );
+  }
+
   extractExprSeq () {
     return this.wrap(
       'eseq', this.extractRawExprSeq().map(e => this.maybeWrap('call', e))

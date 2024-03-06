@@ -17,12 +17,12 @@ export class ExpandState {
   nextNode () { return this.nodes.shift() }
 
   subStateFor (node) {
-    return new this.contructor(node.contents);
+    return new this.constructor(node.contents);
   }
 
   extractAll () {
     let res = [];
-    while (this.nodes) {
+    while (this.nodes.length) {
       res.push(this.extractOne());
     }
     return res;
@@ -34,9 +34,7 @@ export class ExpandState {
     delete node.type;
     let next = { };
     if (node.contents) {
-      next.contents = node.contents.map(
-        n => this.subStateFor(n).extractAll()
-      );
+      next.contents = this.subStateFor(node).extractAll();
       delete node.contents;
     } else {
       next.value = node.value;
