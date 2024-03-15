@@ -11,6 +11,6 @@ export class Message extends Value {
     let [ target, ...sendArgs ] = [
       ...(this.target ? [this.target] : []), ...this.args, ...args
     ];
-    return yield* cx.send(target, this.messageId, sendArgs);
+    return yield* cx.send(target, this.message, sendArgs);
   }
 }
