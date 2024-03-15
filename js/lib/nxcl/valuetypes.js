@@ -5,3 +5,5 @@ export { List } from "./value/list.js";
 export { Block } from "./value/block.js";
 export { Call } from "./value/call.js";
 export { ESeq } from "./value/eseq.js";
+export { Int } from "./value/int.js";
+export { Message } from "./value/message.js";
