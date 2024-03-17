@@ -5,17 +5,27 @@ export class Scope extends Value {
     let { proto } = args;
     delete args.proto;
     Object.assign(this, args);
-    this.data = Object.create(proto ?? null);
+    this.value = Object.create(proto ?? null);
+  }
+
+  *getCellForName (cx, name) {
+    let cell = this.value[name];
+    if (!cell) { throw "argh" }
+    return cell;
+  }
+
+  *setCellForName (cx, name, cell) {
+    return this.value[name] = cell;
   }
 
   *getValueForName (cx, name) {
-    let cell = this.data[name];
+    let cell = this.value[name];
     if (!cell) { throw "argh" }
     return cell.value;
   }
 
   *setValueForName (cx, name, value) {
-    let cell = this.data[name];
+    let cell = this.value[name];
     if (!cell) { throw "argh" }
     if (!cell.isWriteable) { throw "ARGH" }
     return cell.value = value;
