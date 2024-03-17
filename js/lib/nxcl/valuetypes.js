@@ -7,3 +7,5 @@ export { Call } from "./value/call.js";
 export { ESeq } from "./value/eseq.js";
 export { Int } from "./value/int.js";
 export { Message } from "./value/message.js";
+export { Val } from "./value/val.js";
+export { Var } from "./value/var.js";
