@@ -4,7 +4,7 @@ export class Scope extends Value {
   constructor (args) {
     let { proto } = args;
     delete args.proto;
-    Object.assign(this, args);
+    super(args);
     this.value = Object.create(proto ?? null);
   }
 
@@ -20,7 +20,7 @@ export class Scope extends Value {
 
   *getValueForName (cx, name) {
     let cell = this.value[name];
-    if (!cell) { throw "argh" }
+    if (!cell) { throw `no such cell ${name}` }
     return cell.value;
   }
 
