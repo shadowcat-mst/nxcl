@@ -6,7 +6,8 @@ import { Reader } from "../lib/nxcl/reader.js";
 
 let reader = new Reader();
 
-let call = reader.read({ string: "+ 2 x" });
+// let call = reader.read({ string: "+ 2 x" });
+let call = reader.read({ string: "+ x 2" });
 
 let three = new Int({ value: 3 });
 
