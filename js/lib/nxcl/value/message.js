@@ -14,7 +14,7 @@ export class Message extends Value {
     } else {
       let [ first, ...rest ] = args;
       target = yield* cx.eval(first);
-      sendArgs = [ ...this,args, ...rest ];
+      sendArgs = [ ...this.args, ...rest ];
     }
     return yield* cx.send(target, this.message, sendArgs);
   }
