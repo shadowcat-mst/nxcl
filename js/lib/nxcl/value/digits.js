@@ -10,7 +10,7 @@ export class Digits extends Value {
   }
 
   *[proto.numeric.to_int] () {
-    let value = parseInt(this.data);
-    return new Int({ ...this, data: value })
+    let value = parseInt(this.value);
+    return new Int({ ...this, value })
   }
 }
