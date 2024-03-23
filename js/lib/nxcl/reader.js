@@ -16,6 +16,6 @@ export class Reader {
 
   read (source) {
     let st = new ExpandState([ this.parse(source) ]);
-    return st.extractAll();
+    return st.extractAll()[0];
   }
 }
