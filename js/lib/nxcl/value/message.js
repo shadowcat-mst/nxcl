@@ -8,9 +8,14 @@ export class Message extends Value {
       let args = yield* cx.eval(args);
       return new this.constructor({ ...this, args });
     }
-    let [ target, ...sendArgs ] = [
-      ...(this.target ? [this.target] : []), ...this.args, ...args
-    ];
+    let target, sendArgs;
+    if (target = this.target) {
+      sendArgs = [ ...this,args, ...args ];
+    } else {
+      let [ first, ...rest ] = args;
+      target = yield* cx.eval(first);
+      sendArgs = [ ...this,args, ...rest ];
+    }
     return yield* cx.send(target, this.message, sendArgs);
   }
 }
