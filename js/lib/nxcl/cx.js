@@ -15,6 +15,10 @@ export class Cx {
   }
 
   send (val, messageId, args) {
+    if (!val[messageId]) {
+      // messageId may be a Symbol
+      throw `No such method ${messageId.toString()} on ${val}`;
+    }
     return val[messageId](this, args);
   }
 }
