@@ -3,11 +3,22 @@ import { Message, Int, Call, Name, Val } from "../lib/nxcl/valuetypes.js";
 import { Cx } from "../lib/nxcl/cx.js";
 import { Scope } from "../lib/nxcl/scope.js";
 import { Reader } from "../lib/nxcl/reader.js";
+import { rewriteOps } from "../lib/nxcl/valuehelpers.js"
 
 let reader = new Reader();
 
-// let call = reader.read({ string: "+ 2 x" });
-let call = reader.read({ string: "+ x 2" });
+let callp = reader.read({ string: Bun.argv[2]??'1 + 3' });
+
+console.log(callp.toExternalString());
+
+let isOp; {
+  let ops = { '+': { precedence: 0 } };
+  isOp = cand => (cand instanceof Name) ? ops[cand.value] : null;
+}
+
+let call = rewriteOps(callp, isOp);
+
+console.log(call.toExternalString());
 
 let three = new Int({ value: 3 });
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env -S bun run
 import { Reader } from "../lib/nxcl/reader.js";
 
 let reader = new Reader();
@@ -6,5 +7,5 @@ let reader = new Reader();
 let type = 'read';
 
 console.log(reader[type]({
-  string: "+ x 1"
-}));
+  string: (Bun.argv[2] ?? "+ x 1"),
+}).toExternalString());
