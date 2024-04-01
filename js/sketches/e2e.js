@@ -34,10 +34,10 @@ let scopeData = {
 
 let cx = new Cx({ scope: new Scope({ proto: scopeData }) });
 
-let result = cx.eval(call);
+let result = cx.call(call, []);
 
 let next;
 while (!(next = result.next()).done) {
   console.log('Yield:', next.value);
 }
-console.log('Value:', next.value.value);
+console.log('Value:', next.value.toExternalString());
