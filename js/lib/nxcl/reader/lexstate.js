@@ -47,7 +47,7 @@ const TOK_TYPES_CONTD = {
 
 const TOK_MATCH = {
   ...Object.fromEntries(Object.entries(TOK_TYPES_CONTD).map(
-    ([ k, v ]) => [ k, new RegExp(`^([${v}])`) ]
+    ([ k, v ]) => [ k, new RegExp(`^([${v}]+)`) ]
   )),
   qstring: /'(.*?(?<=[^\\])(?:\\\\)*)'/s,
 };
