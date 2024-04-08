@@ -4,6 +4,7 @@ export { Digits } from "./value/digits.js";
 export { List } from "./value/list.js";
 export { Block } from "./value/block.js";
 export { Call } from "./value/call.js";
+export { Compound } from "./value/compound.js";
 export { ESeq } from "./value/eseq.js";
 export { Int } from "./value/int.js";
 export { Message } from "./value/message.js";
