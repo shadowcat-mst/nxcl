@@ -34,7 +34,7 @@ export class ParseState {
   nextNode () { return this.tokens.shift() }
 
   subStateFor (node) {
-    return new this.contructor(node.contents);
+    return new this.constructor(node.contents);
   }
 
   extractOne () {
