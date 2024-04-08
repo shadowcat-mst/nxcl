@@ -1,4 +1,4 @@
-import { proto } from "../constants.js";
+import { proto, pub } from "../constants.js";
 import { Value } from "../value.js";
 import { Int } from "./int.js";
 
@@ -13,4 +13,7 @@ export class Digits extends Value {
     let value = parseInt(this.value);
     return new Int({ ...this, value })
   }
+
+  [pub.plus] (...args) { return this[proto.numeric.plus](...args) }
+  [pub.to_int] (...args) { return this[proto.numeric.to_int](...args) }
 }
