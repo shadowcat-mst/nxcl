@@ -1,4 +1,4 @@
-import { proto } from "../constants.js";
+import { proto, pub } from "../constants.js";
 import { Value } from "../value.js";
 
 export class Name extends Value {
@@ -11,4 +11,6 @@ export class Name extends Value {
     // no-op assign-to-'$' ?
     return yield* cx.scope.setValueForName(cx, this.value, args[0]);
   }
+
+  toPubSym () { return pub[this.value] }
 }
