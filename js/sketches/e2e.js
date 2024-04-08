@@ -12,7 +12,10 @@ let callp = reader.read({ string: Bun.argv[2]??'1 + 3' });
 console.log(callp.toExternalString());
 
 let isOp; {
-  let ops = { '+': { precedence: 0 } };
+  let ops = {
+    '+': { precedence: 0 },
+    '.': { precedence: 0, tightRight: true },
+  };
   isOp = cand => (cand instanceof Name) ? ops[cand.value] : null;
 }
 
@@ -23,18 +26,24 @@ console.log(call.toExternalString());
 let three = new Int({ value: 3 });
 
 let plus = new Message({
-  message: proto.numeric.plus,
-  args: []
+  call: proto.numeric.plus,
+  withArgs: []
+});
+
+let dot = new Message({
+  call: proto.core.DOT,
+  withArgs: []
 });
 
 let scopeData = {
   '+': new Val({ value: plus }),
+  '.': new Val({ value: dot }),
   'x': new Val({ value: three }),
 };
 
 let cx = new Cx({ scope: new Scope({ proto: scopeData }) });
 
-let result = cx.call(call, []);
+let result = cx.eval(call, []);
 
 let next;
 while (!(next = result.next()).done) {
