@@ -1,11 +1,11 @@
 import {
-  Name, String, Digits, List, Block, Call, ESeq
+  Name, String, Digits, List, Block, Call, Compound, ESeq
 } from "../valuetypes.js";
 
 let typeMap = {
   word: Name, symbol: Name,
   string: String, digits: Digits,
-  list: List, block: Block, call: Call, eseq: ESeq,
+  list: List, block: Block, call: Call, compound: Compound, eseq: ESeq,
 };
 
 export class ExpandState {
