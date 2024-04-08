@@ -1,11 +1,21 @@
 import { proto } from "./constants.js";
 
+export const _Message = {};
+
 export class Value {
   constructor (args) {
     Object.assign(this, args);
   }
 
   *[proto.core.EVAL] () { return this }
+
+  *[proto.core.DOT] (cx, [ messagep ]) {
+    return new _Message.$value({
+      call: messagep.toPubSym(),
+      on: this,
+      withArgs: [],
+    });
+  }
 
   toExternalString () {
     return this.constructor.name + '(' + this.valueToExternalString() + ')';
