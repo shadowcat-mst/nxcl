@@ -16,3 +16,5 @@ const SymbolSet = (prefix) => cascade(prefix, Symbol);
 const SymbolSetTree = (prefix) => cascade(prefix, SymbolSet);
 
 export const proto = SymbolSetTree('xcl.protocol');
+
+export const pub = SymbolSet('xcl.published');
