@@ -12,12 +12,19 @@ export class Int extends Value {
     return new this.constructor({ ...this, value });
   }
 
+  [pub.plus] (...args) { return this[proto.numeric.plus](...args) }
+
   [proto.numeric.plus] (cx, [ otherp ]) {
-    return this._binOp(cx, otherp, (x, y) => x+y);
+    return this._binOp(cx, otherp, (x,y) => x+y);
   }
 
-  *[proto.numeric.to_int] () { return this }
+  [pub.minus] (...args) { return this[proto.numeric.minus](...args) }
 
-  [pub.plus] (...args) { return this[proto.numeric.plus](...args) }
+  [proto.numeric.minus] (cx, [ otherp ]) {
+    return this._binOp(cx, otherp, (x,y) => x-y);
+  }
+
   [pub.to_int] (...args) { return this[proto.numeric.to_int](...args) }
+
+  *[proto.numeric.to_int] () { return this }
 }
