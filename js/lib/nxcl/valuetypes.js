@@ -10,3 +10,4 @@ export { Int } from "./value/int.js";
 export { Message } from "./value/message.js";
 export { Val } from "./value/val.js";
 export { Var } from "./value/var.js";
+export { Bool } from "./value/bool.js";
