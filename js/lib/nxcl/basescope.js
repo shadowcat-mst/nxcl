@@ -19,8 +19,8 @@ binOp('+', proto.numeric.plus, 0);
 binOp('-', proto.numeric.minus, 0);
 binOp('.', proto.core.DOT, 0, { tightRight });
 
-val('true', Bool[pub.true]());
-val('false', Bool[pub.false]());
+val('true', new Bool({ value: true }));
+val('false', new Bool({ value: false }));
 
 export function baseScope () {
   return new Scope({ proto: cells, ops });
