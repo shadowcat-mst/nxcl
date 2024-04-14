@@ -3,8 +3,8 @@ import { proto } from "./constants.js";
 export const _Message = {};
 
 export class Value {
-  constructor (args) {
-    Object.assign(this, args);
+  constructor (opts) {
+    Object.assign(this, opts);
   }
 
   *[proto.core.EVAL] () { return this }

@@ -2,8 +2,8 @@ import { proto } from "./constants.js";
 
 export class Cx {
 
-  constructor (args) {
-    Object.assign(this, args);
+  constructor (opts) {
+    Object.assign(this, opts);
   }
 
   eval (val) {

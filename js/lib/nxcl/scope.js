@@ -1,10 +1,10 @@
 import { Value } from "./value.js";
 
 export class Scope extends Value {
-  constructor (args) {
-    let { proto } = args;
-    delete args.proto;
-    super(args);
+  constructor (opts) {
+    let { proto } = opts;
+    delete opts.proto;
+    super(opts);
     this.value = Object.create(proto ?? null);
   }
 
