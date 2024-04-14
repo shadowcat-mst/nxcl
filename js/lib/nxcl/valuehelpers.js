@@ -28,12 +28,16 @@ export function rewriteOps (orig, isOp) {
 
   if (contents.length < 3) {
     return new constructor({
+      ...orig,
       contents: contents.map(recurse)
     });
   }
 
   let bestOp = findBest(contents, isOp);
-  if (!bestOp) return orig;
+
+  if (!bestOp) {
+    return new constructor({ ...orig, contents: contents.map(recurse) });
+  }
 
   let { idx, tightLeft, tightRight } = bestOp;
 
