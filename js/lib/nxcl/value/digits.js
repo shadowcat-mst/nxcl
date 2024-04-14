@@ -18,6 +18,13 @@ export class Digits extends Value {
     return yield* cx.send(int, proto.numeric.minus, args);
   }
 
+  [pub.eq] (...args) { return this[proto.numeric.eq](...args) }
+
+  *[proto.numeric.eq] (cx, args) {
+    let int = yield* cx.send(this, proto.numeric.to_int);
+    return yield* cx.send(int, proto.numeric.eq, args);
+  }
+
   [pub.to_int] (...args) { return this[proto.numeric.to_int](...args) }
 
   *[proto.numeric.to_int] () {

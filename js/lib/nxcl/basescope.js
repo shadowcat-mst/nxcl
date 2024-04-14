@@ -17,6 +17,7 @@ let tightRight = true;
 
 binOp('+', proto.numeric.plus, 0);
 binOp('-', proto.numeric.minus, 0);
+binOp('==', proto.numeric.eq, 0);
 binOp('.', proto.core.DOT, 0, { tightRight });
 
 val('true', new Bool({ value: true }));
