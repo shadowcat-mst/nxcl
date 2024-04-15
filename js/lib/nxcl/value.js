@@ -26,6 +26,6 @@ export class Value {
     if (Object.hasOwn(this, 'contents')) {
       return this.contents.map(v => v.toExternalString()).join(', ');
     }
-    throw "Neither .value nor .contents present on Value object; WTF?!";
+    return "!.value&!.contents&WTF";
   }
 }
