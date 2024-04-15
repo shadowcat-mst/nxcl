@@ -51,7 +51,7 @@ export function rewriteOps (orig, isOp) {
   let rhsp = tightRight ? [ after.shift() ] : after.splice(0);
 
   let [ lhs, rhs ] = [ lhsp, rhsp ].map(
-    p => p.length == 1 ? p[0] : new constructor(p)
+    p => p.length == 1 ? p[0] : new constructor({ contents: p })
   );
 
   let opCall = new Call({ contents: [ op, recurse(lhs), recurse(rhs) ] });
