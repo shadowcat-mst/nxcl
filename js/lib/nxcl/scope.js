@@ -1,3 +1,4 @@
+import { proto } from "./constants.js";
 import { Value } from "./value.js";
 
 export class Scope extends Value {
@@ -8,26 +9,28 @@ export class Scope extends Value {
     this.value = Object.create(proto ?? null);
   }
 
-  *getCellForName (cx, name) {
+  *getCell (cx, name) {
     let cell = this.value[name];
-    if (!cell) { throw "argh" }
+    if (!cell) {
+      throw `no such cell ${name}`;
+    }
     return cell;
   }
 
-  *setCellForName (cx, name, cell) {
+  *setCell (cx, name, cell) {
     return this.value[name] = cell;
   }
 
-  *getValueForName (cx, name) {
-    let cell = this.value[name];
-    if (!cell) { throw `no such cell ${name}` }
-    return cell.value;
+  *_callCell (cx, name, args) {
+    let cell = yield* this.getCell(cx, name);
+    return yield* cx.send(cell, proto.core.CALL, args);
   }
 
-  *setValueForName (cx, name, value) {
-    let cell = this.value[name];
-    if (!cell) { throw "argh" }
-    if (!cell.isWriteable) { throw "ARGH" }
-    return cell.value = value;
+  *getCellValue (cx, name) {
+    return yield* this._callCell(cx, name, []);
+  }
+
+  *setCellValue (cx, name, value) {
+    return yield* this._callCell(cx, name, [value]);
   }
 }

@@ -7,18 +7,23 @@ export class Cx {
   }
 
   eval (val) {
-    return val[proto.core.EVAL](this);
+    return this.send(val, proto.core.EVAL, []);
   }
 
   call (val, args) {
-    return val[proto.core.CALL](this, args);
+    return this.send(val, proto.core.CALL, args);
   }
 
-  send (val, messageId, args) {
-    if (!val[messageId]) {
-      // messageId may be a Symbol
-      throw `No such method ${messageId.toString()} on ${val}`;
+  expr ([ first, ...rest ]) {
+    let message = proto.core[rest.length ? 'CALL' : 'EVAL'];
+    return this.send(first, message, rest);
+  }
+
+  send (val, message, args) {
+    if (!val[message]) {
+      // message may be a Symbol
+      throw `No such method ${message.toString()} on ${val}`;
     }
-    return val[messageId](this, args);
+    return val[message](this, args);
   }
 }
