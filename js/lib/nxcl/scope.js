@@ -31,4 +31,18 @@ export class Scope extends Value {
   *setCellValue (cx, name, value) {
     return yield* this._callCell(cx, name, [value]);
   }
+
+  *setMethod (cx, type, name, value) {
+    let overrides = this.methods[name] ??= [];
+    // NYI: sorting by inheritance and replacing
+    methods.push([ type, value ]);
+  }
+
+  *getMethod (cx, value, name) {
+    for (let [ type, override ] of this.methods[name] ?? []) {
+      if (value instanceof type) return override;
+    }
+    return value[name];
+  }
+
 }

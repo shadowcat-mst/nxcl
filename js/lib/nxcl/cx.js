@@ -19,11 +19,12 @@ export class Cx {
     return this.send(first, message, rest);
   }
 
-  send (val, message, args) {
-    if (!val[message]) {
+  *send (val, message, args) {
+    let method = yield* this.scope.getMethod(this, val, message);
+    if (!method) {
       // message may be a Symbol
       throw `No such method ${message.toString()} on ${val}`;
     }
-    return val[message](this, args);
+    return yield* method.call(val, this, args);
   }
 }
