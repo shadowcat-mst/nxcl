@@ -2,15 +2,13 @@ import { proto } from "./constants.js";
 import { Value } from "./value.js";
 
 export class Scope extends Value {
-  constructor (opts) {
-    let { proto } = opts;
-    delete opts.proto;
-    super(opts);
-    this.value = Object.create(proto ?? null);
-  }
+
+  cells = this.cells ?? {};
+  methods = this.methods ?? {};
+  ops = this.ops ?? {};
 
   *getCell (cx, name) {
-    let cell = this.value[name];
+    let cell = this.cells[name];
     if (!cell) {
       throw `no such cell ${name}`;
     }
@@ -18,7 +16,7 @@ export class Scope extends Value {
   }
 
   *setCell (cx, name, cell) {
-    return this.value[name] = cell;
+    return this.cells[name] = cell;
   }
 
   *_callCell (cx, name, args) {

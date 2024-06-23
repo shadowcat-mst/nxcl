@@ -24,5 +24,5 @@ val('true', new Bool({ value: true }));
 val('false', new Bool({ value: false }));
 
 export function baseScope () {
-  return new Scope({ proto: cells, ops });
+  return new Scope({ cells, ops });
 }
