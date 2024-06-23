@@ -1,3 +1,4 @@
+export { Value } from "./value.js";
 export { Name } from "./value/name.js";
 export { String } from "./value/string.js";
 export { Digits } from "./value/digits.js";
