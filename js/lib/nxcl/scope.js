@@ -3,9 +3,9 @@ import { Value } from "./value.js";
 
 export class Scope extends Value {
 
-  cells = this.cells ?? {};
-  methods = this.methods ?? {};
-  ops = this.ops ?? {};
+  cells = this.cells ?? { __proto__: null };
+  methods = this.methods ?? { __proto__: null };
+  ops = this.ops ?? { __proto__: null };
 
   *getCell (cx, name) {
     let cell = this.cells[name];
