@@ -22,7 +22,7 @@ console.log(call.toExternalString());
 
 let cx = new Cx({ scope });
 
-let result = cx.eval(call, []);
+let result = cx.eval(call);
 
 let next;
 while (!(next = result.next()).done) {
