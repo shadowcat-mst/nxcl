@@ -1,5 +1,4 @@
-import { Name } from "./value/name.js";
-import { Call } from "./value/call.js";
+import { Name, Call } from "./valuetypes.js";
 
 function findBest (haystack, isOp) {
   let ends = { 0: true, [haystack.length - 1]: true };
