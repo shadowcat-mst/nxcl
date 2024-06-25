@@ -22,10 +22,25 @@ console.log(call.toExternalString());
 
 let cx = new Cx({ scope });
 
+/*
+exhaust(
+  scope.setMethod(
+    cx, Int, proto.numeric.plus,
+    function* () { return new Int({ value: 42 }) },
+  )
+);
+*/
+
 let result = cx.eval(call);
 
-let next;
-while (!(next = result.next()).done) {
-  console.log('Yield:', next.value);
+function exhaust (result) {
+  let next;
+  while (!(next = result.next()).done) {
+    console.log('Yield:', next.value.map(x => (x??'').toString()).join(', '));
+  }
+  return next.value;
 }
-console.log('Value:', next.value.toExternalString());
+
+let last = exhaust(result);
+
+console.log('Value:', last.toExternalString());
