@@ -17,6 +17,8 @@ export class Value {
     });
   }
 
+  toString () { return this.toExternalString() }
+
   toExternalString () {
     return this.constructor.name + '(' + this.valueToExternalString() + ')';
   }
