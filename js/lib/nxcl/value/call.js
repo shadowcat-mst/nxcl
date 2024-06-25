@@ -15,4 +15,11 @@ export class Call extends Value {
     let combiner = yield* cx.eval(combinerp);
     return yield* cx.call(combiner, args);
   }
+
+  *[proto.core.ASSIGN_VALUE] (cx, [ v ]) {
+    let [ combinerp, ...callargs ] = this.contents;
+    let combiner = yield* cx.eval(combinerp);
+    let args = [ callargs, v ];
+    return yield* cx.send(combiner, proto.core.ASSIGN_VIA_CALL, args);
+  }
 }
