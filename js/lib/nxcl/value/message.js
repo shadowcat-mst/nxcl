@@ -26,7 +26,7 @@ export class Message extends Value {
     }
     return [
       ':call ' + this.call.toString(),
-      ':on ' + this.on.toExternalString(),
+      ...(this.on ? ':on ' + [ this.on.toExternalString() ] : []),
       ...Object.hasOwn(this, 'withArgs')
         ? [ ':with-args ' + splatArgs(this.withArgs) ]
         : [],
