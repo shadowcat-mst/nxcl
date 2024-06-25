@@ -14,12 +14,8 @@ export class Cx {
     return this.send(val, proto.core.CALL, args);
   }
 
-  expr ([ first, ...rest ]) {
-    let message = proto.core[rest.length ? 'CALL' : 'EVAL'];
-    return this.send(first, message, rest);
-  }
-
   *send (val, message, args) {
+    yield [ val, message, args ];
     let method = yield* this.scope.getMethod(this, val, message);
     if (!method) {
       // message may be a Symbol
