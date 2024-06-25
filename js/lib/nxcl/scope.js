@@ -35,7 +35,7 @@ export class Scope extends Value {
   *setMethod (cx, type, name, value) {
     let overrides = this.methods[name] ??= [];
     // NYI: sorting by inheritance and replacing
-    methods.push([ type, value ]);
+    overrides.push([ type, value ]);
   }
 
   *getMethod (cx, value, name) {
@@ -43,6 +43,14 @@ export class Scope extends Value {
       if (value instanceof type) return override;
     }
     return value[name];
+  }
+
+  *derive (cx) {
+    let derived = {};
+    for (let k of [ 'cells', 'methods', 'ops' ]) {
+      derived[k] = { __proto__: this[k] };
+    }
+    return new this.constructor(derived);
   }
 
 }
