@@ -34,9 +34,19 @@ exhaust(
 let result = cx.eval(call);
 
 function exhaust (result) {
+  let indent = 0;
   let next;
   while (!(next = result.next()).done) {
-    console.log('Yield:', next.value.map(x => (x??'').toString()).join(', '));
+    let [ first, ...rest ] = next.value;
+    let indentStr = '';
+    if (first == '+') {
+      indentStr = '  '.repeat(indent);
+      indent += 1;
+    } else if (first == '-') {
+      indent -= 1;
+      indentStr = '  '.repeat(indent);
+    }
+    console.log(indentStr + first, rest.map(x => (x??'').toString()).join(', '));
   }
   return next.value;
 }
