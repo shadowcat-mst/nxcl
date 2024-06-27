@@ -153,7 +153,7 @@ export class ParseState {
       }
       is_before = is_after;
     }
-    if (cur) res.push(cur);
+    if (cur.length) res.push(cur);
 
     // Need a replacement for this that I don't hate.
     //
