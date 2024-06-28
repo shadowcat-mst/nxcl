@@ -20,10 +20,7 @@ export class List extends Value {
   }
 
   *[proto.collection.at] (cx, [ atp ]) {
-    let at = yield* cx.eval(atp);
-    if (!(at instanceof Int)) {
-      at = yield* Int.prototype._toInt(cx, at);
-    }
+    let at = yield* Int.prototype._toInt(cx, atp);
     return this.contents[at.value];
   }
 
