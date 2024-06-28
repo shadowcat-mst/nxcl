@@ -42,4 +42,6 @@ export class Int extends Value {
   [pub.to_int] (...args) { return this[proto.numeric.to_int](...args) }
 
   *[proto.numeric.to_int] () { return this }
+
+  toExternalString () { return this.value }
 }

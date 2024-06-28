@@ -13,4 +13,6 @@ export class Name extends Value {
   }
 
   toPubSym () { return pub[this.value] }
+
+  toExternalString () { return this.value }
 }

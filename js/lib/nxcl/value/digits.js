@@ -31,4 +31,6 @@ export class Digits extends Value {
     let value = parseInt(this.value);
     return new Int({ ...this, value })
   }
+
+  toExternalString () { return this.value }
 }

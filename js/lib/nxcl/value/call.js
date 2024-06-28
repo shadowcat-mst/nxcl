@@ -22,4 +22,6 @@ export class Call extends Value {
     let args = [ callargs, v ];
     return yield* cx.send(combiner, proto.core.ASSIGN_VIA_CALL, args);
   }
+
+  toExternalString () { return '[ ' + this.valueToExternalString(' ') + ' ]' }
 }
