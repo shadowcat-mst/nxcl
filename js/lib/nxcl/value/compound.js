@@ -12,4 +12,8 @@ export class Compound extends Value {
     }
     return cur;
   }
+
+  toExternalString () {
+    return this.contents.map(v => v.toExternalString()).join('')
+  }
 }
