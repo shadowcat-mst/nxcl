@@ -5,7 +5,11 @@ export class Message extends Value {
 
   *[proto.core.CALL] (cx, args) {
     if (!Object.hasOwn(this, 'withArgs')) {
-      let withArgs = yield* cx.eval(args);
+      let withArgs = [];
+      for (let argp of args) {
+        let arg = yield* cx.eval(argp);
+        withArgs.push(arg);
+      }
       return new this.constructor({ ...this, withArgs });
     }
     let on, sendArgs;

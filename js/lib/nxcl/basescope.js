@@ -2,6 +2,7 @@ import { Scope } from "./scope.js";
 import { proto, pub } from "./constants.js";
 import { Value, Val, Message, Bool } from "./valuetypes.js";
 import { letKeyword } from "./kw/let.js";
+import { dotKeyword } from "./kw/dot.js";
 
 let cells = {}, ops = {};
 
@@ -25,7 +26,7 @@ let tightRight = true;
 binOp(0, '+', proto.numeric.plus);
 binOp(0, '-', proto.numeric.minus);
 binOp(0, '==', proto.numeric.eq);
-binOp(0, '.', proto.core.DOT, { tightRight });
+// binOp(0, '.', proto.core.DOT, { tightRight });
 binOp(0, '++', proto.core.concat, 0);
 
 binOp(0, '=', {
@@ -39,6 +40,7 @@ binOp(0, '=', {
 val('true', new Bool({ value: true }));
 val('false', new Bool({ value: false }));
 
+binOp(0, '.', dotKeyword, { tightRight });
 val('let', letKeyword);
 
 export function baseScope () {
