@@ -4,7 +4,7 @@ import {
 
 let typeMap = {
   word: Name, symbol: Name,
-  string: String, digits: Digits,
+  qstring: String, digits: Digits,
   list: List, block: Block, call: Call, compound: Compound, eseq: ESeq,
 };
 

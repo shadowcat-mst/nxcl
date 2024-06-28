@@ -179,14 +179,14 @@ export class LexState {
           end: tok.end,
         };
       }
-      contents = [ {
+    /*  contents = [ {
         type: 'qchars',
         start: c_start,
         end: c_end,
         value: tok.value,
-      } ];
+      } ]; */
     }
-    let { start, end, type } = tok;
+    let { start, end, type, value } = tok;
     let { source } = this;
     return {
       type,
@@ -194,7 +194,7 @@ export class LexState {
       delimiter_end,
       start,
       end,
-      contents,
+      value,
       source,
     };
   }
