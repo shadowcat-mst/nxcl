@@ -87,9 +87,7 @@ export class ParseState {
     let block = this.nextNode();
     return {
       ...block,
-      contents: this.subStateFor(block)
-                    .extractRawExprSeq()
-                    .map(e => this.maybeWrap('call', e)),
+      contents: [ this.subStateFor(block).extractExprSeq() ],
     };
   }
 
