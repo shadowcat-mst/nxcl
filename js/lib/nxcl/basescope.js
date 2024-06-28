@@ -5,31 +5,36 @@ import { letKeyword } from "./kw/let.js";
 
 let cells = {}, ops = {};
 
-function binOp (symbol, call, precedence, opts) {
-  cells[symbol] = new Val({ value: new Message({ call, withArgs: [] }) });
-  ops[symbol] = { precedence, ...opts };
-}
-
 function val (symbol, value) {
   cells[symbol] = new Val({ value });
 }
 
+function binOp (precedence, symbol, valuep, opts) {
+  let value;
+  if (typeof valuep == 'symbol') {
+    value = new Message({ call: valuep, withArgs: [] });
+  } else {
+    value = valuep;
+  }
+  val(symbol, value);
+  ops[symbol] = { precedence, ...opts };
+}
+
 let tightRight = true;
 
-binOp('+', proto.numeric.plus, 0);
-binOp('-', proto.numeric.minus, 0);
-binOp('==', proto.numeric.eq, 0);
-binOp('.', proto.core.DOT, 0, { tightRight });
-binOp('++', proto.core.concat, 0);
+binOp(0, '+', proto.numeric.plus);
+binOp(0, '-', proto.numeric.minus);
+binOp(0, '==', proto.numeric.eq);
+binOp(0, '.', proto.core.DOT, { tightRight });
+binOp(0, '++', proto.core.concat, 0);
 
-val('=', {
+binOp(0, '=', {
   __proto__: Value.prototype,
   *[proto.core.CALL] (cx, [ left, right ]) {
     return yield* cx.send(left, proto.core.ASSIGN_VALUE, [ right ]);
   },
   toExternalString () { return 'Native(=)' },
 });
-ops['='] = { precedence: 0 };
 
 val('true', new Bool({ value: true }));
 val('false', new Bool({ value: false }));
