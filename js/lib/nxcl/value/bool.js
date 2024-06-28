@@ -18,4 +18,6 @@ export class Bool extends Value {
 
   static *[pub.true] () { return new this({ value: true }) }
   static *[pub.false] () { return new this({ value: false }) }
+
+  toExternalString () { return this.value ? 'true' : 'false' }
 }
