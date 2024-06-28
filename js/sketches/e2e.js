@@ -31,7 +31,7 @@ exhaust(
 );
 */
 
-let result = cx.eval(call);
+let result = cx.call(call);
 
 function exhaust (result) {
   let indent = 0;
