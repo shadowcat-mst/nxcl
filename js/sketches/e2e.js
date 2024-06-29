@@ -38,6 +38,12 @@ function exhaust (result) {
   let next;
   while (!(next = result.next()).done) {
     let [ first, ...rest ] = next.value;
+    if (first == '+') {
+      // method name fuckery
+      rest[1] = rest[1].description
+            .replace('xcl.protocol.', '')
+            .replace(/\./, '::');
+    }
     let indentStr = '';
     if (first == '+') {
       indentStr = '  '.repeat(indent);
