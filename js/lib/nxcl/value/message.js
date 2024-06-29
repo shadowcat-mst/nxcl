@@ -28,8 +28,15 @@ export class Message extends Value {
       if (!args.length) return '()';
       return '( ' + args.map(x => x.toExternalString()).join(', ') + ' )';
     }
+    let callDescr = (typeof this.call == 'symbol'
+      ? this.call
+            .description
+            .replace('xcl.protocol.', '')
+            .replace(/\./, '::')
+      : this.call.toString()
+    );
     return [
-      ':call ' + this.call.toString(),
+      ':call ' + callDescr,
       ...this.on ? [ ':on ' + this.on.toExternalString() ] : [],
       ...Object.hasOwn(this, 'withArgs')
         ? [ ':with-args ' + splatArgs(this.withArgs) ]
