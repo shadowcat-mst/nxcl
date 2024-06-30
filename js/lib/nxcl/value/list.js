@@ -42,5 +42,16 @@ export class List extends Value {
 
   [proto.core.CALL] (...args) { return this[proto.collection.at](...args) }
 
+  *[proto.core.ASSIGN_VALUE] (cx, args) {
+    let v = yield* cx.eval(args[0]);
+    if (!(v instanceof this.constructor)) throw "ARGH";
+    if (this.contents.length != v.contents.length) throw "MISMATCH";
+    let assignTo = this.contents, assignFrom = v.contents;
+    for (let i in assignTo) {
+      yield* cx.send(assignTo[i], proto.core.ASSIGN_VALUE, [ assignFrom[i] ]);
+    }
+    return v;
+  }
+
   toExternalString () { return '(' + this.valueToExternalString() + ')' }
 }
