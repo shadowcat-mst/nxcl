@@ -11,10 +11,7 @@ export class List extends Value {
     let mapped = [];
     for (let v of this.contents) {
       let ret = yield* cx.call(cb, [ v ]);
-      if (!(ret instanceof List)) {
-        ret = new List({ contents: [ret] });
-      }
-      mapped.push(...ret.contents);
+      mapped.push(...ret instanceof List ? ret.contents: [ret]);
     }
     return new this.constructor({ contents: mapped });
   }
