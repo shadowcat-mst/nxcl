@@ -1,5 +1,5 @@
 import { proto } from "../constants.js";
-import { Name, Value, Val, Call } from "../valuetypes.js";
+import { Name, Value, Val, Var, Call } from "../valuetypes.js";
 
 function* withAssigner (outerCx, CellType) {
   let outerScope = outerCx.scope;
@@ -14,15 +14,18 @@ function* withAssigner (outerCx, CellType) {
 
 const expr = list => list.length > 1 ? new Call({ contents: list }) : list[0];
 
-export let letKeyword = {
+const makeKeyword = (name, CellType) => { return {
   __proto__: Value.prototype,
   *[proto.core.CALL] (outerCx, args) {
-    let innerCx = yield* withAssigner(outerCx, Val);
+    let innerCx = yield* withAssigner(outerCx, CellType);
     return yield* innerCx.eval(expr(args));
   },
   *[proto.core.ASSIGN_VIA_CALL] (outerCx, [ args, value ]) {
-    let innerCx = yield* withAssigner(outerCx, Val);
+    let innerCx = yield* withAssigner(outerCx, CellType);
     return yield* innerCx.send(expr(args), proto.core.ASSIGN_VALUE, [ value ]);
   },
-  toExternalString () { return 'Native(let)' },
-};
+  toExternalString () { return `Native(${name})` },
+} };
+
+export let letKeyword = makeKeyword('let', Val);
+export let varKeyword = makeKeyword('var', Var);

@@ -1,7 +1,7 @@
 import { Scope } from "./scope.js";
 import { proto, pub } from "./constants.js";
 import { Value, Val, Message, Bool } from "./valuetypes.js";
-import { letKeyword } from "./kw/let.js";
+import { letKeyword, varKeyword } from "./kw/let.js";
 import { dotKeyword } from "./kw/dot.js";
 
 let cells = {}, ops = {};
@@ -42,6 +42,7 @@ val('false', new Bool({ value: false }));
 
 binOp(0, '.', dotKeyword, { tightRight });
 val('let', letKeyword);
+val('var', varKeyword);
 
 export function baseScope () {
   return new Scope({ cells, ops });
