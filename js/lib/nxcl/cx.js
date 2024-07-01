@@ -29,8 +29,8 @@ export class Cx {
     return ret;
   }
 
-  *derive () {
-    let scope = yield* this.scope.derive();
+  *derive ({ scope } = {}) {
+    scope ??= yield* this.scope.derive();
     return new this.constructor({ scope });
   }
 }

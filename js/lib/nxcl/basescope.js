@@ -3,6 +3,7 @@ import { proto, pub } from "./constants.js";
 import { Value, Val, Message, Bool } from "./valuetypes.js";
 import { letKeyword, varKeyword } from "./kw/let.js";
 import { dotKeyword } from "./kw/dot.js";
+import { fexprKeyword } from "./kw/fexpr.js";
 
 let cells = {}, ops = {};
 
@@ -31,7 +32,8 @@ binOp(0, '++', proto.core.concat, 0);
 
 binOp(0, '=', {
   __proto__: Value.prototype,
-  *[proto.core.CALL] (cx, [ left, right ]) {
+  *[proto.core.CALL] (cx, [ left, rightp ]) {
+    let right = yield* cx.eval(rightp);
     return yield* cx.send(left, proto.core.ASSIGN_VALUE, [ right ]);
   },
   toExternalString () { return 'Native(=)' },
@@ -43,6 +45,7 @@ val('false', new Bool({ value: false }));
 binOp(0, '.', dotKeyword, { tightRight });
 val('let', letKeyword);
 val('var', varKeyword);
+val('fexpr', fexprKeyword);
 
 export function baseScope () {
   return new Scope({ cells, ops });

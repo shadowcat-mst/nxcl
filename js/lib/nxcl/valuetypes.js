@@ -12,3 +12,4 @@ export { Message } from "./value/message.js";
 export { Val } from "./value/val.js";
 export { Var } from "./value/var.js";
 export { Bool } from "./value/bool.js";
+export { Fexpr } from "./value/fexpr.js";
