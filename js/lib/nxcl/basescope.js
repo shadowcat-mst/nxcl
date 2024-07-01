@@ -3,7 +3,7 @@ import { proto, pub } from "./constants.js";
 import { Value, Val, Message, Bool } from "./valuetypes.js";
 import { letKeyword, varKeyword } from "./kw/let.js";
 import { dotKeyword } from "./kw/dot.js";
-import { fexprKeyword } from "./kw/fexpr.js";
+import { fexprKeyword, funKeyword } from "./kw/fexpr.js";
 
 let cells = {}, ops = {};
 
@@ -46,6 +46,7 @@ binOp(0, '.', dotKeyword, { tightRight });
 val('let', letKeyword);
 val('var', varKeyword);
 val('fexpr', fexprKeyword);
+val('fun', funKeyword);
 
 export function baseScope () {
   return new Scope({ cells, ops });
