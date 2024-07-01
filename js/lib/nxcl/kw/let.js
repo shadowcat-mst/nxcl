@@ -1,7 +1,7 @@
 import { proto } from "../constants.js";
 import { Name, Value, Val, Var, Call } from "../valuetypes.js";
 
-function* withAssigner (outerCx, CellType) {
+export function* withAssigner (outerCx, CellType) {
   let outerScope = outerCx.scope;
   let scope = yield* outerScope.derive();
   function* ASSIGN_VALUE (cx, [ value ]) {
