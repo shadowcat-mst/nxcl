@@ -5,7 +5,7 @@ import { Bool } from "./bool.js";
 export class Int extends Value {
 
   constructor (opts) {
-    if (! Number.isSafeInteger(opts.value)) throw "ARGH";
+    if (! Number.isSafeInteger(opts.value)) throw "Unsafe int";
     super(opts);
   }
 

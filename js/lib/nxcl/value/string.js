@@ -10,7 +10,9 @@ export class String extends Value {
 
   *[proto.core.concat] (cx, [ otherp ]) {
     let other = yield* cx.eval(otherp);
-    if (!(other instanceof this.constructor)) throw "ARGH";
+    if (!(other instanceof this.constructor)) {
+      throw "String.concat but not a String";
+    }
     let value = this.value + other.value;
     return new this.constructor({ value });
   }

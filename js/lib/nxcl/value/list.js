@@ -32,7 +32,9 @@ export class List extends Value {
 
   *[proto.core.concat] (cx, [ otherp ]) {
     let other = yield* cx.eval(otherp);
-    if (!(other instanceof this.constructor)) throw "ARGH";
+    if (!(other instanceof this.constructor)) {
+      throw "List.concat but not a List";
+    }
     let contents = this.contents.concat(other.contents);
     return new this.constructor({ contents });
   }
@@ -41,8 +43,12 @@ export class List extends Value {
 
   *[proto.core.ASSIGN_VALUE] (cx, args) {
     let v = yield* cx.eval(args[0]);
-    if (!(v instanceof this.constructor)) throw "ARGH";
-    if (this.contents.length != v.contents.length) throw "MISMATCH";
+    if (!(v instanceof this.constructor)) {
+      throw "List.ASSIGN_VALUE but not a List";
+    }
+    if (this.contents.length != v.contents.length) {
+      throw "List.ASSIGN_VALUE but different lengths";
+    }
     let assignTo = this.contents, assignFrom = v.contents;
     for (let i in assignTo) {
       yield* cx.send(assignTo[i], proto.core.ASSIGN_VALUE, [ assignFrom[i] ]);
