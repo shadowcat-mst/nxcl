@@ -21,7 +21,7 @@ export class Value {
 
   toExternalString () {
     return (
-      this.constructor.name + '.new(' + this.valueToExternalString() + ')'
+      this.constructor.name + '(' + this.valueToExternalString() + ')'
     );
   }
 
