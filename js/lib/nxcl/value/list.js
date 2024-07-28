@@ -42,7 +42,7 @@ export class List extends Value {
   [proto.core.CALL] (...args) { return this[proto.collection.at](...args) }
 
   *[proto.core.ASSIGN_VALUE] (cx, args) {
-    let v = yield* cx.eval(args[0]);
+    let v = args[0];
     if (!(v instanceof this.constructor)) {
       throw "List.ASSIGN_VALUE but not a List";
     }
