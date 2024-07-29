@@ -4,6 +4,7 @@ import { Value, Val, Message, Bool } from "./valuetypes.js";
 import { letKeyword, varKeyword } from "./kw/let.js";
 import { dotKeyword } from "./kw/dot.js";
 import { fexprKeyword, funKeyword } from "./kw/fexpr.js";
+import { equalsKeyword } from "./kw/equals.js";
 
 let cells = {}, ops = {};
 
@@ -30,14 +31,7 @@ binOp(0, '==', proto.numeric.eq);
 // binOp(0, '.', proto.core.DOT, { tightRight });
 binOp(0, '++', proto.core.concat, 0);
 
-binOp(0, '=', {
-  __proto__: Value.prototype,
-  *[proto.core.CALL] (cx, [ left, rightp ]) {
-    let right = yield* cx.eval(rightp);
-    return yield* cx.send(left, proto.core.ASSIGN_VALUE, [ right ]);
-  },
-  toExternalString () { return 'Native(=)' },
-});
+binOp(0, '=', equalsKeyword);
 
 val('true', new Bool({ value: true }));
 val('false', new Bool({ value: false }));
