@@ -1,13 +1,15 @@
-import { proto } from "./constants.js";
+import { proto, pub } from "./constants.js";
+import { Value } from "./value.js";
 
-export class Cx {
-
-  constructor (opts) {
-    Object.assign(this, opts);
-  }
+export class Cx extends Value {
 
   // these are equivalent to e.g.
   // eval* (val) { return yield* this.send(...) }
+
+  *[pub.eval] (cx, [ valuep ]) {
+    let value = yield* cx.eval(valuep);
+    return yield* this.eval(value);
+  }
 
   eval (val) {
     return this.send(val, proto.core.EVAL, []);
