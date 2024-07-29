@@ -6,7 +6,7 @@ export class Fexpr extends Value {
 
   *[proto.core.CALL] (callcx, args) {
     let scope = yield* this.scope.derive();
-    yield* scope.setCell(callcx, 'callcx', new Val(callcx));
+    yield* scope.setCell(callcx, 'callcx', new Val({ value: callcx }));
     let cx = yield* callcx.derive({ scope });
 
     let acx = yield* withAssigner(cx, Val);
