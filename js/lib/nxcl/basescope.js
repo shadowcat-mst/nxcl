@@ -5,6 +5,7 @@ import { letKeyword, varKeyword } from "./kw/let.js";
 import { dotKeyword } from "./kw/dot.js";
 import { fexprKeyword, funKeyword } from "./kw/fexpr.js";
 import { equalsKeyword } from "./kw/equals.js";
+import { quoteKeyword, identityKeyword } from "./kw/identity.js";
 
 let cells = {}, ops = {};
 
@@ -41,6 +42,8 @@ val('let', letKeyword);
 val('var', varKeyword);
 val('fexpr', fexprKeyword);
 val('fun', funKeyword);
+val('\\', quoteKeyword);
+val('$', identityKeyword);
 
 export function baseScope () {
   return new Scope({ cells, ops });
