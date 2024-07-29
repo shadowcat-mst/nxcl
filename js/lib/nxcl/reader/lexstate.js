@@ -1,6 +1,8 @@
 'use strict';
 
-const SYMBOL_CHARS = '.!$%&:<=>@\\^|~?*/+-';
+// TOK_MATCH regexp assembly needs \\ and TOK_START assembly won't mind a dupe
+
+const SYMBOL_CHARS = '.!$%&:<=>@\\\\^|~?*/+-';
 
 const DIGITS = '0123456789';
 
@@ -93,6 +95,7 @@ export class LexState {
       throw `Unexpected ${this.peekChar()||'end of input'}`;
     }
     let value, length;
+console.log('Matching:', type, 'with:', TOK_MATCH[type]);
     string = string.replace(
       TOK_MATCH[type], (m, t) => { value = t; length = m.length; return '' }
     );
