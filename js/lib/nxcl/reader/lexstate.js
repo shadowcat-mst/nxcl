@@ -95,7 +95,6 @@ export class LexState {
       throw `Unexpected ${this.peekChar()||'end of input'}`;
     }
     let value, length;
-console.log('Matching:', type, 'with:', TOK_MATCH[type]);
     string = string.replace(
       TOK_MATCH[type], (m, t) => { value = t; length = m.length; return '' }
     );
