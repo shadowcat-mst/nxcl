@@ -1,1 +1,5 @@
 let $. = \[. this];
+
+# In practice probably better using callcx.call but then double-eval risks
+
+let do = fexpr (@args) { callcx.eval \$[@@args] }
