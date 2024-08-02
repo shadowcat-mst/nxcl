@@ -1,10 +1,12 @@
 import { proto } from "../constants.js";
 import { Value, List } from "../valuetypes.js";
 
+let { CALL } = proto.core;
+
 export class Fun extends Value {
 
-  *[proto.core.CALL] (callcx, argsp) {
+  *[CALL] (callcx, argsp) {
     let args = yield* callcx.eval(new List({ contents: argsp }));
-    return yield* callcx.send(this.fexpr, proto.core.CALL, args.contents);
+    return yield* callcx.send(this.fexpr, CALL, args.contents);
   }
 }

@@ -1,5 +1,7 @@
 import { proto } from "./constants.js";
 
+let { EVAL, DOT } = proto.core;
+
 export const _Message = {};
 
 export class Value {
@@ -7,9 +9,9 @@ export class Value {
     Object.assign(this, opts);
   }
 
-  *[proto.core.EVAL] () { return this }
+  *[EVAL] () { return this }
 
-  *[proto.core.DOT] (cx, [ messagep ]) {
+  *[DOT] (cx, [ messagep ]) {
     return new _Message.$value({
       call: messagep.toPubSym(),
       on: this,

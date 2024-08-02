@@ -2,6 +2,8 @@ import { proto, pub } from "../constants.js";
 import { Value } from "../value.js";
 import { Int } from "./int.js";
 
+let { EVAL, CALL, ASSIGN_VALUE, concat } = proto.core;
+
 export class List extends Value {
 
   [pub.lmap] (...args) { return this[proto.collection.lmap](...args) }
@@ -21,7 +23,7 @@ export class List extends Value {
     return this.contents[at.value];
   }
 
-  *[proto.core.EVAL] (cx) {
+  *[EVAL] (cx) {
     let contents = [];
     for (let vp of this.contents) {
       let v = yield* cx.eval(vp);
@@ -30,7 +32,7 @@ export class List extends Value {
     return new this.constructor({ contents });
   }
 
-  *[proto.core.concat] (cx, [ otherp ]) {
+  *[concat] (cx, [ otherp ]) {
     let other = yield* cx.eval(otherp);
     if (!(other instanceof this.constructor)) {
       throw "List.concat but not a List";
@@ -39,9 +41,9 @@ export class List extends Value {
     return new this.constructor({ contents });
   }
 
-  [proto.core.CALL] (...args) { return this[proto.collection.at](...args) }
+  [CALL] (...args) { return this[proto.collection.at](...args) }
 
-  *[proto.core.ASSIGN_VALUE] (cx, args) {
+  *[ASSIGN_VALUE] (cx, args) {
     let v = args[0];
     if (!(v instanceof this.constructor)) {
       throw "List.ASSIGN_VALUE but not a List";
@@ -51,7 +53,7 @@ export class List extends Value {
     }
     let assignTo = this.contents, assignFrom = v.contents;
     for (let i in assignTo) {
-      yield* cx.send(assignTo[i], proto.core.ASSIGN_VALUE, [ assignFrom[i] ]);
+      yield* cx.send(assignTo[i], ASSIGN_VALUE, [ assignFrom[i] ]);
     }
     return v;
   }

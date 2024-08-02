@@ -1,9 +1,11 @@
 import { proto } from "../constants.js";
 import { Value, Message } from "../valuetypes.js";
 
+let { CALL, DOT } = proto.core;
+
 export let dotKeyword = {
   __proto__: Value.prototype,
-  *[proto.core.CALL] (cx, args) {
+  *[CALL] (cx, args) {
     if (args.length == 1) {
       // .name
       return new Message({
@@ -13,7 +15,7 @@ export let dotKeyword = {
     if (args.length == 2) {
       let [ objp, messagep ] = args;
       let obj = yield* cx.eval(objp);
-      return yield* cx.send(obj, proto.core.DOT, [ messagep ]);
+      return yield* cx.send(obj, DOT, [ messagep ]);
     }
     throw "Eh? (dotKeyword)";
   },

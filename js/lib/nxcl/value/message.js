@@ -1,9 +1,11 @@
 import { proto } from "../constants.js";
 import { Value, _Message } from "../value.js";
 
+let { CALL } = proto.core;
+
 export class Message extends Value {
 
-  *[proto.core.CALL] (cx, args) {
+  *[CALL] (cx, args) {
     if (!Object.hasOwn(this, 'withArgs')) {
       let withArgs = [];
       for (let argp of args) {

@@ -1,13 +1,15 @@
 import { proto, pub } from "../constants.js";
 import { Value } from "../value.js";
 
+let { EVAL, ASSIGN_VALUE } = proto.core;
+
 export class Name extends Value {
 
-  *[proto.core.EVAL] (cx) {
+  *[EVAL] (cx) {
     return yield* cx.scope.getCellValue(cx, this.value);
   }
 
-  *[proto.core.ASSIGN_VALUE] (cx, args) {
+  *[ASSIGN_VALUE] (cx, args) {
     // no-op assign-to-'$' ?
     return yield* cx.scope.setCellValue(cx, this.value, args[0]);
   }

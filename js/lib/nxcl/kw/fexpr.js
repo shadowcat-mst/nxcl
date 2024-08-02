@@ -1,13 +1,15 @@
 import { proto } from "../constants.js";
 import { Value, Fexpr, Fun } from "../valuetypes.js";
 
+let { CALL } = proto.core;
+
 function _Fun (...args) {
   return new Fun({ fexpr: new Fexpr(...args) });
 }
 
 const makeKeyword = (name, Ftype) => { return {
   __proto__: Value.prototype,
-  *[proto.core.CALL] (cx, args) {
+  *[CALL] (cx, args) {
     // should also handle 'fun/fexpr foo (...) {...}'
     let [ argspec, body ] = args;
     let scope = yield* cx.scope.derive();

@@ -31,7 +31,9 @@ exhaust(
 );
 */
 
-let result = cx.call(call, []);
+// ?? (reinstated ESeq eval, maybe a good idea, maybe not
+
+let result = cx.eval(call, []);
 
 function exhaust (result) {
   let indent = 0;

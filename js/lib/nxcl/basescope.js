@@ -7,6 +7,8 @@ import { fexprKeyword, funKeyword } from "./kw/fexpr.js";
 import { equalsKeyword } from "./kw/equals.js";
 import { quoteKeyword, identityKeyword } from "./kw/identity.js";
 
+let { core, numeric } = proto;
+
 let cells = {}, ops = {};
 
 function val (symbol, value) {
@@ -26,11 +28,11 @@ function binOp (precedence, symbol, valuep, opts) {
 
 let tightRight = true;
 
-binOp(0, '+', proto.numeric.plus);
-binOp(0, '-', proto.numeric.minus);
-binOp(0, '==', proto.numeric.eq);
-// binOp(0, '.', proto.core.DOT, { tightRight });
-binOp(0, '++', proto.core.concat, 0);
+binOp(0, '+', numeric.plus);
+binOp(0, '-', numeric.minus);
+binOp(0, '==', numeric.eq);
+// binOp(0, '.', core.DOT, { tightRight });
+binOp(0, '++', core.concat, 0);
 
 binOp(0, '=', equalsKeyword);
 

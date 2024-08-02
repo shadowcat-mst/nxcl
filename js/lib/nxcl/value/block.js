@@ -1,14 +1,16 @@
 import { proto } from "../constants.js";
 import { Value, Val, Call } from "../valuetypes.js";
 
+let { CALL } = proto.core;
+
 export class Block extends Value {
 
-  *[proto.core.CALL] (cx, args) {
+  *[CALL] (cx, args) {
     let scope = yield* cx.scope.derive();
     let deferQueue = [];
     yield* scope.setCell(cx, 'defer', new Val({ value: {
       __proto__: Value.prototype,
-      *[proto.core.CALL] (cx, args) {
+      *[CALL] (cx, args) {
         deferQueue.unshift([ cx.scope, new Call({ contents: args }) ]);
       },
     }}));

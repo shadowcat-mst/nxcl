@@ -21,7 +21,7 @@ export class Scope extends Value {
 
   *_callCell (cx, name, args) {
     let cell = yield* this.getCell(cx, name);
-    return yield* cx.send(cell, proto.core.CALL, args);
+    return yield* cx.call(cell, args);
   }
 
   *getCellValue (cx, name) {
