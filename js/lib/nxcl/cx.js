@@ -1,22 +1,26 @@
 import { proto, pub } from "./constants.js";
 import { Value } from "./value.js";
 
-export class Cx extends Value {
+let { EVAL, CALL } = proto.core;
 
-  // these are equivalent to e.g.
-  // eval* (val) { return yield* this.send(...) }
+let valueEval = Value.prototype[EVAL];
+
+export class Cx extends Value {
 
   *[pub.eval] (cx, [ valuep ]) {
     let value = yield* cx.eval(valuep);
     return yield* this.eval(value);
   }
 
-  eval (val) {
-    return this.send(val, proto.core.EVAL, []);
+  *eval (val) {
+    if (val[EVAL] === valueEval) {
+      return val;
+    }
+    return yield* this.send(val, EVAL, []);
   }
 
-  call (val, args) {
-    return this.send(val, proto.core.CALL, args);
+  *call (val, args) {
+    return yield* this.send(val, CALL, args);
   }
 
   *send (val, message, args) {
