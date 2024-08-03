@@ -7,8 +7,7 @@ function _Fun (...args) {
   return new Fun({ fexpr: new Fexpr(...args) });
 }
 
-const makeKeyword = (name, Ftype) => { return {
-  __proto__: Value.prototype,
+const makeKeyword = (name, Ftype) => { return new Value({
   *[CALL] (cx, args) {
     // should also handle 'fun/fexpr foo (...) {...}'
     let [ argspec, body ] = args;
@@ -16,7 +15,7 @@ const makeKeyword = (name, Ftype) => { return {
     return new Ftype({ scope, argspec, body });
   },
   toExternalString () { return `Native(${name})` },
-} };
+})};
 
 export let fexprKeyword = makeKeyword('fexpr', Fexpr);
 export let funKeyword = makeKeyword('fun', _Fun);

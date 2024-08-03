@@ -8,12 +8,11 @@ export class Block extends Value {
   *[CALL] (cx, args) {
     let scope = yield* cx.scope.derive();
     let deferQueue = [];
-    yield* scope.setCell(cx, 'defer', new Val({ value: {
-      __proto__: Value.prototype,
+    yield* scope.setCell(cx, 'defer', new Val({ value: new Value({
       *[CALL] (cx, args) {
         deferQueue.unshift([ cx.scope, new Call({ contents: args }) ]);
       },
-    }}));
+    })}));
     let ecx = yield* cx.derive({ scope });
     try {
       return yield* ecx.call(this.contents[0], []);

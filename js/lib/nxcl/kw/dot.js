@@ -3,8 +3,7 @@ import { Value, Message } from "../valuetypes.js";
 
 let { CALL, DOT } = proto.core;
 
-export let dotKeyword = {
-  __proto__: Value.prototype,
+export let dotKeyword = new Value({
   *[CALL] (cx, args) {
     if (args.length == 1) {
       // .name
@@ -20,4 +19,4 @@ export let dotKeyword = {
     throw "Eh? (dotKeyword)";
   },
   toExternalString () { return 'Native(.)' },
-};
+});
