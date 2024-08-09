@@ -6,6 +6,7 @@ import { dotKeyword } from "./kw/dot.js";
 import { fexprKeyword, funKeyword } from "./kw/fexpr.js";
 import { equalsKeyword } from "./kw/equals.js";
 import { quoteKeyword, identityKeyword } from "./kw/identity.js";
+import { dynamicKeyword } from "./kw/dynamic.js";
 
 let { core, numeric } = proto;
 
@@ -46,6 +47,7 @@ val('fexpr', fexprKeyword);
 val('fun', funKeyword);
 val('\\', quoteKeyword);
 val('$', identityKeyword);
+val('dynamic', dynamicKeyword);
 
 export function baseScope () {
   return new Scope({ cells, ops });

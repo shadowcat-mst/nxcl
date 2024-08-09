@@ -7,6 +7,8 @@ let valueEval = Value.prototype[EVAL];
 
 export class Cx extends Value {
 
+  dynamics = this.dynamics ?? { __proto__ : null };
+
   *[pub.eval] (cx, [ valuep ]) {
     let value = yield* cx.eval(valuep);
     return yield* this.eval(value);
@@ -35,8 +37,9 @@ export class Cx extends Value {
     return ret;
   }
 
-  *derive ({ scope } = {}) {
+  *derive ({ scope, dynamics } = {}) {
     scope ??= yield* this.scope.derive();
-    return new this.constructor({ scope });
+    dynamics ??= { __proto__: this.dynamics };
+    return new this.constructor({ scope, dynamics });
   }
 }
