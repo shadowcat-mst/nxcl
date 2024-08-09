@@ -5,6 +5,8 @@ let { CALL } = proto.core;
 
 export class Block extends Value {
 
+  get body () { return this.contents[0] }
+
   *[CALL] (cx, args) {
     let scope = yield* cx.scope.derive();
     let deferQueue = [];
@@ -15,7 +17,7 @@ export class Block extends Value {
     })}));
     let ecx = yield* cx.derive({ scope });
     try {
-      return yield* ecx.call(this.contents[0], []);
+      return yield* ecx.call(this.body, []);
     } finally {
       for (let [ scope, call ] of deferQueue) {
         yield* (yield* cx.derive({ scope })).eval(call);
