@@ -16,7 +16,11 @@ export class Scope extends Value {
   }
 
   *setCell (cx, name, cell) {
-    return this.cells[name] = cell;
+    return this.cells = {
+      __proto__: Object.getPrototypeOf(this.cells),
+      ...this.cells,
+      [name]: cell
+    };
   }
 
   *_callCell (cx, name, args) {
