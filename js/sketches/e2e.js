@@ -37,7 +37,7 @@ let result = cx.eval(call, []);
 
 function exhaust (result) {
   let indent = 0;
-  let next;
+  let next, lastResult;
   while (!(next = result.next()).done) {
     let [ first, ...rest ] = next.value;
     if (first == '+') {
@@ -53,6 +53,8 @@ function exhaust (result) {
     } else if (first == '-') {
       indent -= 1;
       indentStr = '  '.repeat(indent);
+      if (rest[0] == lastResult) continue;
+      lastResult = rest[0];
     }
     console.log(indentStr + first, rest.map(x => (x??'').toString()).join(', '));
   }

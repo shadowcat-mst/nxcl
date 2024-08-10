@@ -18,5 +18,6 @@ export let dynamicKeyword = new Value({
   *[ASSIGN_VIA_CALL] (cx, args) {
     let name = checkArg(args[0][0]);
     return cx.dynamics[name] = args[1];
-  }
+  },
+  toExternalString () { return `Native(dynamic)` },
 });
