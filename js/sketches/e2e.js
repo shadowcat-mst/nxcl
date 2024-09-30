@@ -1,10 +1,10 @@
-import { proto } from "../lib/nxcl/constants.js";
-import { Message, Int, Call, Name, Val } from "../lib/nxcl/valuetypes.js";
-import { Cx } from "../lib/nxcl/cx.js";
-import { Scope } from "../lib/nxcl/scope.js";
-import { baseScope } from "../lib/nxcl/basescope.js";
-import { Reader } from "../lib/nxcl/reader.js";
-import { rewriteOps } from "../lib/nxcl/valuehelpers.js"
+import { proto } from "../src/nxcl/constants.js";
+import { Message, Int, Call, Name, Val } from "../src/nxcl/valuetypes.js";
+import { Cx } from "../src/nxcl/cx.js";
+import { Scope } from "../src/nxcl/scope.js";
+import { baseScope } from "../src/nxcl/basescope.js";
+import { Reader } from "../src/nxcl/reader.js";
+import { rewriteOps } from "../src/nxcl/valuehelpers.js"
 
 let reader = new Reader();
 

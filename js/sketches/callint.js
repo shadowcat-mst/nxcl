@@ -1,7 +1,7 @@
-import { proto } from "../lib/nxcl/constants.js";
-import { Message, Int, Call, Name, Val } from "../lib/nxcl/valuetypes.js";
-import { Cx } from "../lib/nxcl/cx.js";
-import { Scope } from "../lib/nxcl/scope.js";
+import { proto } from "../src/nxcl/constants.js";
+import { Message, Int, Call, Name, Val } from "../src/nxcl/valuetypes.js";
+import { Cx } from "../src/nxcl/cx.js";
+import { Scope } from "../src/nxcl/scope.js";
 
 let two = new Int({ value: 2 });
 let three = new Int({ value: 3 });
