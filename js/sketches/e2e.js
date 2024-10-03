@@ -6,34 +6,36 @@ import { baseScope } from "../src/nxcl/basescope.js";
 import { Reader } from "../src/nxcl/reader.js";
 import { rewriteOps } from "../src/nxcl/valuehelpers.js"
 
-let reader = new Reader();
+if (import.meta.main) {
+  run(Bun.argv[2]??'1 + 3');
+} else {
+  globalThis.runXcl = run;
+}
 
-let callp = reader.read({ string: Bun.argv[2]??'1 + 3' });
+function run (string) {
 
-console.log(callp.toExternalString());
+  let reader = new Reader();
 
-let scope = baseScope();
+  let callp = reader.read({ string });
 
-let isOp = cand => (cand instanceof Name) ? scope.ops[cand.value] : null;
+  console.log(callp.toExternalString());
 
-let call = rewriteOps(callp, isOp);
+  let scope = baseScope();
 
-console.log(call.toExternalString());
+  let isOp = cand => (cand instanceof Name) ? scope.ops[cand.value] : null;
 
-let cx = new Cx({ scope });
+  let call = rewriteOps(callp, isOp);
 
-/*
-exhaust(
-  scope.setMethod(
-    cx, Int, proto.numeric.plus,
-    function* () { return new Int({ value: 42 }) },
-  )
-);
-*/
+  console.log(call.toExternalString());
 
-// ?? (reinstated ESeq eval, maybe a good idea, maybe not
+  let cx = new Cx({ scope });
 
-let result = cx.eval(call, []);
+  let result = cx.eval(call, []);
+
+  let last = exhaust(result);
+
+  console.log('Value:', last.toExternalString());
+}
 
 function exhaust (result) {
   let indent = 0;
@@ -60,7 +62,3 @@ function exhaust (result) {
   }
   return next.value;
 }
-
-let last = exhaust(result);
-
-console.log('Value:', last.toExternalString());
