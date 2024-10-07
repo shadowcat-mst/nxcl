@@ -1,0 +1,115 @@
+let { assign } = Object;
+
+let models.TraceNode = class TraceNode {
+
+  // has: message, value, children
+
+  children = [];
+
+  constructor (args) {
+    assign(this, args);
+  }
+
+  addChildFor (message) {
+    let child = new this.constructor({ message, parent: this });
+    this.children.push(child);
+    return child;
+  }
+
+  completeNode (value) {
+    this.value = value;
+    return this.parent;
+  }
+
+}
+
+class Value {
+  constructor (args) { assign(this, args) }
+
+  render = () => span(this.valueModel.toString());
+}
+
+class Message {
+
+  get call () { return this.messageModel.callDescr() }
+
+  get on () {
+    return (new Value({ valueModel: this.messageModel.on }).render;
+  }
+
+  get args () {
+    return message.withArgs.map(
+      valueModel => (new Value({ valueModel }).render
+    );
+  }
+
+  constructor (args) { assign(this, args) }
+
+  render = () => table(
+    { border: 1 },
+    tbody(tr(
+      td(this.call),
+      td(this.on),
+      this.args.map(td),
+    ))
+  );
+}
+
+class TraceNode {
+
+  subNodesOpen = false;
+
+  get subnodes () {
+    this._subnodes ??= this._build_subnodes();
+    return this._subnodes.map(v => v.render);
+  }
+
+  _build_subnodes () {
+    return this.nodeModel.children.map(
+      nodeModel => new this.constructor({ nodeModel })
+    );
+  }
+
+  get message () {
+    this._message ??= this._build_message();
+    return this._message.render;
+  }
+
+  _build_message () {
+    return new Message({ messageModel: this.nodeModel.message });
+  }
+
+  get value () {
+    this._value ??= this._build_value();
+    return this._value.render;
+  }
+
+  _build_value () {
+    return new Value({ valueModel: this.nodeModel.value });
+  }
+
+  constructor (args) {
+    assign(this, args);
+    makeObservable(this, {
+      subNodesOpen: observable,
+      toggleSubNodesOpen: action.bound,
+    });
+  }
+
+  toggleSubNodesOpen () {
+    this.subNodesOpen = !this.subNodesOpen;
+  }
+
+  render = () => div(
+    div('-> ',
+      span({ onclick: this.toggleSubNodesOpen },
+        this.subNodesOpen ? '[-]' : '[+]',
+        this.message)),
+    this.subNodesOpen
+      ? div(this.subnodes)
+      : [],
+    div('<- ', this.value),
+  );
+}
+
+assign(views, { Value, Message, TraceNode });
