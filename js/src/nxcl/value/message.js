@@ -25,11 +25,7 @@ export class Message extends Value {
     return yield* cx.send(on, this.call, sendArgs);
   }
 
-  valueToExternalString () {
-    function splatArgs (args) {
-      if (!args.length) return '()';
-      return '( ' + args.map(x => x.toExternalString()).join(', ') + ' )';
-    }
+  callDescr() {
     let callDescr = (typeof this.call == 'symbol'
       ? this.call
             .description
@@ -37,8 +33,15 @@ export class Message extends Value {
             .replace(/\./, '::')
       : this.call.toString()
     );
+  }
+
+  valueToExternalString () {
+    function splatArgs (args) {
+      if (!args.length) return '()';
+      return '( ' + args.map(x => x.toExternalString()).join(', ') + ' )';
+    }
     return [
-      ':call ' + callDescr,
+      ':call ' + this.callDescr(),
       ...this.on ? [ ':on ' + this.on.toExternalString() ] : [],
       ...Object.hasOwn(this, 'withArgs')
         ? [ ':with-args ' + splatArgs(this.withArgs) ]
