@@ -4,7 +4,7 @@ import { h, options } from 'preact';
 let RenderView = ({ view }) => view.render();
 
 let expandChildren = (children) => children.map(c =>
-  (c instanceof View)
+  View.isView(c)
     ? h(c)
     : Array.isArray(c)
       ? expandChildren(c)
@@ -14,7 +14,7 @@ let expandChildren = (children) => children.map(c =>
 let oldHook = options.vnode;
 
 function newHook (vnode) {
-  if (vnode.type instanceof View) {
+  if (View.isView(vnode.type)) {
     vnode.props.view = vnode.type;
     vnode.type = RenderView;
   }
@@ -30,6 +30,9 @@ function newHook (vnode) {
 options.vnode = newHook;
 
 class View {
+
+  static isView (thing) { return thing instanceof this }
+
   constructor (args) {
     Object.assign(this, args);
   }
