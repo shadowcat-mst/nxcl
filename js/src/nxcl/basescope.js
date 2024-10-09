@@ -19,7 +19,7 @@ function val (symbol, value) {
 function binOp (precedence, symbol, valuep, opts) {
   let value;
   if (typeof valuep == 'symbol') {
-    value = new Message({ call: valuep, withArgs: [] });
+    value = new Message({ call: valuep, args: [] });
   } else {
     value = valuep;
   }

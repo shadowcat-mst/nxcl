@@ -15,7 +15,7 @@ export class Value {
     return new _Message.$value({
       call: messagep.toPubSym(),
       on: this,
-      withArgs: [],
+      args: [],
     });
   }
 

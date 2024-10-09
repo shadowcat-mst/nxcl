@@ -6,21 +6,21 @@ let { CALL } = proto.core;
 export class Message extends Value {
 
   *[CALL] (cx, args) {
-    if (!Object.hasOwn(this, 'withArgs')) {
-      let withArgs = [];
+    if (!Object.hasOwn(this, 'args')) {
+      let newArgs = [];
       for (let argp of args) {
         let arg = yield* cx.eval(argp);
-        withArgs.push(arg);
+        newArgs.push(arg);
       }
-      return new this.constructor({ ...this, withArgs });
+      return new this.constructor({ ...this, args: newArgs });
     }
     let on, sendArgs;
     if (on = this.on) {
-      sendArgs = [ ...this.withArgs, ...args ];
+      sendArgs = [ ...this.args, ...args ];
     } else {
       let [ first, ...rest ] = args;
       on = yield* cx.eval(first);
-      sendArgs = [ ...this.withArgs, ...rest ];
+      sendArgs = [ ...this.args, ...rest ];
     }
     return yield* cx.send(on, this.call, sendArgs);
   }
@@ -33,6 +33,7 @@ export class Message extends Value {
             .replace(/\./, '::')
       : this.call.toString()
     );
+    return callDescr;
   }
 
   valueToExternalString () {
@@ -43,8 +44,8 @@ export class Message extends Value {
     return [
       ':call ' + this.callDescr(),
       ...this.on ? [ ':on ' + this.on.toExternalString() ] : [],
-      ...Object.hasOwn(this, 'withArgs')
-        ? [ ':with-args ' + splatArgs(this.withArgs) ]
+      ...Object.hasOwn(this, 'args')
+        ? [ ':args ' + splatArgs(this.args) ]
         : [],
     ].join(', ');
   }

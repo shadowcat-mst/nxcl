@@ -38,7 +38,7 @@ class Message {
   }
 
   get args () {
-    return message.withArgs.map(
+    return message.args.map(
       valueModel => (new Value({ valueModel }).render
     );
   }
