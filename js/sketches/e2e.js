@@ -29,8 +29,7 @@ function makeTraceHandler () {
     if (type == 'enter') {
       indentStr = '  '.repeat(indent);
       indent += 1;
-      let message = new Message(payload);
-      description = [ message.callDescr(), message.on, ...(message.args??[]) ]
+      description = [ payload.callDescr(), payload.on, ...(payload.args??[]) ]
                       .map(x => (x??'').toString()).join(' ');
     } else if (type == 'leave') {
       indent -= 1;

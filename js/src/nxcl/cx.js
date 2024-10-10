@@ -1,5 +1,6 @@
 import { proto, pub } from "./constants.js";
 import { Value } from "./value.js";
+import { Message } from "./value/message.js";
 
 let { EVAL, CALL } = proto.core;
 
@@ -27,16 +28,16 @@ export class Cx extends Value {
     return yield* this.send(val, CALL, args);
   }
 
-  *send (val, message, args) {
+  *send (on, call, args) {
     if (this.trace) {
-      yield [ 'trace', 'enter', { call: message, on: val, args } ];
+      yield [ 'trace', 'enter', new Message({ on, call, args }) ];
     }
-    let method = yield* this.scope.getMethod(this, val, message);
+    let method = yield* this.scope.getMethod(this, on, call);
     if (!method) {
       // message may be a Symbol
       throw `No such method ${message.toString()} on ${val}`;
     }
-    let ret = yield* method.call(val, this, args);
+    let ret = yield* method.call(on, this, args);
     if (this.trace) yield [ 'trace', 'leave', ret ];
     return ret;
   }
