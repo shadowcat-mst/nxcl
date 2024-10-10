@@ -17,6 +17,11 @@ function findBest (haystack, isOp) {
   return null;
 }
 
+export function weave (value, scope) {
+  let isOp = cand => (cand instanceof Name) ? scope.ops[cand.value] : null;
+  return rewriteOps(value, isOp);
+}
+
 export function rewriteOps (orig, isOp) {
 
   if (!Object.hasOwn(orig, 'contents')) return orig;

@@ -1,65 +1,44 @@
-import { proto } from "../src/nxcl/constants.js";
-import { Message, Int, Call, Name, Val } from "../src/nxcl/valuetypes.js";
-import { Cx } from "../src/nxcl/cx.js";
-import { Scope } from "../src/nxcl/scope.js";
-import { baseScope } from "../src/nxcl/basescope.js";
-import { Reader } from "../src/nxcl/reader.js";
-import { rewriteOps } from "../src/nxcl/valuehelpers.js"
+import { Message } from "../src/nxcl/valuetypes.js";
+import { Interp } from "../src/nxcl/interp.js";
 
 if (import.meta.main) {
-  run(Bun.argv[2]??'1 + 3');
+  await run(Bun.argv[2]??'1 + 3');
 } else {
   globalThis.runXcl = run;
 }
 
-function run (string) {
+async function run (string) {
 
-  let reader = new Reader();
+  let interp = new Interp();
 
-  let callp = reader.read({ string });
-
-  console.log(callp.toExternalString());
-
-  let scope = baseScope();
-
-  let isOp = cand => (cand instanceof Name) ? scope.ops[cand.value] : null;
-
-  let call = rewriteOps(callp, isOp);
+  let call = interp.prepareString(string);
 
   console.log(call.toExternalString());
 
-  let cx = new Cx({ scope });
+  let result = await interp.eval(call, {
+    eventHandlers: { trace: makeTraceHandler() },
+  });
 
-  let result = cx.eval(call, []);
-
-  let last = exhaust(result);
-
-  console.log('Value:', last.toExternalString());
+  console.log('Value:', result.toExternalString());
 }
 
-function exhaust (result) {
-  let indent = 0;
-  let next, lastResult;
-  while (!(next = result.next()).done) {
-    let [ e1, e2, payload ] = next.value;
-    if (e1 !== 'trace') {
-      continue;
-    }
+function makeTraceHandler () {
+  let indent = 0, lastResult;
+  return (type, payload) => {
     let indentStr = '', description;
-    if (e2 == 'enter') {
+    if (type == 'enter') {
       indentStr = '  '.repeat(indent);
       indent += 1;
       let message = new Message(payload);
       description = [ message.callDescr(), message.on, ...(message.args??[]) ]
                       .map(x => (x??'').toString()).join(' ');
-    } else if (e2 == 'leave') {
+    } else if (type == 'leave') {
       indent -= 1;
       indentStr = '  '.repeat(indent);
-      if (payload == lastResult) continue;
+      if (payload == lastResult) return;
       lastResult = payload;
       description = payload.toString();
     }
-    console.log(indentStr + e2, description);
-  }
-  return next.value;
+    console.log(indentStr + type, description);
+  };
 }

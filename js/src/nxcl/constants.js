@@ -1,4 +1,4 @@
-function lazyObject(builder) {
+export function lazyObject(builder) {
   let obj, proxy = new Proxy({}, {
     get (target, prop, receiver) {
       return obj[prop] = builder(prop);
