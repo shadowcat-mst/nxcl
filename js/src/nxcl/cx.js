@@ -9,6 +9,8 @@ export class Cx extends Value {
 
   dynamics = this.dynamics ?? { __proto__ : null };
 
+  trace = true; // default should be false, but for the moment ...
+
   *[pub.eval] (cx, [ valuep ]) {
     let value = yield* cx.eval(valuep);
     return yield* this.eval(value);
@@ -26,14 +28,16 @@ export class Cx extends Value {
   }
 
   *send (val, message, args) {
-    yield [ '+', val, message, args ];
+    if (this.trace) {
+      yield [ 'trace', 'enter', { call: message, on: val, args } ];
+    }
     let method = yield* this.scope.getMethod(this, val, message);
     if (!method) {
       // message may be a Symbol
       throw `No such method ${message.toString()} on ${val}`;
     }
     let ret = yield* method.call(val, this, args);
-    yield [ '-', ret ];
+    if (this.trace) yield [ 'trace', 'leave', ret ];
     return ret;
   }
 

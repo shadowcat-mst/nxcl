@@ -41,24 +41,25 @@ function exhaust (result) {
   let indent = 0;
   let next, lastResult;
   while (!(next = result.next()).done) {
-    let [ first, ...rest ] = next.value;
-    if (first == '+') {
-      // method name fuckery
-      rest[1] = rest[1].description
-            .replace('xcl.protocol.', '')
-            .replace(/\./, '::');
+    let [ e1, e2, payload ] = next.value;
+    if (e1 !== 'trace') {
+      continue;
     }
-    let indentStr = '';
-    if (first == '+') {
+    let indentStr = '', description;
+    if (e2 == 'enter') {
       indentStr = '  '.repeat(indent);
       indent += 1;
-    } else if (first == '-') {
+      let message = new Message(payload);
+      description = [ message.callDescr(), message.on, ...(message.args??[]) ]
+                      .map(x => (x??'').toString()).join(' ');
+    } else if (e2 == 'leave') {
       indent -= 1;
       indentStr = '  '.repeat(indent);
-      if (rest[0] == lastResult) continue;
-      lastResult = rest[0];
+      if (payload == lastResult) continue;
+      lastResult = payload;
+      description = payload.toString();
     }
-    console.log(indentStr + first, rest.map(x => (x??'').toString()).join(', '));
+    console.log(indentStr + e2, description);
   }
   return next.value;
 }
