@@ -39,4 +39,12 @@ export class TraceBuilder {
       }
     };
   }
+
+  get evalOpts () {
+    return { eventHandlers: { trace: this.handler } };
+  }
+
+  buildView (viewClass) {
+    return new viewClass({ model: this.rootNode });
+  }
 }

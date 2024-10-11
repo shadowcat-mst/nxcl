@@ -17,9 +17,9 @@ async function run (string) {
 
   let traceBuilder = new TraceBuilder();
 
-  let result = await interp.evalString(string, {
-    eventHandlers: { trace: traceBuilder.handler },
-  });
+  let { evalOpts } = traceBuilder;
 
-  return (new TraceNode({ model: traceBuilder.rootNode })).render();
+  let result = await interp.evalString(string, evalOpts);
+
+  return traceBuilder.buildView(TraceNode).render();
 }
