@@ -3,8 +3,14 @@ import { tagBuilders, View, ViewWithSubviews, Self } from '../view.js';
 
 let { div, span, table, tbody, tr, td, ul, li } = tagBuilders;
 
+let spanStyle = { style: { outline: "solid 1px", padding: "2px", } };
+
 class Value extends View {
-  render () { return span(this.model.toString()) }
+  render () {
+    return span(
+      spanStyle,
+      this.model.toString(),
+  ) }
 }
 
 class Message extends ViewWithSubviews({
@@ -15,13 +21,10 @@ class Message extends ViewWithSubviews({
   get call () { return this.model.callDescr() }
 
   render () {
-    return table(
-      { border: 1 },
-      tbody(tr(
-        td(this.call),
-        td(this.on),
-        this.args.map(v => td(v)),
-      ))
+    return span(
+      span(spanStyle, this.call),
+      this.on,
+      this.args,
     );
   }
 }
@@ -48,16 +51,19 @@ export class TraceNode extends ViewWithSubviews({
 
   render () {
     return ul(
-      li('ENTER ',
+      li({ style: { padding: '2px' } },
+       span(spanStyle, 'ENTER'), ' ',
         span({ onclick: this.toggleExpanded },
           this.message,
           this.hasChildren && (this.isExpanded ? '[-]' : '[+]'),
         )
       ),
       this.hasChildren && this.isExpanded
-        ? li(this.children)
+        ? li({ style: { padding: '2px' } }, this.children)
         : [],
-      li('LEAVE ', this.value),
+      li({ style: { padding: '2px' } },
+        span(spanStyle, 'LEAVE'), ' ', this.value
+      ),
     );
   }
 }
