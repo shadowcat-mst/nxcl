@@ -1,7 +1,7 @@
-import { observable, action, makeObservable } from 'mobx';
+import { observable, action, makeObservable } from '../libs.js';
 import { tagBuilders, View, ViewWithSubviews, Self } from '../view.js';
 
-let { div, span, table, tbody, tr, td, ul, li } = tagBuilders;
+let { div, span, ul, li } = tagBuilders;
 
 let spanStyle = { style: { outline: "solid 1px", padding: "2px", } };
 

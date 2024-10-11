@@ -1,7 +1,7 @@
 import { lazyObject } from '../nxcl/constants.js';
-import { h, options } from 'preact';
-import { makeObservable } from 'mobx';
-import { observer } from 'mobx-preact';
+import { observer, createElement, preactOptions } from './libs.js';
+
+export { createElement as 'h' };
 
 // Going to have to think about how we deal with this wrt hot reload
 
@@ -14,13 +14,13 @@ let vnodeTag = Symbol('vnodeTag');
 
   let expandChildren = (children) => children.map(c =>
     View.isView(c)
-      ? h(c)
+      ? createElement(c)
       : Array.isArray(c)
         ? expandChildren(c)
         : c
   );
 
-  let oldHook = options.vnode;
+  let oldHook = preactOptions.vnode;
 
   function newHook (vnode) {
     vnode[vnodeTag] = true;
@@ -37,7 +37,7 @@ let vnodeTag = Symbol('vnodeTag');
     if (oldHook) oldHook(vnode);
   }
 
-  options.vnode = newHook;
+  preactOptions.vnode = newHook;
 }
 
 function isPlainObject (thing) {
@@ -59,7 +59,7 @@ export const tagBuilders = lazyObject(propName => {
   );
   return (...args) => {
     let props = isPlainObject(args[0]) ? args.shift() : {};
-    return h(tagName, props, args);
+    return createElement(tagName, props, args);
   }
 });
 
