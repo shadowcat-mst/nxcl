@@ -1,8 +1,6 @@
 import { lazyObject } from '../nxcl/constants.js';
 import { observer, createElement, preactOptions } from './libs.js';
 
-export { createElement as 'h' };
-
 // Going to have to think about how we deal with this wrt hot reload
 
 let vnodeTag = Symbol('vnodeTag');
@@ -49,6 +47,8 @@ function isPlainObject (thing) {
 }
 
 // a lazyObject based hyperaxe
+
+export { createElement as 'h' };
 
 export const tagBuilders = lazyObject(propName => {
   // propName 'fooBar' -> tagName 'foo-bar'
