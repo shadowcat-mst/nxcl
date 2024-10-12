@@ -5,6 +5,8 @@ let { div, span, ul, li } = tagBuilders;
 
 let spanStyle = { style: { outline: "solid 1px", padding: "2px", } };
 
+let liStyle = { style: { padding: '2px' } };
+
 class Value extends View {
   render () {
     return span(
@@ -22,9 +24,9 @@ class Message extends ViewWithSubviews({
 
   render () {
     return span(
-      span(spanStyle, this.call),
-      this.on,
-      this.args,
+      span(spanStyle, this.call), ' ',
+      this.on, ' ',
+      this.args.map(a => [ a, ' ' ]),
     );
   }
 }
@@ -37,7 +39,7 @@ export class TraceNode extends ViewWithSubviews({
 
   constructor (args) {
     super(args);
-    makeObservable({
+    makeObservable(this, {
       isExpanded: observable,
       toggleExpanded: action.bound,
     });
@@ -45,23 +47,23 @@ export class TraceNode extends ViewWithSubviews({
 
   isExpanded = true;
 
-  toggleExpanded () { this.isExpanded = !this.isExpanded }
+  toggleExpanded = () => { this.isExpanded = !this.isExpanded }
 
   get hasChildren () { return !!this.model.children.length }
 
   render () {
     return ul(
-      li({ style: { padding: '2px' } },
+      li(liStyle,
        span(spanStyle, 'ENTER'), ' ',
         span({ onclick: this.toggleExpanded },
           this.message,
-          this.hasChildren && (this.isExpanded ? '[-]' : '[+]'),
+          this.hasChildren && (this.isExpanded ? ' [-]' : ' [+]'),
         )
       ),
       this.hasChildren && this.isExpanded
-        ? li({ style: { padding: '2px' } }, this.children)
+        ? li(liStyle, this.children)
         : [],
-      li({ style: { padding: '2px' } },
+      li(liStyle,
         span(spanStyle, 'LEAVE'), ' ', this.value
       ),
     );
