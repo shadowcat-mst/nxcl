@@ -10,6 +10,11 @@ if (import.meta.main) {
 } else {
   globalThis.runXcl = run;
   globalThis.render = render;
+  let showTrace_ = async function (string) {
+    let vnode = await run(string);
+    render(vnode, document.body);
+  };
+  globalThis.showTrace = (string) => { showTrace_(string) };
 }
 
 async function run (string) {
