@@ -1,5 +1,5 @@
 import { observable, action, makeObservable } from '../libs.js';
-import { tagBuilders, View, ViewWithSubviews, Self } from '../view.js';
+import { tagBuilders, View, ViewWithSubviews, Self } from '../viewcore.js';
 
 let { div, span, ul, li } = tagBuilders;
 
