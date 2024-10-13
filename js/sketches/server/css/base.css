@@ -3,3 +3,11 @@ body {
   color: #ffdd44;
   font-family: monospace;
 }
+
+span {
+  margin-right: 5px;
+}
+
+li {
+  padding: 2px;
+}

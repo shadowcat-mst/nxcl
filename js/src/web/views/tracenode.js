@@ -3,14 +3,9 @@ import { tagBuilders, View, ViewWithSubviews, Self } from '../viewcore.js';
 
 let { div, span, ul, li } = tagBuilders;
 
-let spanStyle = { style: { outline: "solid 1px", padding: "2px", } };
-
-let liStyle = { style: { padding: '2px' } };
-
 class Value extends View {
   render () {
     return span(
-      spanStyle,
       this.model.toString(),
   ) }
 }
@@ -24,9 +19,9 @@ class Message extends ViewWithSubviews({
 
   render () {
     return span(
-      span(spanStyle, this.call), ' ',
-      this.on, ' ',
-      this.args.map(a => [ a, ' ' ]),
+      span(this.call),
+      this.on,
+      this.args,
     );
   }
 }
@@ -53,19 +48,18 @@ export class TraceNode extends ViewWithSubviews({
 
   render () {
     return ul(
-      li(liStyle,
-       span(spanStyle, 'ENTER'), ' ',
-        span({ onclick: this.toggleExpanded },
-          this.message,
-          this.hasChildren && (this.isExpanded ? ' [-]' : ' [+]'),
+      li(
+        span('ENTER'),
+        this.message,
+        this.hasChildren && span(
+          { onclick: this.toggleExpanded },
+          (this.isExpanded ? '[-]' : '[+]'),
         )
       ),
       this.hasChildren && this.isExpanded
-        ? li(liStyle, this.children)
+        ? li(this.children)
         : [],
-      li(liStyle,
-        span(spanStyle, 'LEAVE'), ' ', this.value
-      ),
+      li(span('LEAVE'), this.value),
     );
   }
 }
