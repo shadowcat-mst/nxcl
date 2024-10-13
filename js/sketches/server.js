@@ -1,4 +1,4 @@
-const jsFile = /(?<=^\/)(src|sketches)\/(.*\.js)$/;
+const staticFile = /(?<=^\/)(css|src|sketches)\/(.*)$/;
 
 Bun.serve({
   port: 4172,
@@ -8,15 +8,17 @@ Bun.serve({
       console.log('Serving: index');
       return new Response(Bun.file('sketches/server/index.html'));
     }
-    let m = path.match(jsFile);
+    let m = path.match(staticFile);
     if (m) {
-      let jsPath = m[0];
+      let staticPath = m[0];
       if (m[1] == 'src') {
         let bundlePath = `bundle/${m[2]}`;
-        if (Bun.file(bundlePath).size) jsPath = bundlePath;
+        if (Bun.file(bundlePath).size) staticPath = bundlePath;
+      } else if (m[1] == 'css') {
+        staticPath = `sketches/server/css/${m[2]}`;
       }
-      console.log(`Serving: ${jsPath}`);
-      return new Response(Bun.file(jsPath));
+      console.log(`Serving: ${staticPath}`);
+      return new Response(Bun.file(staticPath));
     }
     return new Response('Nope', { status: 404 });
   }
