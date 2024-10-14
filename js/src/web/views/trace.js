@@ -1,18 +1,21 @@
+import { registry } from '../viewregistry.js';
 import { observable, action, makeObservable } from '../libs.js';
 import { tagBuilders, View, ViewWithSubviews, Self } from '../viewcore.js';
 
+let { my, R } = registry(import.meta);
+
 let { div, span, ul, li } = tagBuilders;
 
-class Value extends View {
+R(class Value extends View {
   render () {
     return span(
       this.model.toString(),
   ) }
-}
+});
 
-class Message extends ViewWithSubviews({
-  on: Value,
-  args: [Value],
+R(class Message extends ViewWithSubviews({
+  on: my.Value,
+  args: [my.Value],
 }) {
 
   get call () { return this.model.callDescr() }
@@ -24,11 +27,11 @@ class Message extends ViewWithSubviews({
       this.args,
     );
   }
-}
+});
 
-export class TraceNode extends ViewWithSubviews({
-  value: Value,
-  message: Message,
+R(class TraceNode extends ViewWithSubviews({
+  value: my.Value,
+  message: my.Message,
   children: [Self],
 }) {
 
@@ -62,4 +65,4 @@ export class TraceNode extends ViewWithSubviews({
       li(span('LEAVE'), this.value),
     );
   }
-}
+});

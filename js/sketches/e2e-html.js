@@ -1,8 +1,11 @@
 import { Message } from "../src/nxcl/valuetypes.js";
 import { Interp } from "../src/nxcl/interp.js";
-import { TraceNode } from "../src/web/views/tracenode.js";
 import { TraceBuilder } from "../src/nxcl/tracebuilder.js";
 import { render, renderToString, createElement } from '../src/web/libs.js';
+import { views } from "../src/web/viewregistry.js";
+import "../src/web/views/trace.js";
+
+let { TraceNode } = views.trace;
 
 if (import.meta.main) {
   let vnode = await run(Bun.argv[2]??'1 + 3');
