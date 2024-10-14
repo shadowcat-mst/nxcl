@@ -8,6 +8,10 @@ span {
   margin-right: 5px;
 }
 
+span.toggle:hover {
+  background-color: #7f6e22;
+}
+
 li {
   padding: 2px;
 }

@@ -51,7 +51,7 @@ export class TraceNode extends ViewWithSubviews({
       li(
         span('ENTER'),
         this.message,
-        this.hasChildren && span(
+        this.hasChildren && span.toggle(
           { onclick: this.toggleExpanded },
           (this.isExpanded ? '[-]' : '[+]'),
         )
