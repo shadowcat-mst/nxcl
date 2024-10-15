@@ -1,8 +1,12 @@
-import { registry } from '../viewregistry.js';
+import { registry } from '../../util/exportregistry.js';
 import { observable, action, makeObservable } from '../libs.js';
 import { tagBuilders, View, ViewWithSubviews, Self } from '../viewcore.js';
 
-let { my, R } = registry(import.meta);
+let { classes, R } = registry(import.meta);
+
+const { TraceNode, Value, Message } = classes;
+
+export { TraceNode };
 
 let { div, span, ul, li } = tagBuilders;
 
@@ -14,8 +18,8 @@ R(class Value extends View {
 });
 
 R(class Message extends ViewWithSubviews({
-  on: my.Value,
-  args: [my.Value],
+  on: Value,
+  args: [Value],
 }) {
 
   get call () { return this.model.callDescr() }
@@ -30,8 +34,8 @@ R(class Message extends ViewWithSubviews({
 });
 
 R(class TraceNode extends ViewWithSubviews({
-  value: my.Value,
-  message: my.Message,
+  value: Value,
+  message: Message,
   children: [Self],
 }) {
 

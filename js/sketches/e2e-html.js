@@ -2,13 +2,12 @@ import { Message } from "../src/nxcl/valuetypes.js";
 import { Interp } from "../src/nxcl/interp.js";
 import { TraceBuilder } from "../src/nxcl/tracebuilder.js";
 import { render, renderToString, createElement } from '../src/web/libs.js';
-import { views } from "../src/web/viewregistry.js";
-import "../src/web/views/trace.js";
-
-let { TraceNode } = views.trace;
+import { TraceNode } from '../src/web/views/trace.js';
 
 if (import.meta.main) {
-  let vnode = await run(Bun.argv[2]??'1 + 3');
+  let vnode = await run(Bun.argv[2]??'{3}()');
+  console.log(renderToString(vnode, {}, { jsx: false }));
+  await import('../sketches/reload/views/trace.js');
   console.log(renderToString(vnode, {}, { jsx: false }));
 } else {
   globalThis.runXcl = run;
