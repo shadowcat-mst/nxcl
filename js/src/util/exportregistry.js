@@ -23,8 +23,7 @@ class ModuleRegistry {
 
   predeclareClass (name) {
     if (Reflect.has(this.classes, name)) return this.classes[name];
-    let newClass;
-    eval('newClass = class ' + name + ' extends Predeclaration { }');
+    let newClass = { [name]: class extends Predeclaration {} }[name];
     return this.classes[name] = newClass;
   }
 }
