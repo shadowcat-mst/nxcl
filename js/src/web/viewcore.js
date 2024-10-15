@@ -1,4 +1,4 @@
-import { lazyObject, lazyFunctionObject } from '../nxcl/util/lazy.js';
+import { lazyObject, lazyFunctionObject } from '../util/lazy.js';
 import { observer, createElement, preactOptions } from './libs.js';
 
 // Going to have to think about how we deal with this wrt hot reload

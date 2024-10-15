@@ -1,11 +1,4 @@
-export function lazyObject(builder) {
-  let obj, proxy = new Proxy({}, {
-    get (target, prop, receiver) {
-      return obj[prop] = builder(prop);
-    }
-  });
-  return obj = Object.create(proxy);
-}
+import { lazyObject } from "../util/lazy.js";
 
 function cascade(prefix, Maker) {
   return lazyObject(prop => Maker(`${prefix}.${prop}`));
