@@ -8,7 +8,7 @@ const { TraceNode, Value, Message } = classes;
 
 export { TraceNode };
 
-let { div, span, ul, li } = tagBuilders;
+let { div, span, ul, li, strong } = tagBuilders;
 
 R(class Value extends View {
   render () {
@@ -56,7 +56,7 @@ R(class TraceNode extends ViewWithSubviews({
   render () {
     return ul(
       li(
-        span('ENTER'),
+        span.bright('->'),
         this.message,
         this.hasChildren && span.toggle(
           { onclick: this.toggleExpanded },
@@ -66,7 +66,7 @@ R(class TraceNode extends ViewWithSubviews({
       this.hasChildren && this.isExpanded
         ? li(this.children)
         : [],
-      li(span('LEAVE'), this.value),
+      li(span.bright('<-'), this.value),
     );
   }
 });

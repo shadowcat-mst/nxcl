@@ -8,6 +8,10 @@ span {
   margin-right: 5px;
 }
 
+span.bright {
+  color: #ffff88;
+}
+
 span.toggle:hover {
   background-color: #7f6e22;
 }
@@ -17,9 +21,10 @@ li {
 }
 
 ul ul {
+  padding-top: 0px;
   padding-left: 20px;
 }
 
 ul {
-  list-style-type: disc;
+  list-style-type: none;
 }
