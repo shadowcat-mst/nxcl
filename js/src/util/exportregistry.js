@@ -1,3 +1,5 @@
+import { createAtom } from '../web/libs.js';
+
 class Predeclaration {
   constructor () {
     throw `Attempt to construct predeclared class ${this.constructor.name}`;
@@ -18,12 +20,19 @@ class ModuleRegistry {
     let myClass = this.predeclareClass(name);
     Reflect.setPrototypeOf(myClass, userClass);
     Reflect.setPrototypeOf(myClass.prototype, userClass.prototype);
+    myClass.reportChanged();
     return myClass;
   }
 
   predeclareClass (name) {
     if (Reflect.has(this.classes, name)) return this.classes[name];
-    let newClass = { [name]: class extends Predeclaration {} }[name];
+    let classAtom = createAtom(name);
+    let newClass = {
+      [name]: class extends Predeclaration {
+        static reportObserved () { classAtom.reportObserved() }
+        static reportChanged () { classAtom.reportChanged() }
+      }
+    }[name];
     return this.classes[name] = newClass;
   }
 }

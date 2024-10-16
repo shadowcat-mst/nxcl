@@ -1,14 +1,16 @@
-import { lazyObject, lazyFunctionObject } from '../util/lazy.js';
 import { observer, createElement, preactOptions } from './libs.js';
 
-// Going to have to think about how we deal with this wrt hot reload
+import { tagBuilders, vnodeTag } from './fullblade.js';
 
-let vnodeTag = Symbol('vnodeTag');
+export { tagBuilders };
 
 {
   // Hook view rendering into preact via preact.options
 
-  let RenderView = observer(({ view }) => view.render());
+  let RenderView = observer(({ view }) => {
+    view.constructor.reportObserved();
+    return view.render();
+  });
 
   let expandChildren = (children) => children.map(c =>
     View.isView(c)
@@ -37,48 +39,6 @@ let vnodeTag = Symbol('vnodeTag');
 
   preactOptions.vnode = newHook;
 }
-
-function isPlainObject (thing) {
-  return (
-    typeof thing == 'object'
-    && Object.getPrototypeOf(thing) == Object.prototype
-    && !thing[vnodeTag]
-  );
-}
-
-// a lazyObject based hyperaxe
-
-export { createElement as 'h' };
-
-// 'fooBar' -> 'foo-bar'
-
-let kebab = (name) => 
-  name.split(/(?=[A-Z])/)
-      .map(x => x.toLowerCase())
-      .join('-');
-
-let makeTagBuilder = (classes, tagName) => {
-  let func = (...args) => {
-    let props = isPlainObject(args[0]) ? { ...args.shift() } : {};
-    if (classes.length) {
-      props.class = [
-        ...classes,
-        ...(
-          props.class
-            ? Array.isArray(props.class) ? props.class : [ props.class ]
-            : []),
-      ];
-    }
-    return createElement(tagName, props, args);
-  }
-  return lazyFunctionObject(func,
-    propName => makeTagBuilder([ ...classes, kebab(propName) ], tagName)
-  );
-};
-
-export const tagBuilders = lazyObject(
-  propName => makeTagBuilder([], kebab(propName))
-);
 
 export const Self = Symbol('Self');
 
