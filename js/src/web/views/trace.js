@@ -47,7 +47,7 @@ R(class TraceNode extends ViewWithSubviews({
     });
   }
 
-  isExpanded = true;
+  isExpanded = false;
 
   toggleExpanded = () => { this.isExpanded = !this.isExpanded }
 
