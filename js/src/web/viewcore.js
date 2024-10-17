@@ -1,4 +1,4 @@
-import { observer, createElement, preactOptions } from './libs.js';
+import { observer, createElement, preactOptions, Fragment } from './libs.js';
 
 import { tagBuilders, vnodeTag } from './fullblade.js';
 
@@ -9,7 +9,8 @@ export { tagBuilders };
 
   let RenderView = observer(({ view }) => {
     view.constructor.reportObserved();
-    return view.render();
+    let r = view.render();
+    return Array.isArray(r) ? createElement(Fragment, {}, r) : r;
   });
 
   let expandChildren = (children) => children.map(c =>
