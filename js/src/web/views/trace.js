@@ -25,11 +25,11 @@ R(class Message extends ViewWithSubviews({
   get call () { return this.model.callDescr() }
 
   render () {
-    return span(
+    return [
       span(this.call),
       this.on,
       this.args,
-    );
+    ];
   }
 });
 
