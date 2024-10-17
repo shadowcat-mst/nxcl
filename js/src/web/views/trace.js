@@ -1,8 +1,8 @@
-import { registry } from '../../util/exportregistry.js';
+import { getRegistry } from '../../util/moduleregistry.js';
 import { observable, action, makeObservable } from '../libs.js';
 import { tagBuilders, View, ViewWithSubviews, Self } from '../viewcore.js';
 
-let { classes, R } = registry(import.meta);
+let { classes, R } = getRegistry(import.meta);
 
 const { TraceNode, Value, Message } = classes;
 

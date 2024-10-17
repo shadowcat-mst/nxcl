@@ -46,7 +46,7 @@ function nameForURL (url) {
   return m[1];
 }
 
-export function registry (meta) {
+export function getRegistry (meta) {
   let registryName = nameForURL(meta.url);
   return registries[registryName] ??= new ModuleRegistry();
 }
