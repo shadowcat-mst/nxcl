@@ -33,7 +33,7 @@ export function Reactive (superClass, tprops) {
 
   for (let [ tname, tdescr ] of ownEntries(tprops)) {
 
-    if ('get' in tdescr && 'set' in tdescr) {
+    if (tdescr.get && tdsecr.set) {
       throw `Can't pass both get and set for Reactive() arg ${tname}`;
     }
 
@@ -88,7 +88,7 @@ export function Reactive (superClass, tprops) {
         });
       }
 
-    } else if ('set' in tdescr) {
+    } else if (tdescr.set) {
 
       let atomName = tname + '$atom', valueName = tname + '$value';
       let setFn = tdescr.set;
@@ -112,7 +112,7 @@ export function Reactive (superClass, tprops) {
         },
       });
 
-    } else if ('get' in tdescr) {
+    } else if (tdescr.get) {
 
       let computedName = tname + '$computed';
       let getFn = tdescr.get;
