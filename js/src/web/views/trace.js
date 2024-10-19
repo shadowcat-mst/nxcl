@@ -1,5 +1,5 @@
 import { getRegistry } from '../../util/moduleregistry.js';
-import { observable, action, makeObservable } from '../libs.js';
+import { observable, action } from '../libs.js';
 import { tagBuilders, View, subviews, Self } from '../viewcore.js';
 import { Reactive } from '../reactive.js';
 
