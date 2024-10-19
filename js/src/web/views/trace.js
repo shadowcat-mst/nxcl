@@ -1,6 +1,7 @@
 import { getRegistry } from '../../util/moduleregistry.js';
 import { observable, action, makeObservable } from '../libs.js';
-import { tagBuilders, View, ViewWithSubviews, Self } from '../viewcore.js';
+import { tagBuilders, View, subviews, Self } from '../viewcore.js';
+import { Reactive } from '../reactive.js';
 
 let { classes, R } = getRegistry(import.meta);
 
@@ -17,10 +18,10 @@ R(class Value extends View {
   ) }
 });
 
-R(class Message extends ViewWithSubviews({
+R(class Message extends Reactive(View, subviews({
   on: Value,
   args: [Value],
-}) {
+})) {
 
   get call () { return this.model.callDescr() }
 
@@ -33,23 +34,15 @@ R(class Message extends ViewWithSubviews({
   }
 });
 
-R(class TraceNode extends ViewWithSubviews({
-  value: Value,
-  message: Message,
-  children: [Self],
+R(class TraceNode extends Reactive(View, {
+  ...subviews({
+    value: Value,
+    message: Message,
+    children: [Self],
+  }),
+  isExpanded: false,
+  toggleExpanded () { this.isExpanded = !this.isExpanded },
 }) {
-
-  constructor (args) {
-    super(args);
-    makeObservable(this, {
-      isExpanded: observable,
-      toggleExpanded: action.bound,
-    });
-  }
-
-  isExpanded = false;
-
-  toggleExpanded = () => { this.isExpanded = !this.isExpanded }
 
   get hasChildren () { return !!this.model.children.length }
 

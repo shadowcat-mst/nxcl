@@ -1,4 +1,4 @@
-import { action, computed, createAtom } from '../src/web/libs.js';
+import { action, computed, createAtom } from './libs.js';
 
 function makeDollarProp (obj, name, value) {
   Object.defineProperty(obj, name, {

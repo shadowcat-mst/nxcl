@@ -1,5 +1,7 @@
 import { observer, createElement, preactOptions, Fragment } from './libs.js';
 
+import { ReactivePropertyDescriptor } from './reactive.js';
+
 import { tagBuilders, vnodeTag } from './fullblade.js';
 
 export { tagBuilders };
@@ -54,21 +56,19 @@ export class View {
   toString () { return `[object ${this.constructor.name}]` }
 }
 
-export function ViewWithSubviews (subviews) {
-  let newBase = class ViewWithSubviews extends View {};
-  for (let [ name, config ] of Object.entries(subviews)) {
-    let arrayOf = Array.isArray(config);
-    let [type] = arrayOf ? config : [config];
-    let slot = '_' + name;
-    let make = (type == Self) ? null : model => new type({ model });
-    Object.defineProperty(newBase.prototype, name, {
-      get () {
-        if (slot in this) return this[slot];
-        let makeV = make ?? (model => new this.constructor({ model }));
-        let src = this.model[name];
-        return this[slot] = arrayOf ? (src??[]).map(makeV) : makeV(src);
-      }
-    });
-  }
-  return newBase;
+export function subviews (spec) {
+  return Object.fromEntries(
+    Object.entries(spec).map(([ name, config ]) => {
+      let arrayOf = Array.isArray(config);
+      let [type] = arrayOf ? config : [config];
+      let make = (type == Self) ? null : model => new type({ model });
+      return [ name, new ReactivePropertyDescriptor({
+        get () {
+          let makeV = make ?? (model => new this.constructor({ model }));
+          let src = this.model[name];
+          return arrayOf ? (src??[]).map(makeV) : makeV(src);
+        }
+      }) ];
+    })
+  );
 }
