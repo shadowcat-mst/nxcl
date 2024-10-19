@@ -7,8 +7,6 @@ import { TraceNode } from '../src/web/views/trace.js';
 if (import.meta.main) {
   let vnode = await run(Bun.argv[2]??'{3}()');
   console.log(renderToString(vnode, {}, { jsx: false }));
-  await import('../sketches/reload/views/trace.js');
-  console.log(renderToString(vnode, {}, { jsx: false }));
 } else {
   globalThis.runXcl = run;
   globalThis.render = render;
