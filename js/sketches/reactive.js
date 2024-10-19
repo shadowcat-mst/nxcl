@@ -22,18 +22,18 @@ export class ReactivePropertyDescriptor {
 export function Reactive (superClass, tprops) {
 
   let newName = 'Reactive' + superClass.name;
+
+  // need to extends something so the superclass constructor gets called
+
   let newClass = {
-    [newName]: class extends Object {
-      constructor (...args) { super(...args) }
-    },
+    [newName]: class extends Object { },
   }[newName];
-  let newProto = newClass.prototype;
 
   Object.setPrototypeOf(newClass, superClass);
-  Object.setPrototypeOf(newProto, superClass.prototype);
+  Object.setPrototypeOf(newClass.prototype, superClass.prototype);
 
   function newProp (name, descr) {
-    Object.defineProperty(newProto, name, descr);
+    Object.defineProperty(newClass.prototype, name, descr);
   }
 
   for (let [ tname, tdescr ] of ownEntries(tprops)) {
