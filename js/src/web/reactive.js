@@ -23,14 +23,9 @@ export function Reactive (superClass, tprops) {
 
   let newName = 'Reactive' + superClass.name;
 
-  // need to extends something so the superclass constructor gets called
-
   let newClass = {
-    [newName]: class extends Object { },
+    [newName]: class extends superClass { },
   }[newName];
-
-  Object.setPrototypeOf(newClass, superClass);
-  Object.setPrototypeOf(newClass.prototype, superClass.prototype);
 
   function newProp (name, descr) {
     Object.defineProperty(newClass.prototype, name, descr);
