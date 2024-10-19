@@ -22,7 +22,11 @@ export class ReactivePropertyDescriptor {
 export function Reactive (superClass, tprops) {
 
   let newName = 'Reactive' + superClass.name;
-  let newClass = { [newName]: class { } }[newName];
+  let newClass = {
+    [newName]: class extends Object {
+      constructor (...args) { super(...args) }
+    },
+  }[newName];
   let newProto = newClass.prototype;
 
   Object.setPrototypeOf(newClass, superClass);
@@ -74,7 +78,7 @@ export function Reactive (superClass, tprops) {
             let atom = this[atomName]
               ?? makeDollarProp(this, atomName, createAtom(tname));
             atom.reportObserved();
-            return Object.hasOwn(this[valueName])
+            return Object.hasOwn(this, valueName)
               ? this[valueName]
               : this[valueName] = tvalue;
           },
@@ -83,7 +87,7 @@ export function Reactive (superClass, tprops) {
               ?? makeDollarProp(this, atomName, createAtom(tname));
             atom.reportChanged();
             return Object.hasOwn(this, valueName)
-              ? this.valueName = newValue
+              ? this[valueName] = newValue
               : makeDollarProp(this, valueName, newValue);
           },
         });
@@ -99,7 +103,7 @@ export function Reactive (superClass, tprops) {
           let atom = this[atomName]
             ?? makeDollarProp(this, atomName, createAtom(tname));
           atom.reportObserved();
-          return Object.hasOwn(this[valueName])
+          return Object.hasOwn(this, valueName)
             ? this[valueName]
             : this[valueName] = setFn.call(this);
         },
@@ -108,7 +112,7 @@ export function Reactive (superClass, tprops) {
             ?? makeDollarProp(this, atomName, createAtom(tname));
           atom.reportChanged();
           return Object.hasOwn(this, valueName)
-            ? this.valueName = setFn.call(this, newValue)
+            ? this[valueName] = setFn.call(this, newValue)
             : makeDollarProp(this, valueName, setFn.call(this, newValue));
         },
       });
@@ -121,7 +125,7 @@ export function Reactive (superClass, tprops) {
       newProp(tname, {
         get () {
           return (this[computedName]
-            ?? makeDollarProp(this, computedName, computed(getFn.bind(this)))
+            ??= makeDollarProp(this, computedName, computed(getFn.bind(this)))
           ).get()
         },
       });
