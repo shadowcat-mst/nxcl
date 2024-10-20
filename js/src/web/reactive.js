@@ -1,4 +1,4 @@
-import { action, computed, createAtom } from './libs.js';
+import { action, computed, flow, createAtom } from './libs.js';
 
 function makeDollarProp (obj, name, value) {
   Object.defineProperty(obj, name, {
@@ -18,6 +18,10 @@ function ownEntries (obj) {
 export class ReactivePropertyDescriptor {
   constructor (args) { Object.assign(this, args) }
 }
+
+// from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction
+
+const GeneratorFunction = function* () {}.constructor;
 
 export function Reactive (superClass, tprops) {
 
@@ -47,10 +51,15 @@ export function Reactive (superClass, tprops) {
 
       if (typeof tvalue == 'function') {
 
-        // action() calls createAction() which makes a function that calls
-        // executeAction() and passes through 'this' to be used in .apply()
         let actionName = tname + '$action';
-        let actionFn = action(tvalue);
+
+        // action() and flow() both pass through 'this'
+
+        let actionFn = (
+          tvalue instanceof GeneratorFunction
+            ? flow(tvalue)
+            : action(tvalue)
+        );
 
         newProp(tname, {
           enumerable: false,
