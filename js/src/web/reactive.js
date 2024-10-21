@@ -101,26 +101,32 @@ export class ReactiveClassBuilder {
 
   makeSetterDescriptorsFor (tname, tdescr) {
     let atomName = tname + '$atom', valueName = tname + '$value';
-    let setFn = tdescr.set;
+    let functionName = tname + '$setFunction';
 
-    return [[ tname, {
-      get () {
-        let atom = this[atomName]
-          ?? makeDollarProp(this, atomName, createAtom(tname));
-        atom.reportObserved();
-        return Object.hasOwn(this, valueName)
-          ? this[valueName]
-          : this[valueName] = setFn.call(this);
-      },
-      set (newValue) {
-        let atom = this[atomName]
-          ?? makeDollarProp(this, atomName, createAtom(tname));
-        atom.reportChanged();
-        return Object.hasOwn(this, valueName)
-          ? this[valueName] = setFn.call(this, newValue)
-          : makeDollarProp(this, valueName, setFn.call(this, newValue));
-      },
-    } ]];
+    return [
+      [ functionName, {
+        enumerable: false,
+        value: tdescr.set,
+      } ],
+      [ tname, {
+        get () {
+          let atom = this[atomName]
+            ?? makeDollarProp(this, atomName, createAtom(tname));
+          atom.reportObserved();
+          return Object.hasOwn(this, valueName)
+            ? this[valueName]
+            : this[valueName] = this[functionName]();
+        },
+        set (newValue) {
+          let atom = this[atomName]
+            ?? makeDollarProp(this, atomName, createAtom(tname));
+          atom.reportChanged();
+          return Object.hasOwn(this, valueName)
+            ? this[valueName] = this[functionName](newValue)
+            : makeDollarProp(this, valueName, this[functionName](newValue));
+        },
+      } ]
+    ];
   }
 
   makeGetterDescriptorsFor (tname, tdescr) {
