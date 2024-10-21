@@ -24,18 +24,111 @@ export class ReactivePropertyDescriptor {
 const GeneratorFunction = function* () {}.constructor;
 
 export function Reactive (superClass, tprops) {
+  return new ReactiveClassBuilder({ superClass, tprops }).build();
+}
 
-  let newName = 'Reactive' + superClass.name;
+export class ReactiveClassBuilder {
 
-  let newClass = {
-    [newName]: class extends superClass { },
-  }[newName];
+  constructor (args) { Object.assign(this, args) }
 
-  function newProp (name, descr) {
-    Object.defineProperty(newClass.prototype, name, descr);
+  makeValueDescriptorsFor(tname, tdescr) {
+
+    let value = tdescr.value;
+    let valueType = typeof value;
+
+    if (valueType == 'object') {
+      throw `Can't pass object value for Reactive() arg ${tname}; try set`;
+    }
+
+    if (valueType == 'function') {
+      return this.makeFunctionDescriptorsFor(tname, value);
+    }
+
+    return this.makePlainValueDescriptorsFor(tname, value);
   }
 
-  for (let [ tname, tdescr ] of ownEntries(tprops)) {
+  makeFunctionDescriptorsFor(tname, tvalue) {
+    let actionName = tname + '$action';
+
+    // action() and flow() both pass through 'this'
+
+    let actionFn = (
+      tvalue instanceof GeneratorFunction
+        ? flow(tvalue)
+        : action(tvalue)
+    );
+
+    return [[ tname, {
+      enumerable: false,
+      get () {
+        return this[actionName]
+          ?? makeDollarProp(this, actionName, actionFn.bind(this))
+      },
+     } ]];
+  }
+
+  makePlainValueDescriptorsFor (tname, tvalue) {
+
+    let atomName = tname + '$atom', valueName = tname + '$value';
+
+    return [[ tname, {
+      get () {
+        let atom = this[atomName]
+          ?? makeDollarProp(this, atomName, createAtom(tname));
+        atom.reportObserved();
+        return Object.hasOwn(this, valueName)
+          ? this[valueName]
+          : this[valueName] = tvalue;
+      },
+      set (newValue) {
+        let atom = this[atomName]
+          ?? makeDollarProp(this, atomName, createAtom(tname));
+            atom.reportChanged();
+        return Object.hasOwn(this, valueName)
+          ? this[valueName] = newValue
+          : makeDollarProp(this, valueName, newValue);
+      },
+    } ]];
+  }
+
+  makeSetterDescriptorsFor (tname, tdescr) {
+    let atomName = tname + '$atom', valueName = tname + '$value';
+    let setFn = tdescr.set;
+
+    return [[ tname, {
+      get () {
+        let atom = this[atomName]
+          ?? makeDollarProp(this, atomName, createAtom(tname));
+        atom.reportObserved();
+        return Object.hasOwn(this, valueName)
+          ? this[valueName]
+          : this[valueName] = setFn.call(this);
+      },
+      set (newValue) {
+        let atom = this[atomName]
+          ?? makeDollarProp(this, atomName, createAtom(tname));
+        atom.reportChanged();
+        return Object.hasOwn(this, valueName)
+          ? this[valueName] = setFn.call(this, newValue)
+          : makeDollarProp(this, valueName, setFn.call(this, newValue));
+      },
+    } ]];
+  }
+
+  makeGetterDescriptorsFor (tname, tdescr) {
+    let computedName = tname + '$computed';
+    let getFn = tdescr.get;
+
+    return [[ tname, {
+      get () {
+        return (this[computedName]
+          ??= makeDollarProp(this, computedName, computed(getFn.bind(this)))
+        ).get()
+      },
+    } ]];
+  }
+
+  makeDescriptorsFor (tname, tdescr) {
 
     if (tdescr.get && tdsecr.set) {
       throw `Can't pass both get and set for Reactive() arg ${tname}`;
@@ -46,98 +139,40 @@ export function Reactive (superClass, tprops) {
     }
 
     if ('value' in tdescr) {
-
-      let tvalue = tdescr.value;
-
-      if (typeof tvalue == 'function') {
-
-        let actionName = tname + '$action';
-
-        // action() and flow() both pass through 'this'
-
-        let actionFn = (
-          tvalue instanceof GeneratorFunction
-            ? flow(tvalue)
-            : action(tvalue)
-        );
-
-        newProp(tname, {
-          enumerable: false,
-          get () {
-            return this[actionName]
-              ?? makeDollarProp(this, actionName, actionFn.bind(this))
-          },
-        });
-
-      } else if (typeof tvalue == 'object') {
-
-        throw `Can't pass object value for Reactive() arg ${tname}; try set`;
-
-      } else {
-
-        let atomName = tname + '$atom', valueName = tname + '$value';
-
-        newProp(tname, {
-          get () {
-            let atom = this[atomName]
-              ?? makeDollarProp(this, atomName, createAtom(tname));
-            atom.reportObserved();
-            return Object.hasOwn(this, valueName)
-              ? this[valueName]
-              : this[valueName] = tvalue;
-          },
-          set (newValue) {
-            let atom = this[atomName]
-              ?? makeDollarProp(this, atomName, createAtom(tname));
-            atom.reportChanged();
-            return Object.hasOwn(this, valueName)
-              ? this[valueName] = newValue
-              : makeDollarProp(this, valueName, newValue);
-          },
-        });
-      }
-
-    } else if (tdescr.set) {
-
-      let atomName = tname + '$atom', valueName = tname + '$value';
-      let setFn = tdescr.set;
-
-      newProp(tname, {
-        get () {
-          let atom = this[atomName]
-            ?? makeDollarProp(this, atomName, createAtom(tname));
-          atom.reportObserved();
-          return Object.hasOwn(this, valueName)
-            ? this[valueName]
-            : this[valueName] = setFn.call(this);
-        },
-        set (newValue) {
-          let atom = this[atomName]
-            ?? makeDollarProp(this, atomName, createAtom(tname));
-          atom.reportChanged();
-          return Object.hasOwn(this, valueName)
-            ? this[valueName] = setFn.call(this, newValue)
-            : makeDollarProp(this, valueName, setFn.call(this, newValue));
-        },
-      });
-
-    } else if (tdescr.get) {
-
-      let computedName = tname + '$computed';
-      let getFn = tdescr.get;
-
-      newProp(tname, {
-        get () {
-          return (this[computedName]
-            ??= makeDollarProp(this, computedName, computed(getFn.bind(this)))
-          ).get()
-        },
-      });
-
-    } else {
-      // Notreached?
-      throw `No value, get or set in ${tname}`;
+      return this.makeValueDescriptorsFor(tname, tdescr);
     }
+
+    if (tdescr.get) {
+      return this.makeGetterDescriptorsFor(tname, tdescr);
+    }
+
+    if (tdescr.set) {
+      return this.makeSetterDescriptorsFor(tname, tdescr);
+    }
+
+    throw "Wut";
   }
-  return newClass;
+
+  makeClass () {
+    let newName = 'Reactive' + this.superClass.name;
+
+    return { [newName]: class extends this.superClass { } }[newName];
+  }
+
+  makeDescriptors () {
+    return Object.entries(Object.getOwnPropertyDescriptors(this.tprops))
+      .flatMap(([ k, v ]) => this.makeDescriptorsFor(k, v));
+  }
+
+  build () {
+    let newClass = this.makeClass();
+
+    let newProto = newClass.prototype;
+
+    this.makeDescriptors().forEach(([ name, descr ]) =>
+      Object.defineProperty(newProto, name, descr)
+    );
+
+    return newClass;
+  }
 }
