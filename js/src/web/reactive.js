@@ -50,21 +50,29 @@ export class ReactiveClassBuilder {
   makeFunctionDescriptorsFor(tname, tvalue) {
     let actionName = tname + '$action';
 
+    let functionName = tname + '$actionFunction';
+
     // action() and flow() both pass through 'this'
 
     let actionFn = (
       tvalue instanceof GeneratorFunction
-        ? flow(tvalue)
-        : action(tvalue)
+        ? flow(function (...args) { return this[functionName](...args) })
+        : action(function (...args) { return this[functionName](...args) })
     );
 
-    return [[ tname, {
-      enumerable: false,
-      get () {
-        return this[actionName]
-          ?? makeDollarProp(this, actionName, actionFn.bind(this))
-      },
-     } ]];
+    return [
+      [ functionName, {
+        enumerable: false,
+        value: tvalue,
+      } ],
+      [ tname, {
+        enumerable: false,
+        get () {
+          return this[actionName]
+            ?? makeDollarProp(this, actionName, actionFn.bind(this))
+        },
+       } ],
+    ];
   }
 
   makePlainValueDescriptorsFor (tname, tvalue) {
