@@ -130,16 +130,23 @@ export class ReactiveClassBuilder {
   }
 
   makeGetterDescriptorsFor (tname, tdescr) {
-    let computedName = tname + '$computed';
-    let getFn = tdescr.get;
+    let computedName = tname + '$computedValue';
+    let computeFunctionName = tname + '$compute';
+    let getFn = function () { return this[computeFunctionName]() };
 
-    return [[ tname, {
-      get () {
-        return (this[computedName]
-          ??= makeDollarProp(this, computedName, computed(getFn.bind(this)))
-        ).get()
-      },
-    } ]];
+    return [
+      [ computeFunctionName, {
+        enumerable: false,
+        value: tdescr.get
+      } ],
+      [ tname, {
+        get () {
+          return (this[computedName]
+            ??= makeDollarProp(this, computedName, computed(getFn.bind(this)))
+          ).get()
+        },
+      } ]
+    ];
   }
 
   makeDescriptorsFor (tname, tdescr) {
