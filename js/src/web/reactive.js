@@ -144,7 +144,7 @@ export class ReactiveClassBuilder {
 
   makeDescriptorsFor (tname, tdescr) {
 
-    if (tdescr.get && tdsecr.set) {
+    if (tdescr.get && tdescr.set) {
       throw `Can't pass both get and set for Reactive() arg ${tname}`;
     }
 
