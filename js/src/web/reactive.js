@@ -9,12 +9,6 @@ function makeDollarProp (obj, name, value) {
   return value;
 }
 
-function ownEntries (obj) {
-  return Object.entries(
-    Object.getOwnPropertyDescriptors(obj)
-  );
-}
-
 export class ReactivePropertyDescriptor {
   constructor (args) { Object.assign(this, args) }
 }
