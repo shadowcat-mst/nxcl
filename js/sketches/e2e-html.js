@@ -11,8 +11,9 @@ if (import.meta.main) {
   globalThis.runXcl = run;
   globalThis.render = render;
   let showTrace_ = async function (string) {
-    let vnode = await run(string);
-    render(vnode, document.body);
+    let view = await run(string);
+    globalThis.rootView = view;
+    render(createElement(view), document.body);
   };
   globalThis.showTrace = (string) => { showTrace_(string) };
 }
@@ -27,5 +28,5 @@ async function run (string) {
 
   let result = await interp.evalString(string, evalOpts);
 
-  return createElement(traceBuilder.buildView(TraceNode));
+  return traceBuilder.buildView(TraceNode);
 }
