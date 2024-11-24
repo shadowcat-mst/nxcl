@@ -1,0 +1,6 @@
+// Possibly useful because of map/forEach etc. passing extra crap as well as
+// the element; have accidentally footgunned myself before with that one;
+// leaving it here because I need to remind myself that this is the way to
+// deal with that problem but not sure where if anywhere it actually belongs.
+
+function oneArg (f) { return (arg) => f(arg) }
