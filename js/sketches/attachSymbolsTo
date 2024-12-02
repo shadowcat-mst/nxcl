@@ -1,0 +1,6 @@
+const attachSymbolsTo = (to, name = to.name) => new Proxy({}, {
+
+  get (target, prop, receiver) {
+    return to[prop] ??= Symbol(`${name}.${prop}`)
+  }
+})

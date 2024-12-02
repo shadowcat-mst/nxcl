@@ -1,6 +1,5 @@
 import { getRegistry } from '../../util/moduleregistry.js';
-import { observable, action } from '../libs.js';
-import { tagBuilders, View, subviews, Self } from '../viewcore.js';
+import { tagBuilders, View, subviews } from '../viewcore.js';
 import { Reactive } from '../reactive.js';
 
 let { classes, R } = getRegistry(import.meta);
@@ -38,7 +37,7 @@ R(class TraceNode extends Reactive(View, {
   ...subviews({
     value: Value,
     message: Message,
-    children: [Self],
+    children: [],
   }),
   isExpanded: false,
   toggleExpanded () { this.isExpanded = !this.isExpanded },

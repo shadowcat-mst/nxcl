@@ -1,4 +1,4 @@
-import { createAtom } from '../web/libs.js';
+import { mobx } from '../web/libs.js';
 
 class Predeclaration {
   constructor () {
@@ -26,7 +26,7 @@ class ModuleRegistry {
 
   predeclareClass (name) {
     if (Reflect.has(this.classes, name)) return this.classes[name];
-    let classAtom = createAtom(name);
+    let classAtom = mobx.createAtom(name);
     let newClass = {
       [name]: class extends Predeclaration {
         static reportObserved () { classAtom.reportObserved() }

@@ -1,193 +1,127 @@
-import { action, computed, flow, createAtom } from './libs.js';
+import { mobx } from './libs.js';
 
-function makeDollarProp (obj, name, value) {
-  Object.defineProperty(obj, name, {
-    enumerable: false,
-    writable: true,
-    value
-  });
-  return value;
-}
+import {
+  makeHiddenProp,
+  setHiddenProp,
+  ensureHiddenProp,
+  Class,
+  BindingClass,
+  isGenerator,
+} from '../util/objects.js';
 
-export class ReactivePropertyDescriptor {
-  constructor (args) { Object.assign(this, args) }
-}
-
-// from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction
-
-const GeneratorFunction = function* () {}.constructor;
-
-export function Reactive (superClass, tprops) {
-  return new ReactiveClassBuilder({ superClass, tprops }).build();
-}
-
-export class ReactiveClassBuilder {
-
-  constructor (args) { Object.assign(this, args) }
-
-  makeValueDescriptorsFor(tname, tdescr) {
-
-    let value = tdescr.value;
-    let valueType = typeof value;
-
-    if (valueType == 'object') {
-      throw `Can't pass object value for Reactive() arg ${tname}; try set`;
-    }
-
-    if (valueType == 'function') {
-      return this.makeFunctionDescriptorsFor(tname, value);
-    }
-
-    return this.makePlainValueDescriptorsFor(tname, value);
+const propNamesFor = (prefix) => new Proxy({}, {
+  get (target, prop, receiver) {
+    return prefix + prop
   }
+})
 
-  makeFunctionDescriptorsFor(tname, tvalue) {
-    let actionName = tname + '$action';
-
-    let functionName = tname + '$actionFunction';
-
-    // action() and flow() both pass through 'this'
-
-    let actionFn = (
-      tvalue instanceof GeneratorFunction
-        ? flow(function (...args) { return this[functionName](...args) })
-        : action(function (...args) { return this[functionName](...args) })
-    );
-
-    return [
-      [ functionName, {
-        enumerable: false,
-        value: tvalue,
-      } ],
-      [ tname, {
-        enumerable: false,
-        get () {
-          return this[actionName]
-            ?? makeDollarProp(this, actionName, actionFn.bind(this))
-        },
-       } ],
-    ];
-  }
-
-  makePlainValueDescriptorsFor (tname, tvalue) {
-
-    let atomName = tname + '$atom', valueName = tname + '$value';
-
-    return [[ tname, {
+const propHandlers = {
+  method (object, name, { method }) {
+    const wrap = isGenerator(method) ? mobx.flow : mobx.action
+    makeHiddenProp(object, name, wrap(method))
+  },
+  builder (object, name, { builder, filter = v => v, writable }) {
+    const { $value, $atom } = propNamesFor(name)
+    function ensureAtom () {
+      return ensureHiddenProp(this, $atom, () => mobx.createAtom(name))
+    }
+    const descriptor = {
       get () {
-        let atom = this[atomName]
-          ?? makeDollarProp(this, atomName, createAtom(tname));
-        atom.reportObserved();
-        return Object.hasOwn(this, valueName)
-          ? this[valueName]
-          : this[valueName] = tvalue;
+        ensureAtom.call(this).reportObserved()
+        return ensureHiddenProp(
+          this, $value, () => filter.call(this, builder.call(this))
+        )
       },
-      set (newValue) {
-        let atom = this[atomName]
-          ?? makeDollarProp(this, atomName, createAtom(tname));
-            atom.reportChanged();
-        return Object.hasOwn(this, valueName)
-          ? this[valueName] = newValue
-          : makeDollarProp(this, valueName, newValue);
-      },
-    } ]];
-  }
-
-  makeSetterDescriptorsFor (tname, tdescr) {
-    let atomName = tname + '$atom', valueName = tname + '$value';
-    let functionName = tname + '$setFunction';
-
-    return [
-      [ functionName, {
-        enumerable: false,
-        value: tdescr.set,
-      } ],
-      [ tname, {
-        get () {
-          let atom = this[atomName]
-            ?? makeDollarProp(this, atomName, createAtom(tname));
-          atom.reportObserved();
-          return Object.hasOwn(this, valueName)
-            ? this[valueName]
-            : this[valueName] = this[functionName]();
+      ...(writable && {
+        set (v) {
+          ensureAtom.call(this).reportChanged()
+          return setHiddenProp(this, $value, filter.call(this, v))
         },
-        set (newValue) {
-          let atom = this[atomName]
-            ?? makeDollarProp(this, atomName, createAtom(tname));
-          atom.reportChanged();
-          return Object.hasOwn(this, valueName)
-            ? this[valueName] = this[functionName](newValue)
-            : makeDollarProp(this, valueName, this[functionName](newValue));
-        },
-      } ]
-    ];
-  }
-
-  makeGetterDescriptorsFor (tname, tdescr) {
-    let computedName = tname + '$computedValue';
-    let computeFunctionName = tname + '$compute';
-    let getFn = function () { return this[computeFunctionName]() };
-
-    return [
-      [ computeFunctionName, {
-        enumerable: false,
-        value: tdescr.get
-      } ],
-      [ tname, {
-        get () {
-          return (this[computedName]
-            ??= makeDollarProp(this, computedName, computed(getFn.bind(this)))
-          ).get()
-        },
-      } ]
-    ];
-  }
-
-  makeDescriptorsFor (tname, tdescr) {
-
-    if (tdescr.get && tdescr.set) {
-      throw `Can't pass both get and set for Reactive() arg ${tname}`;
+      }),
     }
-
-    if (tdescr.value instanceof ReactivePropertyDescriptor) {
-      tdescr = tdescr.value;
+    Object.defineProperty(object, name, descriptor)
+  },
+  get (object, name, { get, filter }) {
+    const { $reaction, $value, $atom } = propNamesFor(name)
+    function ensureReaction () {
+      return ensureHiddenProp(this, $reaction, () => new mobx.Reaction(
+        () => { this[$atom].reportChanged(); delete this[$value] }
+      ))
     }
-
-    if ('value' in tdescr) {
-      return this.makeValueDescriptorsFor(tname, tdescr);
+    this.builder(object, name, {
+      filter,
+      builder () {
+        ensureReaction.call(this).track(() => {
+          makeHiddenProp(this, $value, get.call(this))
+        })
+        return this[$value]
+      }
+    })
+  },
+  value (object, name, { value }) {
+    this.builder(object, name, {
+      builder () { return value },
+      writable: true,
+    })
+  },
+  map (object, name, { map: mapper, over }) {
+    const { $reaction, $value, $valueMap, $atom } = propNamesFor(name)
+    function ensureReaction () {
+      return ensureHiddenProp(this, $reaction, () => new mobx.Reaction(
+        () => { this[$atom].reportChanged(); delete this[$value] }
+      ))
     }
+    this.builder(object, name, {
+      builder () {
+        let over$values
+        ensureReaction.call(this).track(() => {
+          over$values = over.call(this)
+        })
+        const oldMap = this[$valueMap] ?? new Map()
+        const newMap = new Map(over$values.map(
+          (v) => [
+            v,
+            oldMap.has(v) ? oldMap.get(v) : mapper.call(this, v)
+          ]
+        ))
+        setHiddenProp(this, $valueMap, newMap)
+        makeHiddenProp(this, $value, Array.from(newMap.values()))
+        return this[$value]
+      }
+    })
+  },
+}
 
-    if (tdescr.get) {
-      return this.makeGetterDescriptorsFor(tname, tdescr);
-    }
+const handlerTypes = new Set(Object.keys(propHandlers))
 
-    if (tdescr.set) {
-      return this.makeSetterDescriptorsFor(tname, tdescr);
-    }
+function handlerTypeFor (spec) {
+  const keys = Object.keys(spec)
+  const [ type, tooMany ] = handlerTypes.intersection(new Set(keys))
+  if (tooMany) throw `Ambiguity! ${keys.join(", ")}`
+  if (!type)   throw `No handler found! ${keys.join(", ")}`
+  return type
+}
 
-    throw "Wut";
+function expandConfig (config) {
+  return Object.entries(
+    Object.getOwnPropertyDescriptors(config)
+  ).map(([ k, v ]) => {
+    if (v.value !== null && typeof v.value === "object") v = v.value
+    else if (typeof v.value === "function") v = { method: v.value }
+    return [ k, v ]
+  })
+}
+
+function applyConfigTo (config, to) {
+  const toProto = to.prototype
+  for (const [ k, v ] of expandConfig(config)) {
+    propHandlers[handlerTypeFor(v)](toProto, k, v)
   }
+  return to
+}
 
-  makeClass () {
-    let newName = 'Reactive' + this.superClass.name;
-
-    return { [newName]: class extends this.superClass { } }[newName];
-  }
-
-  makeDescriptors () {
-    return Object.entries(Object.getOwnPropertyDescriptors(this.tprops))
-      .flatMap(([ k, v ]) => this.makeDescriptorsFor(k, v));
-  }
-
-  build () {
-    let newClass = this.makeClass();
-
-    let newProto = newClass.prototype;
-
-    this.makeDescriptors().forEach(([ name, descr ]) =>
-      Object.defineProperty(newProto, name, descr)
-    );
-
-    return newClass;
-  }
+export function Reactive(superClass, config) {
+  const newClassName = `Reactive${superClass.name}`
+  const newClass = BindingClass(newClassName, superClass)
+  return applyConfigTo(config, newClass)
 }

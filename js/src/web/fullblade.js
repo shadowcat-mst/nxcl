@@ -1,4 +1,4 @@
-import { createElement } from './libs.js';
+import { preact } from './libs.js';
 import { lazyObject, lazyFunctionObject } from '../util/lazy.js';
 
 // a lazyObject based hyperaxe
@@ -34,7 +34,7 @@ let makeTagBuilder = (classes, tagName) => {
             : []),
       ];
     }
-    return createElement(tagName, props, args);
+    return preact.h(tagName, props, args);
   }
   return lazyFunctionObject(func,
     propName => makeTagBuilder([ ...classes, kebab(propName) ], tagName)
