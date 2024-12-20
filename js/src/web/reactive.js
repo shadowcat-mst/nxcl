@@ -15,12 +15,19 @@ const propNamesFor = (prefix) => new Proxy({}, {
   }
 })
 
+const identity = v => v;
+
 const propHandlers = {
   method (object, name, { method }) {
+    if (!method) throw `No method passed for ${name}`
     const wrap = isGenerator(method) ? mobx.flow : mobx.action
     makeHiddenProp(object, name, wrap(method))
   },
-  builder (object, name, { builder, filter = v => v, writable }) {
+  builder (object, name, {
+    builder = () => undefined,
+    filter = identity,
+    writable = false,
+  }) {
     const { $value, $atom } = propNamesFor(name)
     function ensureAtom () {
       return ensureHiddenProp(this, $atom, () => mobx.createAtom(name))
@@ -41,7 +48,8 @@ const propHandlers = {
     }
     Object.defineProperty(object, name, descriptor)
   },
-  get (object, name, { get, filter }) {
+  get (object, name, { get, filter = identity }) {
+    if (!get) throw `No get function passed for ${name}`
     const { $reaction, $value, $atom } = propNamesFor(name)
     function ensureReaction () {
       return ensureHiddenProp(this, $reaction, () => new mobx.Reaction(
@@ -65,6 +73,8 @@ const propHandlers = {
     })
   },
   map (object, name, { map: mapper, over }) {
+    if (!mapper) throw `No map function passed for ${name}`
+    if (!over) throw `No over function passed for ${name}`
     const { $reaction, $value, $valueMap, $atom } = propNamesFor(name)
     function ensureReaction () {
       return ensureHiddenProp(this, $reaction, () => new mobx.Reaction(
