@@ -73,12 +73,12 @@ const propHandlers = {
     if (!over) throw `No over function passed for ${name}`
     const { $valueMap } = propNamesFor(name)
     this.builder(object, name, {
-      builder () {
-        // treat a null result as [] because we've already been told
+      builder: over,
+      filter (over$values) {
+        // treat null over$values as [] because we've already been told
         // this is an array based prop so that's almost certainly DWIM
-        const over$values = over.call(this) ?? []
         const oldMap = this[$valueMap] ?? new Map()
-        const newMap = new Map(over$values.map(
+        const newMap = new Map(over$values && over$values.map(
           (v) => [
             v,
             oldMap.has(v) ? oldMap.get(v) : map.call(this, v)
