@@ -85,7 +85,9 @@ const propHandlers = {
       builder () {
         let over$values
         ensureReaction.call(this).track(() => {
-          over$values = over.call(this)
+          // treat a null result as [] because we've already been told
+          // this is an array based prop so that's almost certainly DWIM
+          over$values = over.call(this) ?? []
         })
         const oldMap = this[$valueMap] ?? new Map()
         const newMap = new Map(over$values.map(
