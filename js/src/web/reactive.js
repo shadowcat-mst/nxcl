@@ -23,20 +23,30 @@ const propHandlers = {
     const wrap = isGenerator(method) ? mobx.flow : mobx.action
     makeHiddenProp(object, name, wrap(method))
   },
-  builder (object, name, {
-    builder = () => undefined,
-    filter = identity,
-    writable = false,
-  }) {
-    const { $value, $atom } = propNamesFor(name)
+  builder (object, name, { builder, filter, writable }) {
+    builder ??= () => undefined
+    filter ??= v => v
+    const { $reaction, $value, $atom } = propNamesFor(name)
     function ensureAtom () {
       return ensureHiddenProp(this, $atom, () => mobx.createAtom(name))
+    }
+    function ensureReaction () {
+      return ensureHiddenProp(this, $reaction, () => new mobx.Reaction(
+        () => { this[$atom].reportChanged(); delete this[$value] }
+      ))
+    }
+    function buildValue () {
+      let value
+      ensureReaction.call(this).track(() => {
+        value = builder.call(this)
+      })
+      return value
     }
     const descriptor = {
       get () {
         ensureAtom.call(this).reportObserved()
         return ensureHiddenProp(
-          this, $value, () => filter.call(this, builder.call(this))
+          this, $value, () => filter.call(this, buildValue.call(this))
         )
       },
       ...(writable && {
@@ -48,23 +58,9 @@ const propHandlers = {
     }
     Object.defineProperty(object, name, descriptor)
   },
-  get (object, name, { get, filter = identity }) {
-    if (!get) throw `No get function passed for ${name}`
-    const { $reaction, $value, $atom } = propNamesFor(name)
-    function ensureReaction () {
-      return ensureHiddenProp(this, $reaction, () => new mobx.Reaction(
-        () => { this[$atom].reportChanged(); delete this[$value] }
-      ))
-    }
-    this.builder(object, name, {
-      filter,
-      builder () {
-        ensureReaction.call(this).track(() => {
-          makeHiddenProp(this, $value, get.call(this))
-        })
-        return this[$value]
-      }
-    })
+  getset (object, name, { get: builder, set: filter }) {
+    const writable = !!filter
+    this.builder(object, name, { builder, filter, writable })
   },
   value (object, name, { value }) {
     this.builder(object, name, {
@@ -72,33 +68,24 @@ const propHandlers = {
       writable: true,
     })
   },
-  map (object, name, { map: mapper, over }) {
-    if (!mapper) throw `No map function passed for ${name}`
+  map (object, name, { map, over }) {
+    if (!map) throw `No map function passed for ${name}`
     if (!over) throw `No over function passed for ${name}`
-    const { $reaction, $value, $valueMap, $atom } = propNamesFor(name)
-    function ensureReaction () {
-      return ensureHiddenProp(this, $reaction, () => new mobx.Reaction(
-        () => { this[$atom].reportChanged(); delete this[$value] }
-      ))
-    }
+    const { $valueMap } = propNamesFor(name)
     this.builder(object, name, {
       builder () {
-        let over$values
-        ensureReaction.call(this).track(() => {
-          // treat a null result as [] because we've already been told
-          // this is an array based prop so that's almost certainly DWIM
-          over$values = over.call(this) ?? []
-        })
+        // treat a null result as [] because we've already been told
+        // this is an array based prop so that's almost certainly DWIM
+        const over$values = over.call(this) ?? []
         const oldMap = this[$valueMap] ?? new Map()
         const newMap = new Map(over$values.map(
           (v) => [
             v,
-            oldMap.has(v) ? oldMap.get(v) : mapper.call(this, v)
+            oldMap.has(v) ? oldMap.get(v) : map.call(this, v)
           ]
         ))
         setHiddenProp(this, $valueMap, newMap)
-        makeHiddenProp(this, $value, Array.from(newMap.values()))
-        return this[$value]
+        return Array.from(newMap.values())
       }
     })
   },
@@ -107,6 +94,7 @@ const propHandlers = {
 const handlerTypes = new Set(Object.keys(propHandlers))
 
 function handlerTypeFor (spec) {
+  if (Object.hasOwn(spec, 'get')) return 'getset'
   const keys = Object.keys(spec)
   const [ type, tooMany ] = handlerTypes.intersection(new Set(keys))
   if (tooMany) throw `Ambiguity! ${keys.join(", ")}`

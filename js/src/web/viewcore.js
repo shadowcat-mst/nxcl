@@ -68,7 +68,7 @@ export function subviews (spec) {
         name,
         arrayOf
           ? { map, over }
-          : { filter: map, get: over }
+          : { filter: map, builder: over }
       ]
     })
   );

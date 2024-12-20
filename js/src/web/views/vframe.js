@@ -11,11 +11,8 @@ let { div } = tagBuilders;
 
 R(class VFrame extends Reactive(View, {
   content: null,
-  attrs: {
-    builder () { return {} },
-    filter (newValue) {
-      return mobx.observable({ style: {}, ...newValue });
-    }
+  set attrs (newValue) {
+    return mobx.observable({ style: {}, ...newValue });
   },
 }) {
 
