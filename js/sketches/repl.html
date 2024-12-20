@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="/css/base.css" />
 <script type="module">
 import { Transcript } from "./transcript.js";
-import { render, renderToString, createElement } from '../src/web/libs.js';
+import { preact } from '../src/web/libs.js';
 import { EvaluationSeq } from '../src/web/views/evaluations.js';
 
 let model = new Transcript();
@@ -13,7 +13,7 @@ await model.appendEntry({ string: 'x + 4' });
 
 let view = new EvaluationSeq({ model });
 
-render(createElement(view), document.body);
+preact.render(preact.h(view), document.body);
 </script>
 </head>
 <body>
