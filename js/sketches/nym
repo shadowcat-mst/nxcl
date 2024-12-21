@@ -1,0 +1,17 @@
+#{{{
+
+Nym - some way of referencing a thing (vaguecat intentional)
+
+Identity - generic anonymous identifier, ala JS Symbol()
+
+KnownIdentity - identity with a lookup path, e.g. proto.core.EVAL
+
+Name - string based identity
+
+NymSpace - a mapping from Nym -> Value
+
+NymGroup - a mapping from Name -> Nym, used for e.g. protocols
+
+  # query: do those nest?
+
+}}}#
