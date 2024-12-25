@@ -2,6 +2,7 @@ export function makeHiddenProp (object, name, value) {
   Object.defineProperty(object, name, {
     enumerable: false,
     writable: true,
+    configurable: true,
     value
   })
   return value
