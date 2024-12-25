@@ -32,6 +32,7 @@ const propHandlers = {
     }
     function ensureReaction () {
       return ensureHiddenProp(this, $reaction, () => new mobx.Reaction(
+        `${object.name}.${name}`,
         () => { this[$atom].reportChanged(); delete this[$value] }
       ))
     }
