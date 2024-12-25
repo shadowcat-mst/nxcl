@@ -8,6 +8,10 @@ Bun.serve({
       console.log('Serving: index');
       return new Response(Bun.file('sketches/server/index.html'));
     }
+    if (path == '/favicon.ico') {
+      console.log('Serving: favicon');
+      return new Response(Bun.file('sketches/server/favicon.ico'));
+    }
     let m = path.match(staticFile);
     if (m) {
       let staticPath = m[0];
