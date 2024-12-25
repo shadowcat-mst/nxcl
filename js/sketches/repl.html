@@ -6,10 +6,12 @@ import { Transcript } from "./transcript.js";
 import { preact } from '../src/web/libs.js';
 import { EvaluationSeq } from '../src/web/views/evaluations.js';
 
-let model = new Transcript();
-
-await model.appendEntry({ string: 'let x = 3' });
-await model.appendEntry({ string: 'x + 4' });
+let model = new Transcript({
+  evaluations: [
+    { code: 'let x = 3' },
+    { code: 'x + 4' },
+  ],
+});
 
 let view = new EvaluationSeq({ model });
 
