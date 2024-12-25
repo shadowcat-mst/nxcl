@@ -13,7 +13,8 @@ export class Interp {
 
   prepareString (string) {
     let exprp = this.reader.read({ string });
-    // should we be weaving here on in eval() ?
+    // should we be weaving here or in eval() ?
+    // also once the weaver allows xcl code lolsob
     return weave(exprp, this.cx.scope);
   }
 
