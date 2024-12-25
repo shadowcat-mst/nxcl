@@ -72,7 +72,7 @@ const propHandlers = {
     if (!over) throw `No over function passed for ${name}`
     const { $valueMap } = propNamesFor(name)
     this.builder(object, name, {
-      builder: over,
+      builder () { return over.call(this).slice() },
       filter (over$values) {
         // treat null over$values as [] because we've already been told
         // this is an array based prop so that's almost certainly DWIM
