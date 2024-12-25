@@ -61,6 +61,7 @@ export function subviews (spec) {
       let arrayOf = Array.isArray(config);
       let [type] = arrayOf ? config : [config];
       function map (model) {
+        if (model  === undefined) return undefined
         return new (type ?? this.constructor)({ model })
       }
       function over () { return this.model[name] }

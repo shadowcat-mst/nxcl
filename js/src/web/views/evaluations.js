@@ -20,7 +20,7 @@ R(class Evaluation extends Reactive(View, subviews({
   render () {
     return [
       div('$ ' + this.code),
-      div(this.trace),
+      div(this.trace ?? '[...]'),
     ];
   }
 });
