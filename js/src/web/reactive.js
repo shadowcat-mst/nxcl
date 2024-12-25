@@ -15,8 +15,6 @@ const propNamesFor = (prefix) => new Proxy({}, {
   }
 })
 
-const identity = v => v;
-
 const propHandlers = {
   method (object, name, { method }) {
     if (!method) throw `No method passed for ${name}`
@@ -24,7 +22,6 @@ const propHandlers = {
     makeHiddenProp(object, name, wrap(method))
   },
   builder (object, name, { builder, filter, writable }) {
-    builder ??= () => undefined
     filter ??= v => v
     const { $reaction, $value, $atom } = propNamesFor(name)
     function ensureAtom () {
@@ -37,6 +34,7 @@ const propHandlers = {
       ))
     }
     function buildValue () {
+      if (!builder) return undefined
       let value
       ensureReaction.call(this).track(() => {
         value = builder.call(this)
