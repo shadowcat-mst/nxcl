@@ -4,6 +4,15 @@ body {
   font-family: monospace;
 }
 
+input {
+  background-color: black;
+  color: #ffdd44;
+  border-color: #3A3311;
+  font-family: monospace;
+}
+
+form.inline { display: inline }
+
 span {
   margin-right: 5px;
 }
