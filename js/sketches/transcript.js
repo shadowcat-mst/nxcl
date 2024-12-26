@@ -21,25 +21,31 @@ class TranscriptRunner {
 
 export class Transcript extends Reactive(Object, {
   set evaluations (v) { return mobx.observable(v ?? []) },
-  *recalculate () {
-    const $reaction = 'recalculate$reaction';
-    const reaction = ensureHiddenProp(
-      this, $reaction,
-      () => new mobx.Reaction($reaction, () => this.recalculate())
-    )
-    const runner = new TranscriptRunner()
-    for (const ev of this.evaluations) {
-      const trace = yield runner.run(ev.code)
-      ev.trace = trace
-      yield
-    }
-    reaction.track(() => this.evaluations.map(v => v.code))
-  },
+  *recalculate () { return yield* this.recalculate_() }
 }) {
 
   constructor (args) {
     super()
     Object.assign(this, args)
     this.recalculate()
+  }
+
+  *recalculate_ () {
+    const runner = new TranscriptRunner()
+    for (const ev of this.evaluations) {
+      const trace = yield runner.run(ev.code)
+      ev.trace = trace
+      yield
+    }
+    // reschedule self on change
+    const $reaction = 'recalculate$reaction';
+    const reaction = ensureHiddenProp(
+      this, $reaction,
+      () => new mobx.Reaction(
+        [ this.constructor.name, $reaction ].join('().'),
+        () => this.recalculate()
+      )
+    )
+    reaction.track(() => this.evaluations.map(v => v.code))
   }
 }
