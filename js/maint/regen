@@ -6,4 +6,4 @@ fi
 
 mkdir -p bundle/web
 
-bun build --format=esm src/web/libs.js >bundle/web/libs.js
+esbuild src/web/libs.js --bundle --format=esm --sourcemap --outfile=bundle/web/libs.js
