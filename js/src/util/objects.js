@@ -62,4 +62,4 @@ const GeneratorFunction = function* () {}.constructor
 // maybe belongs in a util/predicates.js or something instead; here will
 // do for now though
 
-export const isGenerator = (v) => v instanceof GeneratorFunction
+export const isGeneratorFunction = (v) => v instanceof GeneratorFunction

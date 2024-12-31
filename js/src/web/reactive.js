@@ -6,7 +6,7 @@ import {
   ensureHiddenProp,
   Class,
   BindingClass,
-  isGenerator,
+  isGeneratorFunction,
 } from '../util/objects.js';
 
 const propNamesFor = (prefix) => new Proxy({}, {
@@ -18,7 +18,7 @@ const propNamesFor = (prefix) => new Proxy({}, {
 const propHandlers = {
   method (object, name, { method }) {
     if (!method) throw `No method passed for ${name}`
-    const wrap = isGenerator(method) ? mobx.flow : mobx.action
+    const wrap = isGeneratorFunction(method) ? mobx.flow : mobx.action
     makeHiddenProp(object, name, wrap(method))
   },
   builder (object, name, { builder, filter, writable }) {
