@@ -68,16 +68,19 @@ const propHandlers = {
     })
   },
   map (object, name, { map, over }) {
-    if (!map) throw `No map function passed for ${name}`
-    if (!over) throw `No over function passed for ${name}`
+    if (!(map instanceof Function)) throw `No map function passed for ${name}`
+    if (!(over instanceof Function)) throw `No over function passed for ${name}`
     const { $valueMap } = propNamesFor(name)
     this.builder(object, name, {
-      builder () { return over.call(this).slice() },
-      filter (over$values) {
+      builder () {
         // treat null over$values as [] because we've already been told
         // this is an array based prop so that's almost certainly DWIM
+        // (we .slice() to ensure we depend on all members track() wise)
+        return (over.call(this) ?? []).slice()
+      },
+      filter (over$values) {
         const oldMap = this[$valueMap] ?? new Map()
-        const newMap = new Map(over$values && over$values.map(
+        const newMap = new Map(over$values.map(
           (v) => [
             v,
             oldMap.has(v) ? oldMap.get(v) : map.call(this, v)
