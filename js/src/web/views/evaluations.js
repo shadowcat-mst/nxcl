@@ -1,16 +1,12 @@
 import { getRegistry } from '../../util/moduleregistry.js';
-import { tagBuilders, View, subviews } from '../viewcore.js';
+import { View, subviews } from '../viewcore.js';
 import { Reactive } from '../reactive.js';
 import { TraceNode } from './trace.js';
 import { StringEditor } from './stringeditor.js';
 
-let { classes, R } = getRegistry(import.meta);
-
-const { EvaluationSeq, Evaluation } = classes;
+const { classes: { EvaluationSeq, Evaluation }, R } = getRegistry(import.meta);
 
 export { EvaluationSeq };
-
-let { div } = tagBuilders;
 
 R(class Evaluation extends Reactive(View, {
   editor: null,
@@ -39,6 +35,7 @@ R(class Evaluation extends Reactive(View, {
   }
 
   render () {
+    const { div } = this.tagBuilders
     return [
       div(...this.renderCode()),
       div(this.trace ?? '[...]'),
@@ -65,6 +62,7 @@ R(class EvaluationSeq extends Reactive(View, {
   }
 
   render () {
+    const { div } = this.tagBuilders
     return div(this.evaluations, div('$ ', this.appendEditor));
   }
 });

@@ -1,20 +1,16 @@
 import { getRegistry } from '../../util/moduleregistry.js';
-import { tagBuilders, View, subviews } from '../viewcore.js';
+import { View, subviews } from '../viewcore.js';
 import { Reactive } from '../reactive.js';
 
-let { classes, R } = getRegistry(import.meta);
-
-const { TraceNode, Value, Message } = classes;
+const { classes: { TraceNode, Value, Message }, R } = getRegistry(import.meta);
 
 export { TraceNode };
 
-let { div, span, ul, li, strong } = tagBuilders;
-
 R(class Value extends View {
   render () {
-    return span(
-      this.model.toString(),
-  ) }
+    const { span } = this.tagBuilders
+    return span(this.model.toString())
+  }
 });
 
 R(class Message extends Reactive(View, subviews({
@@ -25,6 +21,7 @@ R(class Message extends Reactive(View, subviews({
   get call () { return this.model.callDescr() }
 
   render () {
+    const { span } = this.tagBuilders
     return [
       span(this.call),
       this.on,
@@ -46,6 +43,7 @@ R(class TraceNode extends Reactive(View, {
   get hasChildren () { return !!this.model.children.length }
 
   render () {
+    const { ul, li, span } = this.tagBuilders
     return ul(
       li(
         span.bright('->'),

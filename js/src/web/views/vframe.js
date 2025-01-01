@@ -1,13 +1,11 @@
 import { getRegistry } from '../../util/moduleregistry.js';
 import { mobx } from '../libs.js';
-import { tagBuilders, View } from '../viewcore.js';
+import { View } from '../viewcore.js';
 import { Reactive } from '../reactive.js';
 
-let { classes, R } = getRegistry(import.meta);
+const { classes: { VFrame }, R } = getRegistry(import.meta);
 
-export const { VFrame } = classes;
-
-let { div } = tagBuilders;
+export VFrame
 
 R(class VFrame extends Reactive(View, {
   content: null,
@@ -19,6 +17,7 @@ R(class VFrame extends Reactive(View, {
   get styles () { return this.attrs.style }
 
   render () {
+    const { div } = this.tagBuilders
     return div.vframe(this.attrs, this.content);
   }
 

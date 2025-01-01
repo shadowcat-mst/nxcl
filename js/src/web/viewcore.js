@@ -2,8 +2,6 @@ import { preact, preactOptions, mobx } from './libs.js';
 
 import { tagBuilders, vnodeTag } from './fullblade.js';
 
-export { tagBuilders };
-
 {
   // Hook view rendering into preact via preact options
 
@@ -45,6 +43,8 @@ export { tagBuilders };
 export class View {
 
   static isView (thing) { return thing instanceof this }
+
+  tagBuilders = tagBuilders
 
   constructor (args) {
     if (args) Object.assign(this, args);

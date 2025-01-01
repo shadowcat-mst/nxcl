@@ -1,14 +1,10 @@
 import { getRegistry } from '../../util/moduleregistry.js'
-import { tagBuilders, View, subviews } from '../viewcore.js'
+import { View, subviews } from '../viewcore.js'
 import { Reactive } from '../reactive.js'
 
-const { classes, R } = getRegistry(import.meta)
-
-const { StringEditor } = classes
+const { classes: { StringEditor }, R } = getRegistry(import.meta)
 
 export { StringEditor }
-
-const { form, input } = tagBuilders
 
 R(class StringEditor extends Reactive(View, {
   value: ''
@@ -22,7 +18,7 @@ R(class StringEditor extends Reactive(View, {
   }
 
   render () {
-    const { onInput, onSubmit, value } = this;
+    const { onInput, onSubmit, value, tagBuilders: { form, input } } = this;
     return form.inline({ onSubmit }, input({ onInput, value }));
   }
 })
