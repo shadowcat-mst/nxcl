@@ -13,7 +13,11 @@ class TranscriptRunner {
 
     const { evalOpts } = traceBuilder
 
-    await this.interp.evalString(string, evalOpts)
+    try {
+      await this.interp.evalString(string, evalOpts)
+    } catch (e) {
+      traceBuilder.rootNode.completeNode(`ERROR: ${e}`)
+    }
 
     return traceBuilder.rootNode
   }
@@ -43,7 +47,10 @@ export class Transcript extends Reactive(Object, {
       this, $reaction,
       () => new mobx.Reaction(
         [ this.constructor.name, $reaction ].join('().'),
-        () => this.recalculate()
+        () => {
+          if (this.save) this.save(this.evaluations)
+          this.recalculate()
+        }
       )
     )
     reaction.track(() => this.evaluations.map(v => v.code))

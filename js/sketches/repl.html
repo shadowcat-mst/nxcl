@@ -5,12 +5,18 @@
 import { Transcript } from "./transcript.js";
 import { preact } from '../src/web/libs.js';
 import { EvaluationSeq } from '../src/web/views/evaluations.js';
+import { nexusFromWebSocket } from '../src/stupidrpc/websocket.js';
 
-let model = new Transcript({
-  evaluations: [
-    { code: 'let x = 3' },
-    { code: 'x + 4' },
-  ],
+const nexus = await nexusFromWebSocket(
+  'ws://mallet3.scsys.co.uk:4172/ws',
+  { prefix: 'client:' }
+)
+
+const model = new Transcript({
+  evaluations: await nexus.call('load', 'default'),
+  save: async function (data) {
+    await nexus.call('save', 'default', data.map(v => ({ code: v.code })))
+  }
 });
 
 let view = new EvaluationSeq({ model });

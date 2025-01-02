@@ -11,7 +11,7 @@ export function staticHandler (path) {
   }
   const m = path.match(staticFile)
   if (m) {
-    const staticPath = m[0]
+    let staticPath = m[0]
     if (m[1] == 'src') {
       const bundlePath = `bundle/${m[2]}`
       if (Bun.file(bundlePath).size) staticPath = bundlePath
