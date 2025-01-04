@@ -13,7 +13,7 @@ const callHandlers = {
       const m = dirent.name.match(/^(.*?)\.json$/)
       if (m && m[1].match(allowedStoreName)) names.push(m[1])
     }
-    return names
+    return names.toSorted()
   },
   // not sure if I should be setting { encoding: 'utf8' } on both here
   // but hopefully for the moment 'neither' will at least work consistently
@@ -31,6 +31,9 @@ const callHandlers = {
 }
 
 function startCall (call, ...args) {
+  if (!Object.hasOwn(callHandlers, call)) {
+    throw `Invalid call name: ${call}`;
+  }
   return callHandlers[call](...args)
 }
 

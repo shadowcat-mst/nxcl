@@ -4,7 +4,7 @@ body {
   font-family: monospace;
 }
 
-input {
+input, select {
   background-color: black;
   color: #ffdd44;
   border-color: #3A3311;

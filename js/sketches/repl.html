@@ -3,23 +3,55 @@
 <link rel="stylesheet" href="/css/base.css" />
 <script type="module">
 import { Transcript } from "./transcript.js";
-import { preact } from '../src/web/libs.js';
+import { preact, mobx } from '../src/web/libs.js';
 import { EvaluationSeq } from '../src/web/views/evaluations.js';
+import { VFrame } from '../src/web/views/vframe.js';
+import { SelectField } from '../src/web/views/field/select.js';
 import { nexusFromWebSocket } from '../src/stupidrpc/websocket.js';
+import { Reactive } from '../src/web/reactive.js';
+import { View, subviews } from '../src/web/viewcore.js';
 
-const nexus = await nexusFromWebSocket(
+const nexus = globalThis.nexus = await nexusFromWebSocket(
   'ws://mallet3.scsys.co.uk:4172/ws',
   { prefix: 'client:' }
 )
 
-const model = new Transcript({
-  evaluations: await nexus.call('load', 'default'),
-  save: async function (data) {
-    await nexus.call('save', 'default', data.map(v => ({ code: v.code })))
-  }
-});
+const list = await nexus.call('list')
 
-let view = new EvaluationSeq({ model });
+const picker = new SelectField({
+  attrs: { name: 'transcript' },
+  options: list.map(v => ({ value: v, content: v })),
+  selectedValue: 'default',
+})
+
+const model = new (Reactive(Object, {
+  get tsname () { return picker.selectedValue },
+  get transcript () {
+    const { tsname } = this
+    const evaluations = mobx.observable([])
+    nexus.call('load', tsname).then(v => evaluations.push(...v))
+    return new Transcript({
+      evaluations,
+      async save (data) {
+        await nexus.call('save', tsname, data.map(v => ({ code: v.code })))
+      }
+    })
+  },
+}))()
+
+const view = new (Reactive(View, subviews({
+  transcript: EvaluationSeq,
+})))({
+  model,
+  render () {
+    const { transcript, h: { div, hr } } = this
+    return [
+      div(picker),
+      hr(),
+      div(transcript),
+    ]
+  }
+})
 
 preact.render(preact.h(view), document.body);
 </script>
