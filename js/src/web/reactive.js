@@ -114,16 +114,12 @@ function expandConfig (config) {
   })
 }
 
-function applyConfigTo (config, to) {
-  const toProto = to.prototype
-  for (const [ k, v ] of expandConfig(config)) {
-    propHandlers[handlerTypeFor(v)](toProto, k, v)
-  }
-  return to
-}
-
 export function Reactive(superClass, config) {
   const newClassName = `Reactive${superClass.name}`
   const newClass = BindingClass(newClassName, superClass)
-  return applyConfigTo(config, newClass)
+  const newProto = newClass.prototype
+  for (const [ k, v ] of expandConfig(config)) {
+    propHandlers[handlerTypeFor(v)](newProto, k, v)
+  }
+  return newClass
 }
