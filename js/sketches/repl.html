@@ -11,16 +11,14 @@ import { nexusFromWebSocket } from '../src/stupidrpc/websocket.js';
 import { Reactive } from '../src/web/reactive.js';
 import { View, subviews } from '../src/web/viewcore.js';
 
-const nexus = globalThis.nexus = await nexusFromWebSocket(
+const nexus = await nexusFromWebSocket(
   'ws://mallet3.scsys.co.uk:4172/ws',
   { prefix: 'client:' }
 )
 
-const server = {}
-
-for (const name of [ 'list', 'load', 'save' ]) {
-  server[name] = (...args) => nexus.call(name, ...args)
-}
+const server = Object.fromEntries([ 'list', 'load', 'save' ].map(
+  name => [ name, (...args) => nexus.call(name, ...args) ]
+))
 
 const model = new (Reactive(Object, {
   transcriptName: 'default',
