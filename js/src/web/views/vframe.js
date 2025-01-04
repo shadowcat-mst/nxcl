@@ -5,7 +5,7 @@ import { Reactive } from '../reactive.js';
 
 const { classes: { VFrame }, R } = getRegistry(import.meta);
 
-export VFrame
+export { VFrame }
 
 R(class VFrame extends Reactive(View, {
   content: null,
@@ -17,7 +17,7 @@ R(class VFrame extends Reactive(View, {
   get styles () { return this.attrs.style }
 
   render () {
-    const { div } = this.tagBuilders
+    const { div } = this.h
     return div.vframe(this.attrs, this.content);
   }
 

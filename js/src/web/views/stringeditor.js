@@ -18,7 +18,7 @@ R(class StringEditor extends Reactive(View, {
   }
 
   render () {
-    const { onInput, onSubmit, value, tagBuilders: { form, input } } = this;
+    const { onInput, onSubmit, value, h: { form, input } } = this;
     return form.inline({ onSubmit }, input({ onInput, value }));
   }
 })

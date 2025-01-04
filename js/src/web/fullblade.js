@@ -41,6 +41,7 @@ let makeTagBuilder = (classes, tagName) => {
   );
 };
 
-export const tagBuilders = lazyObject(
+export const h = lazyFunctionObject(
+  preact.h,
   propName => makeTagBuilder([], kebab(propName))
 );

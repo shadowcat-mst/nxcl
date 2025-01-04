@@ -8,7 +8,7 @@ export { TraceNode };
 
 R(class Value extends View {
   render () {
-    const { span } = this.tagBuilders
+    const { span } = this.h
     return span(this.model.toString())
   }
 });
@@ -21,7 +21,7 @@ R(class Message extends Reactive(View, subviews({
   get call () { return this.model.callDescr() }
 
   render () {
-    const { span } = this.tagBuilders
+    const { span } = this.h
     return [
       span(this.call),
       this.on,
@@ -43,7 +43,7 @@ R(class TraceNode extends Reactive(View, {
   get hasChildren () { return !!this.model.children.length }
 
   render () {
-    const { ul, li, span } = this.tagBuilders
+    const { ul, li, span } = this.h
     return ul(
       li(
         span.bright('->'),

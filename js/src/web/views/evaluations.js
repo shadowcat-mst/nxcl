@@ -35,7 +35,7 @@ R(class Evaluation extends Reactive(View, {
   }
 
   render () {
-    const { div } = this.tagBuilders
+    const { div } = this.h
     return [
       div(...this.renderCode()),
       div(this.trace ?? '[...]'),
@@ -62,7 +62,7 @@ R(class EvaluationSeq extends Reactive(View, {
   }
 
   render () {
-    const { div } = this.tagBuilders
+    const { div } = this.h
     return div(this.evaluations, div('$ ', this.appendEditor));
   }
 });

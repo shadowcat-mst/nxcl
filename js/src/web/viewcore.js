@@ -1,12 +1,13 @@
 import { preact, preactOptions, mobx } from './libs.js';
 
-import { tagBuilders, vnodeTag } from './fullblade.js';
+import * as fullblade from './fullblade.js';
 
 {
   // Hook view rendering into preact via preact options
 
   let RenderView = mobx.observer(({ view }) => {
-    view.constructor.reportObserved();
+    const report = view.constructor.reportObserved;
+    if (report) report()
     let r = view.render();
     return Array.isArray(r) ? preact.h(preact.Fragment, {}, r) : r;
   });
@@ -22,7 +23,7 @@ import { tagBuilders, vnodeTag } from './fullblade.js';
   let oldHook = preactOptions.vnode;
 
   function newHook (vnode) {
-    vnode[vnodeTag] = true;
+    vnode[fullblade.vnodeTag] = true;
     let { props } = vnode;
     if (isView(vnode.type)) {
       props.view = vnode.type;
@@ -44,7 +45,7 @@ export class View {
 
   static isView (thing) { return thing instanceof this }
 
-  tagBuilders = tagBuilders
+  h = fullblade.h
 
   constructor (args) {
     if (args) Object.assign(this, args);
