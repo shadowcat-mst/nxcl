@@ -22,33 +22,36 @@ for (const name of [ 'list', 'load', 'save' ]) {
   server[name] = (...args) => nexus.call(name, ...args)
 }
 
-const picker = new SelectField({
-  attrs: { name: 'transcript' },
-  options: (await server.list()).map(v => ({ value: v, content: v })),
-  selectedValue: 'default',
-})
-
 const model = new (Reactive(Object, {
-  get tsname () { return picker.selectedValue },
+  transcriptName: 'default',
   get transcript () {
-    const { tsname } = this
+    const { transcriptName } = this
     const evaluations = mobx.observable([])
-    server.load(tsname).then(v => evaluations.push(...v))
+    server.load(transcriptName).then(v => evaluations.push(...v))
     return new Transcript({
       evaluations,
       async save (data) {
-        await server.save(tsname, data.map(v => ({ code: v.code })))
+        await server.save(transcriptName, data.map(v => ({ code: v.code })))
       }
     })
   },
 }))()
 
+const picker = new (class Picker extends SelectField {
+  get selectedValue () { return this.model.transcriptName }
+  set selectedValue (v) { this.model.transcriptName = v }
+})({
+  model,
+  attrs: { name: 'transcript' },
+  options: (await server.list()).map(v => ({ value: v, content: v })),
+})
+
 const view = new (Reactive(View, subviews({
   transcript: EvaluationSeq,
 })))({
-  model,
+  model, picker,
   render () {
-    const { transcript, h: { div, hr } } = this
+    const { transcript, picker, h: { div, hr } } = this
     return [
       div(picker),
       hr(),
