@@ -16,11 +16,15 @@ const nexus = globalThis.nexus = await nexusFromWebSocket(
   { prefix: 'client:' }
 )
 
-const list = await nexus.call('list')
+const server = {}
+
+for (const name of [ 'list', 'load', 'save' ]) {
+  server[name] = (...args) => nexus.call(name, ...args)
+}
 
 const picker = new SelectField({
   attrs: { name: 'transcript' },
-  options: list.map(v => ({ value: v, content: v })),
+  options: (await server.list()).map(v => ({ value: v, content: v })),
   selectedValue: 'default',
 })
 
@@ -29,11 +33,11 @@ const model = new (Reactive(Object, {
   get transcript () {
     const { tsname } = this
     const evaluations = mobx.observable([])
-    nexus.call('load', tsname).then(v => evaluations.push(...v))
+    server.load(tsname).then(v => evaluations.push(...v))
     return new Transcript({
       evaluations,
       async save (data) {
-        await nexus.call('save', tsname, data.map(v => ({ code: v.code })))
+        await server.save(tsname, data.map(v => ({ code: v.code })))
       }
     })
   },
