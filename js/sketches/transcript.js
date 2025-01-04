@@ -47,10 +47,7 @@ export class Transcript extends Reactive(Object, {
       this, $reaction,
       () => new mobx.Reaction(
         [ this.constructor.name, $reaction ].join('().'),
-        () => {
-          if (this.save) this.save(this.evaluations)
-          this.recalculate()
-        }
+        () => this.recalculate()
       )
     )
     reaction.track(() => this.evaluations.map(v => v.code))

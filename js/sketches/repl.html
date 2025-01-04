@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="/css/base.css" />
 <script type="module">
 import { Transcript } from "./transcript.js";
+import { setHiddenProp } from '../src/util/objects.js';
 import { preact, mobx } from '../src/web/libs.js';
 import { EvaluationSeq } from '../src/web/views/evaluations.js';
 import { VFrame } from '../src/web/views/vframe.js';
@@ -25,13 +26,24 @@ const model = new (Reactive(Object, {
   get transcript () {
     const { transcriptName } = this
     const evaluations = mobx.observable([])
-    server.load(transcriptName).then(v => evaluations.push(...v))
-    return new Transcript({
-      evaluations,
-      async save (data) {
-        await server.save(transcriptName, data.map(v => ({ code: v.code })))
-      }
-    })
+    mobx.flow(function* transcriptSetup () {
+      evaluations.push(...yield server.load(transcriptName))
+      const $reaction = 'transcript$evaluations$reaction'
+      if (this[$reaction]) this[$reaction].dispose()
+      const track = () => reaction.track(
+        () => evaluations.map(v => v.code)
+      )
+      const reaction = setHiddenProp(this, $reaction, new mobx.Reaction(
+        [ this.constructor.name, $reaction ].join('().'),
+        () => {
+          const data = evaluations.map(v => ({ code: v.code }))
+          server.save(transcriptName, data)
+                .then(track)
+        }
+      ))
+      track()
+    }).call(this)
+    return new Transcript({ evaluations })
   },
 }))()
 
