@@ -40,19 +40,11 @@ const model = new (Reactive(Object, {
   },
 }))()
 
-function bind (obj, name, bindTo, boundName) {
-  Object.defineProperty(obj, name, {
-    get () { return bindTo[boundName] },
-    set (v) { bindTo[boundName] = v },
-  })
-  return obj
-}
-
 const picker = new SelectField({
   options: (await server.list()).map(v => ({ value: v, content: v })),
 })
 
-bind(picker, 'selectedValue', model, 'transcriptName')
+picker.$_bind('selectedValue', model, 'transcriptName')
 
 const view = new (Reactive(View, subviews({
   transcript: EvaluationSeq,

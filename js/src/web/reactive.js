@@ -118,16 +118,29 @@ function expandConfig (config) {
   })
 }
 
+const reactiveExtras = {
+  $_method (method) {
+    return makeActionMethod(method).bind(this)
+  },
+  $_run (method, ...args) {
+    return this.$_method(method)(...args)
+  },
+  $_bind (name, bindTo, boundName) {
+    Object.defineProperty(this, name, {
+      get () { return bindTo[boundName] },
+      set (v) { bindTo[boundName] = v },
+    })
+    return this
+  },
+}
+
 export function Reactive(superClass, config) {
   const newClassName = `Reactive${superClass.name}`
   const newClass = BindingClass(newClassName, superClass)
   const newProto = newClass.prototype
-  makeHiddenProp(newProto, '$_method', function (method) {
-    return makeActionMethod(method).bind(this)
-  })
-  makeHiddenProp(newProto, '$_run', function (method, ...args) {
-    return this.$_method(method)(...args)
-  })
+  for (const [ k, v ] of Object.entries(reactiveExtras)) {
+    makeHiddenProp(newProto, k, v)
+  }
   for (const [ k, v ] of expandConfig(config)) {
     propHandlers[handlerTypeFor(v)](newProto, k, v)
   }
