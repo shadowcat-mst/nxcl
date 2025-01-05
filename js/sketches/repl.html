@@ -28,20 +28,13 @@ const model = new (Reactive(Object, {
     const evaluations = mobx.observable([])
     mobx.flow(function* transcriptSetup () {
       evaluations.push(...yield server.load(transcriptName))
-      const $reaction = 'transcript$evaluations$reaction'
-      if (this[$reaction]) this[$reaction].dispose()
-      const track = () => reaction.track(
-        () => evaluations.map(v => v.code)
-      )
-      const reaction = setHiddenProp(this, $reaction, new mobx.Reaction(
-        [ this.constructor.name, $reaction ].join('().'),
-        () => {
-          const data = evaluations.map(v => ({ code: v.code }))
-          server.save(transcriptName, data)
-                .then(track)
-        }
+      const $disposer = 'transcript$reaction$disposer'
+      if (this[$disposer]) this[$disposer]()
+      setHiddenProp(this, $disposer, mobx.reaction(
+        () => evaluations.map(v => ({ code: v.code })),
+        (data) => server.save(transcriptName, data),
+        { name: [ this.constructor.name, $disposer ].join('().') },
       ))
-      track()
     }).call(this)
     return new Transcript({ evaluations })
   },

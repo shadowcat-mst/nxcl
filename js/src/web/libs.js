@@ -21,9 +21,23 @@ export const preact = {
   renderToString,
 }
 
-import { observable, action, flow, createAtom, Reaction } from 'mobx'
+import {
+  observable,
+  action,
+  flow,
+  createAtom,
+  reaction,
+  Reaction
+} from 'mobx'
+
 import { observer } from 'mobx-preact'
 
 export const mobx = {
-  observable, action, flow, createAtom, Reaction, observer
+  observable,
+  action,
+  flow,
+  createAtom,
+  reaction,
+  Reaction,
+  observer
 }
