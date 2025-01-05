@@ -122,11 +122,11 @@ export function Reactive(superClass, config) {
   const newClassName = `Reactive${superClass.name}`
   const newClass = BindingClass(newClassName, superClass)
   const newProto = newClass.prototype
-  makeHiddenProp(newProto, 'anon$method', function (method) {
+  makeHiddenProp(newProto, '$_method', function (method) {
     return makeActionMethod(method).bind(this)
   })
-  makeHiddenProp(newProto, 'anon$run', function (method, ...args) {
-    return this.anon$method(method)(...args)
+  makeHiddenProp(newProto, '$_run', function (method, ...args) {
+    return this.$_method(method)(...args)
   })
   for (const [ k, v ] of expandConfig(config)) {
     propHandlers[handlerTypeFor(v)](newProto, k, v)
