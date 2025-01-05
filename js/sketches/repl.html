@@ -40,14 +40,19 @@ const model = new (Reactive(Object, {
   },
 }))()
 
-const picker = new (class Picker extends SelectField {
-  get selectedValue () { return this.model.transcriptName }
-  set selectedValue (v) { this.model.transcriptName = v }
-})({
-  model,
-  attrs: { name: 'transcript' },
+function bind (obj, name, bindTo, boundName) {
+  Object.defineProperty(obj, name, {
+    get () { return bindTo[boundName] },
+    set (v) { bindTo[boundName] = v },
+  })
+  return obj
+}
+
+const picker = new SelectField({
   options: (await server.list()).map(v => ({ value: v, content: v })),
 })
+
+bind(picker, 'selectedValue', model, 'transcriptName')
 
 const view = new (Reactive(View, subviews({
   transcript: EvaluationSeq,
