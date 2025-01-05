@@ -15,11 +15,15 @@ const propNamesFor = (prefix) => new Proxy({}, {
   }
 })
 
+function makeActionMethod (method) {
+  const wrap = isGeneratorFunction(method) ? mobx.flow : mobx.action
+  return wrap(method)
+}
+
 const propHandlers = {
   method (object, name, { method }) {
     if (!method) throw `No method passed for ${name}`
-    const wrap = isGeneratorFunction(method) ? mobx.flow : mobx.action
-    makeHiddenProp(object, name, wrap(method))
+    makeHiddenProp(object, name, makeActionMethod(method))
   },
   builder (object, name, { builder, filter, writable }) {
     filter ??= v => v
@@ -118,6 +122,12 @@ export function Reactive(superClass, config) {
   const newClassName = `Reactive${superClass.name}`
   const newClass = BindingClass(newClassName, superClass)
   const newProto = newClass.prototype
+  makeHiddenProp(newProto, 'anon$method', function (method) {
+    return makeActionMethod(method).bind(this)
+  })
+  makeHiddenProp(newProto, 'anon$run', function (method, ...args) {
+    return this.anon$method(method)(...args)
+  })
   for (const [ k, v ] of expandConfig(config)) {
     propHandlers[handlerTypeFor(v)](newProto, k, v)
   }

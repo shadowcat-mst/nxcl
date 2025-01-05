@@ -26,7 +26,7 @@ const model = new (Reactive(Object, {
   get transcript () {
     const { transcriptName } = this
     const evaluations = mobx.observable([])
-    mobx.flow(function* transcriptSetup () {
+    this.anon$run(function* transcriptSetup () {
       evaluations.push(...yield server.load(transcriptName))
       const $disposer = 'transcript$reaction$disposer'
       if (this[$disposer]) this[$disposer]()
@@ -35,7 +35,7 @@ const model = new (Reactive(Object, {
         (data) => server.save(transcriptName, data),
         { name: [ this.constructor.name, $disposer ].join('().') },
       ))
-    }).call(this)
+    })
     return new Transcript({ evaluations })
   },
 }))()
