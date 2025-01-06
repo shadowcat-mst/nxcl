@@ -46,6 +46,18 @@ const picker = new SelectField({
 
 picker.$_bind('selectedValue', model, 'transcriptName')
 
+const htmlView = new (Reactive(View, {
+  html: '[...]',
+  onClick () {
+    this.html = preact.renderToString(preact.h(view.transcript))
+  },
+}))({
+  render () {
+    const { onClick, h: { pre } } = this
+    return pre({ onClick }, this.html)
+  }
+})
+
 const view = new (Reactive(View, subviews({
   transcript: EvaluationSeq,
 })))({
@@ -56,6 +68,8 @@ const view = new (Reactive(View, subviews({
       div(picker),
       hr(),
       div(transcript),
+      hr(),
+      div(htmlView),
     ]
   }
 })
